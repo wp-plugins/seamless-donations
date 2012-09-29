@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations by Designgeneers!
 Plugin URI: http://www.designgeneers.com/plugins/seamless-donations
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.
-Version: 2.0.2
+Version: 2.1.0
 Author: Designgeneers
 Author URI: http://www.designgeneers.com
 License: GPL2
@@ -27,6 +27,90 @@ License: GPL2
  
 include 'dgx-donate-admin.php';
 include 'dgx-donate-paypalstd.php';
+
+/******************************************************************************************************/
+function dgx_donate_get_giving_levels()
+{
+	$builtinGivingLevels = array(1000,500,200,100,50,20,10,5);
+
+	$givingLevels = apply_filters('dgx_donate_giving_levels', $builtinGivingLevels);
+
+	// Bad filter?
+
+	if (count($givingLevels) == 0)
+	{
+		$givingLevels = array(1000); // default = just $1000
+	}
+
+	return $givingLevels;
+}
+
+/******************************************************************************************************/
+function dgx_donate_is_valid_giving_level($amount)
+{
+	$givingLevels = dgx_donate_get_giving_levels();
+
+	if (in_array($amount, $givingLevels))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+/******************************************************************************************************/
+function dgx_donate_enable_giving_level($amount)
+{
+	if (dgx_donate_is_valid_giving_level($amount))
+	{
+		$key = dgx_donate_get_giving_level_key($amount);
+		update_option($key, "yes");
+	}
+}
+
+/******************************************************************************************************/
+function dgx_donate_disable_giving_level($amount)
+{
+	if (dgx_donate_is_valid_giving_level($amount))
+	{
+		$key = dgx_donate_get_giving_level_key($amount);
+		delete_option($key);
+	}
+}
+
+/******************************************************************************************************/
+function dgx_donate_is_giving_level_enabled($amount)
+{
+	$levelEnabled = false;
+
+	if (dgx_donate_is_valid_giving_level($amount))
+	{
+		$key = dgx_donate_get_giving_level_key($amount);
+		$value = get_option($key);
+		if (!empty($value))
+		{
+			$levelEnabled = true;
+		}
+	}
+
+	return $levelEnabled;
+}
+
+/******************************************************************************************************/
+function dgx_donate_get_giving_level_key($amount)
+{
+	$key = "dgx_donate_giving_level_" . $amount;
+
+	return $key;
+}
+
+/******************************************************************************************************/
+function dgx_donate_format_amount($amount)
+{
+	$formattedAmount = "$" . $amount;
+
+	return $formattedAmount;
+}
 
 /******************************************************************************************************/
 function dgx_donate_queue_stylesheet() {
@@ -326,28 +410,6 @@ function dgx_donate_get_month_year_selector($monthSelectName, $yearSelectName)
 /******************************************************************************************************/
 function dgx_donate_get_donation_section($formContent)
 {
-	$amount = '1000';
-	if (strcasecmp($amount, "1000") == 0)
-	{
-		$check1000 = " checked ";
-	}
-	else if (strcasecmp($amount, "500") == 0)
-	{
-		$check500 = " checked ";
-	}
-	else if (strcasecmp($amount, "100") == 0)
-	{
-		$check100 = " checked ";
-	}
-	else if (strcasecmp($amount, "50") == 0)
-	{
-		$check50 = " checked ";
-	}
-	else if (strcasecmp($amount, "OTHER") == 0)
-	{
-		$checkOTHER = " checked ";
-	}
-	
 	$repeating = false;
 	if ($repeating)
 	{
@@ -366,15 +428,30 @@ function dgx_donate_get_donation_section($formContent)
 	$output .= "<h2>Donation Information</h2>\n";
 	
 	$output .= "<p>I would like to make a tax-deductible donation in the amount of:</p>";
-	$output .= "<p><input type=\"radio\" name=\"_dgx_donate_amount\" value=\"1000\" $check1000 /> $1000 ";
-	$output .= "<input type=\"radio\" class=\"horiz\" name=\"_dgx_donate_amount\" value=\"500\" $check500 /> $500 ";
-	$output .= "<input type=\"radio\" class=\"horiz\" name=\"_dgx_donate_amount\" value=\"100\" $check100 /> $100 ";
-	$output .= "<input type=\"radio\" class=\"horiz\" name=\"_dgx_donate_amount\" value=\"50\" $check50 /> $50 </p>";
+
+	$output .= "<p>";
+	$checked = " checked=\"checked\" ";
+	$classmod = "";
+	$givingLevels = dgx_donate_get_giving_levels();
+	foreach ($givingLevels as $givingLevel)
+	{
+		$key = dgx_donate_get_giving_level_key($givingLevel);
+
+		if (dgx_donate_is_giving_level_enabled($givingLevel))
+		{
+			$formattedAmount = dgx_donate_format_amount($givingLevel);
+			$output .= "<input $classmod type=\"radio\" name=\"_dgx_donate_amount\" value=\"$givingLevel\" $checked /> $formattedAmount ";
+			$checked = ""; // only select the first one
+			$classmod = " class=\"horiz\" "; // only classmod the second and higher ones
+		}
+	}
+	$output .= "</p>";
+
 	$output .= "<p><input type=\"radio\" name=\"_dgx_donate_amount\" value=\"OTHER\" id=\"dgx-donate-other-radio\" $checkOTHER /> Other: ";
 	$output .= "<input type=\"text\" class=\"aftertext\" id=\"dgx-donate-other-input\" name=\"_dgx_donate_user_amount\" />";
 	$output .= "</p>\n";
 	
-	$output .= "<hr/>";
+	// $output .= "<hr/>";
 	
 	$output .= "</div>\n"; /* dgx-donate-form-section */
 
@@ -515,7 +592,7 @@ function dgx_donate_get_donor_section($formContent)
 /******************************************************************************************************/
 function dgx_donate_get_billing_section($formContent)
 {
-	$donorState = 'WA';
+	$donorState = get_option('dgx_donate_default_state');
 
 	$output .= "<div class=\"dgx-donate-form-section\">\n";
 	$output .= "<h2>Billing Information</h2>\n";

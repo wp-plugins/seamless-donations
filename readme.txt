@@ -4,7 +4,7 @@ Donate link: http://www.designgeneers.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
 Tested up to: 3.4.2
-Stable tag: 2.0.2
+Stable tag: 2.1.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,6 +55,11 @@ Yes!
 6. Dashboard >> Thank You Email Templates
 
 == Changelog ==
+
+= 2.1.0 =
+* Added new suggested giving amounts
+* Now allows you to choose which suggested giving amounts are displayed on the donation form
+* Added ability to change the default state for the donation form
 
 = 2.0.2 =
 * Initial release to WordPress.Org repository

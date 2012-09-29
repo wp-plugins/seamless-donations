@@ -170,6 +170,32 @@ function dgx_donate_init_defaults()
 		update_option('dgx_donate_thanks_text', $message);
 	}
 
+	// Giving levels default
+	$givingLevels = dgx_donate_get_giving_levels();
+	$noneChecked = true;
+	foreach ($givingLevels as $givingLevel)
+	{
+		$levelEnabled = dgx_donate_is_giving_level_enabled($givingLevel);
+		if ($levelEnabled)
+		{
+			$noneChecked = false;
+		}
+	}
+	if ($noneChecked)
+	{
+		// Select 1000, 500, 100, 50 by default
+		dgx_donate_enable_giving_level(1000);
+		dgx_donate_enable_giving_level(500);
+		dgx_donate_enable_giving_level(100);
+		dgx_donate_enable_giving_level(50);
+	}
+
+	// State default
+	$defaultState = get_option('dgx_donate_default_state');
+	if (empty($defaultState))
+	{
+		update_option('dgx_donate_default_state', 'WA');
+	}
 }
 
 /******************************************************************************************************/
@@ -565,7 +591,7 @@ function dgx_donate_main_page()
 	echo "</form>";
 
 	echo "<h3>Settings</h3>\n";
-	echo "<p>Update payment gateway and email settings</p>\n";	
+	echo "<p>Update giving levels, payment gateway and email settings</p>\n";	
 	$actionUrl = "'" . get_admin_url() . "admin.php?page=dgx_donate_settings_page" . "'";
 	echo "<form>\n";
 	echo "<p><input class=\"button\" type=\"button\" value=\"Manage Settings\" onClick=\"parent.location=$actionUrl\"></p>\n";
@@ -1430,6 +1456,33 @@ function dgx_donate_thank_you_page()
 }
 
 /******************************************************************************************************/
+function dgx_donate_save_giving_levels_settings()
+{
+	$noneEnabled = true;
+
+	$givingLevels = dgx_donate_get_giving_levels();
+	foreach ($givingLevels as $givingLevel)
+	{
+		$key = dgx_donate_get_giving_level_key($givingLevel);
+		if (isset($_POST[$key]))
+		{
+			dgx_donate_enable_giving_level($givingLevel);
+			$noneEnabled = false;
+		}
+		else
+		{
+			dgx_donate_disable_giving_level($givingLevel);
+		}
+	}
+
+	// If they are all disabled, at least enable the first one
+	if ($noneEnabled)
+	{
+		dgx_donate_enable_giving_level($givingLevels[0]);
+	}
+}
+
+/******************************************************************************************************/
 function dgx_donate_settings_page()
 {
 	global $gatewayArray;
@@ -1457,6 +1510,22 @@ function dgx_donate_settings_page()
     	$message = "Settings updated.";
     }
 
+    // Save giving level selections
+    $givingLevels = $_POST['dgx_donate_giving_levels'];
+    if (!empty($givingLevels))
+    {
+    	dgx_donate_save_giving_levels_settings();
+    	$message = "Settings updated.";
+    }
+
+    // Save default state
+    $defaultState = $_POST['dgx_donate_default_state'];
+    if (!empty($defaultState))
+    {
+    	update_option('dgx_donate_default_state', $defaultState);
+    	$message = "Settings updated.";
+    }
+
     // Save each payment gateway's settings
     do_action('dgx_donate_save_settings_forms');
     
@@ -1479,8 +1548,26 @@ function dgx_donate_settings_page()
 	echo "<div id=\"col-right\">\n";
 	echo "<div class=\"col-wrap\">\n";
 	
-	echo "<h3>Payment Gateways</h3>\n";
+	// Notification Emails
+	echo "<h3>Notification Emails</h3>\n";
+	echo "<p>Enter one or more emails that should be notified when a new donation arrives.  You can separate multiple email addresses with commas.</p>";
 
+	$notifyMails = get_option('dgx_donate_notify_emails');
+	echo "<form method=\"POST\" action=\"\">\n";
+	echo "<input type=\"hidden\" name=\"dgx_donate_settings_nonce\" id=\"dgx_donate_settings_nonce\" value=\"$nonce\" />\n";		
+
+	echo "<div class=\"form-field\">\n";
+	echo "<label for=\"notifyemails\">Notification Email Address(es)</label><br/>\n";
+	echo "<input type=\"text\" name=\"notifyemails\" value=\"$notifyMails\" />\n";
+	echo "<p class=\"description\">Email address(es) that should be notified of new donations.</p>\n";
+	echo "</div> <!-- form-field --> \n";
+	
+	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update Notification Settings\" name=\"submit\"></p>\n";
+	echo "</form>";
+	echo "<br/>";
+
+	// Payment gateways
+	echo "<h3>Payment Gateways</h3>\n";
 	if (has_action('dgx_donate_show_settings_forms'))
 	{
 		echo "<form method=\"POST\" action=\"\">\n";
@@ -1506,21 +1593,40 @@ function dgx_donate_settings_page()
 	
 	echo "<div id=\"col-left\">\n";
 	echo "<div class=\"col-wrap\">\n";
-	
-	echo "<h3>Notification Emails</h3>\n";
-	echo "<p>Enter one or more emails that should be notified when a new donation arrives.  You can separate multiple email addresses with commas.</p>";
 
-	$notifyMails = get_option('dgx_donate_notify_emails');
+	// Giving Levels
+	echo "<h3>Giving Levels</h3>";
+	echo "<p>Select one or more suggested giving levels for your donors to choose from.</p>";
 	echo "<form method=\"POST\" action=\"\">\n";
-	echo "<input type=\"hidden\" name=\"dgx_donate_settings_nonce\" id=\"dgx_donate_settings_nonce\" value=\"$nonce\" />\n";		
+	echo "<input type=\"hidden\" name=\"dgx_donate_settings_nonce\" id=\"dgx_donate_settings_nonce\" value=\"$nonce\" />\n";
+	echo "<input type=\"hidden\" name=\"dgx_donate_giving_levels\" value=\"1\" />";
+	$givingLevels = dgx_donate_get_giving_levels();
+	foreach ($givingLevels as $givingLevel)
+	{
+		$key = dgx_donate_get_giving_level_key($givingLevel);
+		$checked = "";
+		if (dgx_donate_is_giving_level_enabled($givingLevel))
+		{
+			$checked = " checked ";
+		}
+		echo "<p><input type=\"checkbox\" name=\"$key\" value=\"yes\" $checked /> $givingLevel </p>";
+	}	
 
-	echo "<div class=\"form-field\">\n";
-	echo "<label for=\"notifyemails\">Notification Email Address(es)</label><br/>\n";
-	echo "<input type=\"text\" name=\"notifyemails\" value=\"$notifyMails\" />\n";
-	echo "<p class=\"description\">Email address(es) that should be notified of new donations.</p>\n";
-	echo "</div> <!-- form-field --> \n";
-	
-	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update Notification Settings\" name=\"submit\"></p>\n";
+	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update Levels\" name=\"submit\" /></p>\n";
+	echo "</form>";
+	echo "<br/>";
+
+	// Default state for donor
+	echo "<h3>Donation Defaults</h3>";
+	echo "<p>Select the default state for the donation form.</p>";
+	echo "<form method=\"POST\" action=\"\">\n";
+	echo "<input type=\"hidden\" name=\"dgx_donate_settings_nonce\" id=\"dgx_donate_settings_nonce\" value=\"$nonce\" />\n";
+
+	$defaultState = get_option('dgx_donate_default_state');
+	$selector = dgx_donate_get_state_selector('dgx_donate_default_state', $defaultState);
+	echo "<p>$selector</p>";
+
+	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update Defaults\" name=\"submit\" /></p>\n";
 	echo "</form>";
 
 	do_action('dgx_donate_settings_page_left');
