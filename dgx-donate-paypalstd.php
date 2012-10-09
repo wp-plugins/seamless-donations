@@ -164,7 +164,17 @@ function dgx_donate_paypalstd_get_hidden_form()
 
 	$sessionID = session_id();
 	$successUrl = dgx_donate_paypalstd_get_current_url();
-	$successUrl .= "?thanks=1&sessionid=";
+
+	if (strpos($successUrl, "?") === false)
+	{
+		$successUrl .= "?";
+	}
+	else
+	{
+		$successUrl .= "&";
+	}
+
+	$successUrl .= "thanks=1&sessionid=";
 	$successUrl .= "$sessionID";
 
 	$output .= "<form id=\"dgx-donate-hidden-form\" action=\"$formAction\" method=\"post\">";
@@ -266,6 +276,7 @@ function dgx_donate_paypalstd_ajax_checkout()
 	$designated = $_POST['designated'];
 	$designatedFund = $_POST['designatedFund'];
 	$tributeGift = $_POST['tributeGift'];
+	$memorialGift = $_POST['memorialGift'];
 	$honoreeName = $_POST['honoreeName'];
 	$honorByEmail = $_POST['honorByEmail'];
 	$honoreeEmail = $_POST['honoreeEmail'];
@@ -311,6 +322,7 @@ function dgx_donate_paypalstd_ajax_checkout()
 	$postData['DESIGNATED'] = $designated;
 	$postData['DESIGNATEDFUND'] = $designatedFund;
 	$postData['TRIBUTEGIFT'] = $tributeGift;
+	$postData['MEMORIALGIFT'] = $memorialGift;
 	$postData['HONOREENAME'] = $honoreeName;
 	$postData['HONORBYEMAIL'] = $honorByEmail;
 	$postData['HONOREEEMAIL'] = $honoreeEmail;

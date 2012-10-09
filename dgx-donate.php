@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations by Designgeneers!
 Plugin URI: http://www.designgeneers.com/plugins/seamless-donations
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.
-Version: 2.1.0
+Version: 2.1.1
 Author: Designgeneers
 Author URI: http://www.designgeneers.com
 License: GPL2
@@ -355,10 +355,13 @@ function dgx_donate_get_state_selector($selectName, $selectInitialValue)
 {
 	$output = "<select name=\"$selectName\">";
 	
-	$states = array('AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN',
-		'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV',
-		'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN',
-		'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY');
+	$states = array(
+		'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL',
+		'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME',
+		'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH',
+		'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI',
+		'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI',
+		'WY');
 
 	foreach ($states as $state)
 	{

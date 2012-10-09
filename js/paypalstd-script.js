@@ -20,6 +20,69 @@ function DgxDonateLooksLikeMail(str) {
     return (lastAtPos < lastDotPos && lastAtPos > 0 && str.indexOf('@@') == -1 && lastDotPos > 2 && (str.length - lastDotPos) > 2);
 }
 
+function DgxDonateCountNeedles(needle, haystack)
+{
+	var count = 0;
+    var index = -1;
+    index = haystack.indexOf(needle, index + 1);
+    while (index != -1) {
+        count++;
+        index = haystack.indexOf(needle, index + 1);
+    }
+
+    return count;
+}
+
+function DgxDonateIsValidAmount(amount)
+{
+	// Empty amounts are not allowed
+	if (amount == "")
+	{
+		return false;
+	}
+
+	// Check for anything other than numbers and decimal points	
+	var matchTest = amount.match(/[^0123456789.]/g);
+	if (matchTest != null)
+	{
+		alert('Please use only numbers when specifying your donation amount.');
+		return false;
+	}
+
+	// Count the number of decimal points
+	var pointCount = DgxDonateCountNeedles(".", amount);
+
+	// If more than one decimal point, fail right away
+	if (pointCount > 1)
+	{
+		return false;
+	}
+
+	// A leading zero is not allowed
+	if (amount.substr(0,1) == "0")
+	{
+		return false;
+	}
+
+	// A leading decimal point is not allowed (minimum donation is 1.00)
+	if (amount.substr(0,1) == ".")
+	{
+		return false;
+	}
+
+	// If we have a decimal point and there is anything other than two digits after it, fail
+	if (pointCount == 1)
+	{
+		var pointIndex = amount.indexOf(".");
+		if (pointIndex + 2 != (amount.length - 1))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 function DgxDonateDoCheckout()
 {
 	// First we do a client side validation
@@ -82,31 +145,21 @@ function DgxDonateDoCheckout()
 	var nameOnCard = DgxDonateTrim(values['_dgx_donate_card_name_on_card']);
 	var referringUrl = location.href;
 
-	// TODO: STRIP TAGS
-
-	var amount = 1.00;
+	var amount = "";
 	
 	if (donationAmount == "OTHER")
 	{
-		if (userAmount == "")
-		{
-			formValidates = false;
-			DgxDonateMarkInvalid("_dgx_donate_user_amount");
-		}
-		else
-		{
-			amount = parseFloat(userAmount);
-		}
+		amount = userAmount;
 	}
 	else
 	{
-		amount = parseFloat(donationAmount);
+		amount = donationAmount;
 	}
 
-	if (amount < 1.0)
+	if (!DgxDonateIsValidAmount(amount))
 	{
 		formValidates = false;
-		DgxDonateMarkInvalid("_dgx_donate_user_amount");		
+		DgxDonateMarkInvalid("_dgx_donate_user_amount");	
 	}
 
 	if (tributeGift == 'on')

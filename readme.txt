@@ -4,7 +4,7 @@ Donate link: http://www.designgeneers.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
 Tested up to: 3.4.2
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,6 +55,12 @@ Yes!
 6. Dashboard >> Thank You Email Templates
 
 == Changelog ==
+
+= 2.1.1 =
+* Added missing states - AK and AL - to donation form
+* Added more checks for invalid donation amounts (minimum donation is set to 1.00)
+* Added support for WordPress installations using old-style (not pretty) permalinks
+* Fix bug that caused memorial gift checkbox to be ignored
 
 = 2.1.0 =
 * Added new suggested giving amounts
