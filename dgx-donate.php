@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations by Designgeneers!
 Plugin URI: http://www.designgeneers.com/plugins/seamless-donations
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.
-Version: 2.1.1
+Version: 2.1.2
 Author: Designgeneers
 Author URI: http://www.designgeneers.com
 License: GPL2
@@ -430,7 +430,7 @@ function dgx_donate_get_donation_section($formContent)
 	$output .= "<div class=\"dgx-donate-form-section\">\n";
 	$output .= "<h2>Donation Information</h2>\n";
 	
-	$output .= "<p>I would like to make a tax-deductible donation in the amount of:</p>";
+	$output .= "<p>I would like to make a donation in the amount of:</p>";
 
 	$output .= "<p>";
 	$checked = " checked=\"checked\" ";
