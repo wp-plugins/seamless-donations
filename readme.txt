@@ -4,7 +4,7 @@ Donate link: http://www.designgeneers.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
 Tested up to: 3.4.2
-Stable tag: 2.1.1
+Stable tag: 2.1.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,7 +54,10 @@ Yes!
 5. Dashboard >> Donors
 6. Dashboard >> Thank You Email Templates
 
-== Changelog ==
+== Changelog =
+
+= 2.1.2 =
+* Removed tax deductible from donation form, since not everyone using the plugin is a charity
 
 = 2.1.1 =
 * Added missing states - AK and AL - to donation form
