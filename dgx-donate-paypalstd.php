@@ -178,8 +178,7 @@ function dgx_donate_paypalstd_get_hidden_form()
 	$successUrl .= "$sessionID";
 
 	$output .= "<form id=\"dgx-donate-hidden-form\" action=\"$formAction\" method=\"post\">";
-	$output .= "<input type=\"hidden\" name=\"cmd\" value=\"_cart\" />";
-	$output .= "<input type=\"hidden\" name=\"upload\" value=\"1\" />";
+	$output .= "<input type=\"hidden\" name=\"cmd\" value=\"_donations\" />";
 	$output .= "<input type=\"hidden\" name=\"business\" value=\"$paypalEmail\" />";
 	$output .= "<input type=\"hidden\" name=\"return\" value=\"$successUrl\" />";
 	
@@ -199,10 +198,11 @@ function dgx_donate_paypalstd_get_hidden_form()
 	$output .= "<input type=\"hidden\" name=\"notify_url\" value=\"$notifyUrl\" />";
 	// $output .= "<input type=\"hidden\" name=\"tax_cart\" value=\"\" />";
 		
-	// PayPal shopping carts are 1 based
-	$output .= "<input type=\"hidden\" name=\"item_name_1\" value=\"Donation\" />";
-	$output .= "<input type=\"hidden\" name=\"amount_1\" value=\"1.00\" />";
-	$output .= "<input type=\"hidden\" name=\"quantity_1\" value=\"1\" />";
+	$output .= "<input type=\"hidden\" name=\"item_name\" value=\"Donation\" />";
+	$output .= "<input type=\"hidden\" name=\"amount\" value=\"1.00\" />";
+	$output .= "<input type=\"hidden\" name=\"quantity\" value=\"1\" />";
+
+	$output .= "<input type=\"hidden\" name=\"currency_code\" value=\"USD\" />";
 
 	$output .= "</form>";
 
@@ -371,5 +371,3 @@ function dgx_donate_paypalstd_ajax_checkout()
 
 add_action('wp_ajax_dgx_donate_paypalstd_ajax_checkout', 'dgx_donate_paypalstd_ajax_checkout');
 add_action('wp_ajax_nopriv_dgx_donate_paypalstd_ajax_checkout', 'dgx_donate_paypalstd_ajax_checkout');
-
-?>

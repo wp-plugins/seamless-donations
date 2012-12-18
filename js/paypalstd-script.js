@@ -268,7 +268,7 @@ function DgxDonateDoCheckout()
 	// jQuery('#dgx-donate-hidden-form').find('input[name="country"]').val("xxx");
 	jQuery('#dgx-donate-hidden-form').find('input[name="email"]').val(email);
 	jQuery('#dgx-donate-hidden-form').find('input[name="custom"]').val(sessionID);
-	jQuery('#dgx-donate-hidden-form').find('input[name="amount_1"]').val(amount);
+	jQuery('#dgx-donate-hidden-form').find('input[name="amount"]').val(amount);
 
 	// Disable the pay button
 	var payButton = jQuery('#dgx-donate-form').find("input[type='submit']");

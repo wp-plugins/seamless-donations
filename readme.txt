@@ -3,8 +3,8 @@ Contributors: designgeneers
 Donate link: http://www.designgeneers.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
-Tested up to: 3.4.2
-Stable tag: 2.1.2
+Tested up to: 3.5
+Stable tag: 2.1.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,6 +55,9 @@ Yes!
 6. Dashboard >> Thank You Email Templates
 
 == Changelog =
+
+= 2.1.3 =
+* Changed PayPal cmd from _cart to _donations to avoid donations getting delayed
 
 = 2.1.2 =
 * Removed tax deductible from donation form, since not everyone using the plugin is a charity
