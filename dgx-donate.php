@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations by Designgeneers!
 Plugin URI: http://www.designgeneers.com/plugins/seamless-donations
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.
-Version: 2.1.3
+Version: 2.1.4
 Author: Designgeneers
 Author URI: http://www.designgeneers.com
 License: GPL2
@@ -173,11 +173,23 @@ function dgx_donate_display_thank_you()
 /******************************************************************************************************/
 function dgx_donate_debug_log($message)
 {
-	//$logPath =  dirname(__FILE__) . '/donate-log';
-	//$fh = fopen($logPath, 'a') or die("can't open file");
-	//$timestamp = strftime("%m-%d-%G %H:%M:%S");
-	//fwrite($fh, "$timestamp $message\n");
-	//fclose($fh);
+	$max_log_line_count = 200;
+
+	$debug_log = get_option( 'dgx_donate_log' );
+
+	if ( empty( $debug_log )) {
+		$debug_log = array();
+	}
+
+	$timestamp = strftime("%m-%d-%G %H:%M:%S");
+
+	$debug_log[] = $timestamp . ' ' . $message;
+
+	if ( count( $debug_log ) > $max_log_line_count ) {
+		$debug_log = array_slice( $debug_log, -$max_log_line_count, 0 );
+	}
+
+	update_option( 'dgx_donate_log', $debug_log );
 }
 
 /******************************************************************************************************/

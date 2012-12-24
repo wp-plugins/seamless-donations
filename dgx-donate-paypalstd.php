@@ -358,6 +358,11 @@ function dgx_donate_paypalstd_ajax_checkout()
 	// Save it all in a transient
 	$transientToken = $postData['SESSIONID'];
 	set_transient($transientToken, $postData, 60*60); // 60*60 = 1 hour
+
+	// Log
+	dgx_donate_debug_log( 'Donation transaction started' );
+	dgx_donate_debug_log( 'Name: ' . $postData['FIRSTNAME'] . ' ' . $postData['LASTNAME'] );
+	dgx_donate_debug_log( 'Amount: ' . $postData['AMOUNT'] );
 	
 	// Return success to AJAX caller as " code | message "
 	// A return code of 0 indicates success, and the returnMessage is ignored

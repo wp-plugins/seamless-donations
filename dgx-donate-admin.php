@@ -5,14 +5,15 @@
 /******************************************************************************************************/
 function dgx_donate_add_menus()
 {
-	add_action('dgx_donate_menu', 'dgx_donate_donation_report_menu', 1);
-	add_action('dgx_donate_menu', 'dgx_donate_donor_report_menu', 3);
-	add_action('dgx_donate_menu', 'dgx_donate_email_template_menu', 9);
-	add_action('dgx_donate_menu', 'dgx_donate_thank_you_menu', 11);
-	add_action('dgx_donate_menu', 'dgx_donate_settings_menu', 13);
+	add_action( 'dgx_donate_menu', 'dgx_donate_donation_report_menu', 1 );
+	add_action( 'dgx_donate_menu', 'dgx_donate_donor_report_menu', 3 );
+	add_action( 'dgx_donate_menu', 'dgx_donate_email_template_menu', 9 );
+	add_action( 'dgx_donate_menu', 'dgx_donate_thank_you_menu', 11 );
+	add_action( 'dgx_donate_menu', 'dgx_donate_settings_menu', 13 );
+	add_action( 'dgx_donate_menu', 'dgx_donate_debug_log_menu', 15 );
 }
 
-add_action('init', 'dgx_donate_add_menus');
+add_action( 'init', 'dgx_donate_add_menus' );
 
 /******************************************************************************************************/
 function dgx_donate_echo_admin_footer()
@@ -49,6 +50,10 @@ function dgx_donate_thank_you_menu()
 function dgx_donate_settings_menu()
 {
 	add_submenu_page("dgx_donate_menu_page", __('Settings'), __('Settings'), 'manage_options', 'dgx_donate_settings_page', dgx_donate_settings_page);
+}
+
+function dgx_donate_debug_log_menu() {
+	add_submenu_page( "dgx_donate_menu_page", __('Log'), __('Log'), 'manage_options', 'dgx_donate_debug_log_page', dgx_donate_debug_log_page);
 }
 
 /******************************************************************************************************/
@@ -1636,6 +1641,71 @@ function dgx_donate_settings_page()
 	echo "</div> <!-- col-container -->\n";
 	
 	echo "</div> <!-- wrap -->\n"; 
+}
+
+/******************************************************************************************************/
+function dgx_donate_debug_log_page() {
+
+    if (!current_user_can('manage_options'))
+    {
+      wp_die( __('You do not have sufficient permissions to access this page.') );
+    }
+
+	// If we have form arguments, we must validate the nonce
+	if (count($_POST) > 0)
+	{
+		$nonce = $_POST['dgx_donate_log_nonce'];
+		if (!wp_verify_nonce($nonce, 'dgx_donate_log_nonce'))
+		{
+			wp_die( __('You do not have sufficient permissions to access this page.') );
+		}
+	}
+
+    // Save default state
+    $log_command = $_POST['dgx_donate_log_cmd'];
+    if (!empty($log_command))
+    {
+    	delete_option( 'dgx_donate_log' );
+    	$message = __( 'Log cleared', 'dgx-donate' );
+    }
+
+    echo "<div class='wrap'>";
+	echo "<div id='icon-edit-pages' class='icon32'></div>";
+	echo "<h2>" . __( 'Log', 'dgx-donate' ) . "</h2>";
+
+	// Display any message
+	if (!empty($message))
+	{
+		echo "<div id=\"message\" class=\"updated below-h2\">\n";
+		echo "<p>$message</p>\n";
+		echo "</div>\n";
+	}
+
+	$debug_log_content = get_option( 'dgx_donate_log' );
+
+	if ( empty( $debug_log_content ) ) {
+		echo '<p>';
+		_e( 'The log is empty.', 'dgx-donate' );
+		echo '</p>';
+	}
+	else {
+		echo "<p><textarea readonly style='width: 100%;' rows='20'>";
+		foreach ($debug_log_content as $debug_log_entry) {
+			echo "$debug_log_entry\n";
+		}
+		echo "</textarea></p>";
+
+    	// Set up a nonce
+   		$nonce = wp_create_nonce('dgx_donate_log_nonce');
+
+		echo "<form method='POST' action=''>";
+		echo "<input type='hidden' name='dgx_donate_log_nonce' id='dgx_donate_log_nonce' value='$nonce' />";
+		echo "<input type='hidden' name='dgx_donate_log_cmd' value='clear' />";
+		echo "<p><input id='submit' class='button' type='submit' value='" . __( 'Clear Log', 'dgx-donate' ) . "' name='submit' /></p>";
+		echo "</form>";
+	}
+
+	echo "</div> <!-- wrap -->"; 
 }
 
 ?>
