@@ -1,9 +1,9 @@
 <?php
 /*
-Plugin Name: Seamless Donations by Designgeneers!
+Plugin Name: Seamless Donations
 Plugin URI: http://www.designgeneers.com/plugins/seamless-donations
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.
-Version: 2.1.4
+Version: 2.1.5
 Author: Designgeneers
 Author URI: http://www.designgeneers.com
 License: GPL2

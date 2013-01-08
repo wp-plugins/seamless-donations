@@ -4,7 +4,7 @@ Donate link: http://www.designgeneers.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
 Tested up to: 3.5
-Stable tag: 2.1.4
+Stable tag: 2.1.5
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,6 +55,9 @@ Yes!
 6. Dashboard >> Thank You Email Templates
 
 == Changelog =
+
+= 2.1.5 =
+* Changed plugin name to simply Seamless Donations
 
 = 2.1.4 =
 * Added logging, log menu item and log display to help troubleshoot IPN problems
