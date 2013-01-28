@@ -293,8 +293,8 @@ function DgxDonateDoCheckout()
 		address: address, address2: address2, city: city, state: state, zip: zip, increaseToCover: increaseToCover,
 		paymentMethod: paymentMethod };
 
-	jQuery.post(dgxDonateAjax.ajaxurl, data, DgxDonateCallback);	
-		
+	jQuery.post( dgxDonateAjax.ajaxurl, data, DgxDonateCallback );
+
 	return false;
 }
 
@@ -314,6 +314,16 @@ function DgxDonateMarkInvalid(fieldname)
 	jQuery('#dgx-donate-form').find(selector).addClass('dgx-donate-invalid-input');
 }
 
+function DgxDonateAjaxError( event, jqxhr, settings, exception ) {
+	// Turn off the processing graphic
+	jQuery('.dgx-donate-busy').css('visibility', 'hidden');
+
+	// Display the error
+	alert ( "An Ajax error occurred while requesting the resource - " + settings.url + " - No donation was completed.  Please try again later.");
+
+	return false;
+}
+
 jQuery(document).ready(function() {	
 	
 	// Make sure the payment button is rendered correctly and the payment
@@ -327,6 +337,8 @@ jQuery(document).ready(function() {
 	
 	// Turn off the processing graphic
 	jQuery('.dgx-donate-busy').css('visibility', 'hidden');
-	
+
+	// Register our AJAX error handler
+	jQuery(document).ajaxError( DgxDonateAjaxError );
 });
 

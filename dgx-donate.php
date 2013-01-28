@@ -3,13 +3,13 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://www.designgeneers.com/plugins/seamless-donations
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.
-Version: 2.1.5
-Author: Designgeneers
+Version: 2.1.6
+Author: allendav, designgeneers
 Author URI: http://www.designgeneers.com
 License: GPL2
 */
 
-/*  Copyright 2012 Designgeneers! (email: info@designgeneers.com)
+/*  Copyright 2013 Designgeneers! (email: info@designgeneers.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as 
