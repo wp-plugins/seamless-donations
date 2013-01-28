@@ -1,5 +1,5 @@
 === Plugin Name ===
-Contributors: designgeneers
+Contributors: allendav, designgeneers
 Donate link: http://www.designgeneers.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
