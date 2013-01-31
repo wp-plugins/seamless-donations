@@ -339,6 +339,6 @@ jQuery(document).ready(function() {
 	jQuery('.dgx-donate-busy').css('visibility', 'hidden');
 
 	// Register our AJAX error handler
-	jQuery(document).ajaxError( DgxDonateAjaxError );
+	// jQuery(document).ajaxError( DgxDonateAjaxError );
 });
 

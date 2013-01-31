@@ -4,7 +4,7 @@ Donate link: http://www.designgeneers.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
 Tested up to: 3.5
-Stable tag: 2.1.6
+Stable tag: 2.1.7
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,6 +55,9 @@ Yes!
 6. Dashboard >> Thank You Email Templates
 
 == Changelog =
+
+= 2.1.7 =
+* Rolled back change in 2.1.6 for ajax display due to unanticipated problem with search
 
 = 2.1.6 =
 * Added ajax error display to aid in debugging certain users not being able to complete donations on their sites
