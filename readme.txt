@@ -4,7 +4,7 @@ Donate link: http://www.designgeneers.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
 Tested up to: 3.5.1
-Stable tag: 2.2.0
+Stable tag: 2.3.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,6 +55,9 @@ Yes!
 6. Dashboard >> Thank You Email Templates
 
 == Changelog =
+
+= 2.3.0 =
+* Added a setting to allow you to turn the Tribute Gift section of the form off if you'd like
 
 = 2.2.0 =
 * Added the ability to delete a donation (e.g. if you create a test donation)

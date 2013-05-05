@@ -111,7 +111,12 @@ function dgx_donate_show_paypalstd_donation_form($content)
 		// Pick and choose the built in sections this gateway supports
 		$content = dgx_donate_paypalstd_warning_section($content);
 		$content = dgx_donate_get_donation_section($content);
-		$content = dgx_donate_get_tribute_section($content);
+
+		$show_tribute_section = get_option( 'dgx_donate_show_tribute_section' );
+		if ( "true" == $show_tribute_section ) {
+			$content = dgx_donate_get_tribute_section($content);
+		}
+		
 		$content = dgx_donate_get_donor_section($content);
 		$content = dgx_donate_get_billing_section($content);
 		$content = dgx_donate_paypalstd_payment_section($content);

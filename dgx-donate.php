@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://www.allensnook.com/plugins/seamless-donations/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.
-Version: 2.2.0
+Version: 2.3.0
 Author: allendav
 Author URI: http://www.allensnook.com
 License: GPL2

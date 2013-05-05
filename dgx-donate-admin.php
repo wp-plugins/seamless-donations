@@ -205,6 +205,12 @@ function dgx_donate_init_defaults()
 	{
 		update_option('dgx_donate_default_state', 'WA');
 	}
+
+	// Show Tribute Gift section default
+	$show_tribute_section = get_option( 'dgx_donate_show_tribute_section' );
+	if ( empty( $show_tribute_section ) ) {
+		update_option( 'dgx_donate_show_tribute_section', 'true' );
+	}
 }
 
 /******************************************************************************************************/
@@ -1575,6 +1581,17 @@ function dgx_donate_settings_page()
     	$message = "Settings updated.";
     }
 
+    // Whether to show the tribute section or not
+    $show_tribute_section = $_POST['show_tribute_section'];
+    if ( ! empty( $show_tribute_section ) ) {
+    	if ( "true" == $show_tribute_section ) {
+			update_option( 'dgx_donate_show_tribute_section', 'true' );
+    	} else {
+			update_option( 'dgx_donate_show_tribute_section', 'false' );
+    	}
+    	$message = "Settings updated.";
+    }
+
     // Save default state
     $defaultState = $_POST['dgx_donate_default_state'];
     if (!empty($defaultState))
@@ -1619,7 +1636,7 @@ function dgx_donate_settings_page()
 	echo "<p class=\"description\">Email address(es) that should be notified of new donations.</p>\n";
 	echo "</div> <!-- form-field --> \n";
 	
-	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update Notification Settings\" name=\"submit\"></p>\n";
+	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update\" name=\"submit\"></p>\n";
 	echo "</form>";
 	echo "<br/>";
 
@@ -1632,7 +1649,7 @@ function dgx_donate_settings_page()
 
 		do_action('dgx_donate_show_settings_forms');
 			
-		echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update Gateway Settings\" name=\"submit\"></p>\n";	
+		echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update\" name=\"submit\"></p>\n";	
 		
 		echo "</form>";
 	}
@@ -1669,12 +1686,12 @@ function dgx_donate_settings_page()
 		echo "<p><input type=\"checkbox\" name=\"$key\" value=\"yes\" $checked /> $givingLevel </p>";
 	}	
 
-	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update Levels\" name=\"submit\" /></p>\n";
+	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update\" name=\"submit\" /></p>\n";
 	echo "</form>";
 	echo "<br/>";
 
 	// Default state for donor
-	echo "<h3>Donation Defaults</h3>";
+	echo "<h3>Default State</h3>";
 	echo "<p>Select the default state for the donation form.</p>";
 	echo "<form method=\"POST\" action=\"\">\n";
 	echo "<input type=\"hidden\" name=\"dgx_donate_settings_nonce\" id=\"dgx_donate_settings_nonce\" value=\"$nonce\" />\n";
@@ -1683,8 +1700,28 @@ function dgx_donate_settings_page()
 	$selector = dgx_donate_get_state_selector('dgx_donate_default_state', $defaultState);
 	echo "<p>$selector</p>";
 
-	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update Defaults\" name=\"submit\" /></p>\n";
+	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update\" name=\"submit\" /></p>\n";
 	echo "</form>";
+	echo "<br/>";
+
+	// Show Tribute Section?
+	echo "<h3>Tribute Gift Section</h3>";
+	echo "<p>Show or hide the Tribute Gift section of the donation form.</p>";
+	echo "<form method=\"POST\" action=\"\">\n";
+	echo "<input type=\"hidden\" name=\"dgx_donate_settings_nonce\" id=\"dgx_donate_settings_nonce\" value=\"$nonce\" />\n";
+
+	$show_tribute_section = get_option('dgx_donate_show_tribute_section');
+	if ( "true" == $show_tribute_section ) {
+		$true_checked = "checked";
+	} else {
+		$false_checked = "checked";
+	}
+
+	echo '<p><input type="radio" name="show_tribute_section" value="true" ' . $true_checked . '/> Show the Tribute Gift form section </p>';
+	echo '<p><input type="radio" name="show_tribute_section" value="false" ' . $false_checked . '/> Do not show the Tribute Gift form section</p>';
+
+	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update\" name=\"submit\" /></p>\n";
+	echo "</form>";	
 
 	do_action('dgx_donate_settings_page_left');
 	
