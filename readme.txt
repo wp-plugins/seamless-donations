@@ -54,7 +54,7 @@ Yes!
 5. Dashboard >> Donors
 6. Dashboard >> Thank You Email Templates
 
-== Changelog =
+== Changelog ==
 
 = 2.3.0 =
 * Added a setting to allow you to turn the Tribute Gift section of the form off if you'd like
