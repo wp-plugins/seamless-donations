@@ -1,5 +1,5 @@
 <?php
-/*  Copyright 2012 Designgeneers! Web Design (email: info@designgeneers.com)
+/*  Copyright 2013 Allen Snook (email: allen@allensnook.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as 

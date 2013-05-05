@@ -1,7 +1,7 @@
 <?php
 
 /* PayPal Website Payments Standard Module for Seamless Donations */
-/* Copyright 2012 Designgeneers!  (email: info@designgeneers.com) */
+/* Copyright 2013 Allen Snook (email: allen@allensnook.com) */
 
 define('DGXDONATEPAYPALSTD', 'DGXDONATEPAYPALSTD');
 
