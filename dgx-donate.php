@@ -1,15 +1,15 @@
 <?php
 /*
 Plugin Name: Seamless Donations
-Plugin URI: http://www.designgeneers.com/plugins/seamless-donations
+Plugin URI: http://www.allensnook.com/plugins/seamless-donations/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.
-Version: 2.1.7
-Author: allendav, designgeneers
-Author URI: http://www.designgeneers.com
+Version: 2.3.0
+Author: allendav
+Author URI: http://www.allensnook.com
 License: GPL2
 */
 
-/*  Copyright 2013 Designgeneers! (email: info@designgeneers.com)
+/*  Copyright 2013 Allen Snook (email: allen@allensnook.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as 
