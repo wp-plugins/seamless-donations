@@ -1,6 +1,6 @@
 <?php
 
-/*  Copyright 2012 Designgeneers! (email: info@designgeneers.com) */
+/* Copyright 2013 Allen Snook (email: allen@allensnook.com) */
 
 /******************************************************************************************************/
 function dgx_donate_add_menus()
@@ -20,8 +20,7 @@ function dgx_donate_echo_admin_footer()
 {
 	$pluginVersion = dgx_donate_get_version();
 
-	echo "<p class=\"dgxdonateadminfooter\">Seamless Donations $pluginVersion by ";
-	echo "<a href=\"http://www.designgeneers.com\" target=\"_blank\">Designgeneers!</a></p>";
+	echo "<p class=\"dgxdonateadminfooter\">Seamless Donations $pluginVersion</p>";
 }
 
 add_action('dgx_donate_admin_footer', 'dgx_donate_echo_admin_footer');
@@ -165,6 +164,11 @@ function dgx_donate_init_defaults()
 	{
 		update_option('dgx_donate_paypal_server', 'LIVE');
 	}
+
+	$paypal_email = get_option( 'dgx_donate_paypal_email' );
+	if ( ! is_email( $paypal_email ) ) {
+		update_option( 'dgx_donate_paypal_email', '' );
+	}
 	
 	// Thank you page default
 	$thankYouText = get_option('dgx_donate_thanks_text');
@@ -200,6 +204,12 @@ function dgx_donate_init_defaults()
 	if (empty($defaultState))
 	{
 		update_option('dgx_donate_default_state', 'WA');
+	}
+
+	// Show Tribute Gift section default
+	$show_tribute_section = get_option( 'dgx_donate_show_tribute_section' );
+	if ( empty( $show_tribute_section ) ) {
+		update_option( 'dgx_donate_show_tribute_section', 'true' );
 	}
 }
 
@@ -356,160 +366,208 @@ function dgx_donate_donor_detail_page($donorID)
 /******************************************************************************************************/
 function dgx_donate_donation_detail_page($donationID)
 {
+	// Validate User
+    if ( ! current_user_can( 'manage_options' ) )
+    {
+    	wp_die( __('You do not have sufficient permissions to access this page.') );
+    }
+	
+	// Get form arguments
+	$delete_donation = $_POST['delete_donation'];
+
+	// If we have form arguments, we must validate the nonce
+	if ( count( $_POST ) > 0 )
+	{
+		$nonce = $_POST['dgx_donate_donation_detail_nonce'];
+		if ( ! wp_verify_nonce( $nonce, 'dgx_donate_donation_detail_nonce' ) )
+		{
+			wp_die( __('You do not have sufficient permissions to access this page.') );
+		}
+	}
+
 	echo "<div class=\"wrap\">\n";
 	echo "<div id=\"icon-edit-pages\" class=\"icon32\"></div>\n";
 	echo "<h2>Donation Detail</h2>\n";
-	
-	$amount = get_post_meta($donationID, '_dgx_donate_amount', true);
-	
-	if (empty($amount))
-	{
-		echo "<p>No such donation found ($donationID).</p>";
+
+	$donation_deleted = false;
+	if ( "true" == $delete_donation ) {
+		dgx_donate_debug_log( "Donation (ID: $donationID) deleted" );
+		wp_delete_post( $donationID, true ); /* true = force delete / bypass trash */
+		$donation_deleted = true;
+		$message = __( 'Donation deleted', 'dgx-donate' );
 	}
-	else
+
+	// Display any message
+	if ( ! empty( $message ) )
 	{
-		echo "<div id=\"col-container\">\n";
-		echo "<div id=\"col-right\">\n";
-		echo "<div class=\"col-wrap\">\n";
-	
-		echo "<h3>Donation Details</h3>\n";
-		echo "<table class=\"widefat\"><tbody>\n";
+		echo "<div id=\"message\" class=\"updated below-h2\">\n";
+		echo "<p>$message</p>\n";
+		echo "</div>\n";
+	}
 
-		$year = get_post_meta($donationID, '_dgx_donate_year', true);
-		$month = get_post_meta($donationID, '_dgx_donate_month', true);
-		$day = get_post_meta($donationID, '_dgx_donate_day', true);
-		$time = get_post_meta($donationID, '_dgx_donate_time', true);
-		
-		echo "<tr><th>Date</th><td>$month/$day/$year $time</td></tr>\n";
-		
+	if ( ! $donation_deleted ) {
 		$amount = get_post_meta($donationID, '_dgx_donate_amount', true);
-		$formattedAmount = "$" . number_format($amount, 2);	
-		echo "<tr><th>Amount</th><td>$formattedAmount</td></tr>\n";
-
-		$addToMailingList = get_post_meta($donationID, '_dgx_donate_add_to_mailing_list', true);
-		if (!empty($addToMailingList))
+		
+		if (empty($amount))
 		{
-			$addToMailingList = "Yes";
+			echo "<p>No such donation found ($donationID).</p>";
 		}
 		else
 		{
-			$addToMailingList = "No";
-		}
-		echo "<tr><th>Add to Mailing List?</th><td>$addToMailingList</td></tr>\n";
+			echo "<div id=\"col-container\">\n";
+			echo "<div id=\"col-right\">\n";
+			echo "<div class=\"col-wrap\">\n";
+		
+			echo "<h3>Donation Details</h3>\n";
+			echo "<table class=\"widefat\"><tbody>\n";
 
-		$anonymous = get_post_meta($donationID, '_dgx_donate_anonymous', true);
-		if (empty($anonymous))
-		{
-			$anonymous = "No";
-		}
-		else
-		{
-			$anonymous = "Yes";
-		}
-		echo "<tr><th>Would like to remain anonymous?</th><td>$anonymous</td></tr>\n";
+			$year = get_post_meta($donationID, '_dgx_donate_year', true);
+			$month = get_post_meta($donationID, '_dgx_donate_month', true);
+			$day = get_post_meta($donationID, '_dgx_donate_day', true);
+			$time = get_post_meta($donationID, '_dgx_donate_time', true);
+			
+			echo "<tr><th>Date</th><td>$month/$day/$year $time</td></tr>\n";
+			
+			$amount = get_post_meta($donationID, '_dgx_donate_amount', true);
+			$formattedAmount = "$" . number_format($amount, 2);	
+			echo "<tr><th>Amount</th><td>$formattedAmount</td></tr>\n";
 
-		$fundName = "Undesignated";
-		$designated = get_post_meta($donationID, '_dgx_donate_designated', true);
-		if (!empty($designated))
-		{
-			$fundName = get_post_meta($donationID, '_dgx_donate_designated_fund', true);
-		}
-		echo "<tr><th>Designated Fund</th><td>$fundName</td></tr>\n";
-
-		$tributeGift = get_post_meta($donationID, '_dgx_donate_tribute_gift', true);
-		if (empty($tributeGift))
-		{
-			$tributeGiftMessage = "No";
-		}
-		else
-		{
-			$tributeGiftMessage = "Yes - ";
-
-			$honoreeName = get_post_meta($donationID, '_dgx_donate_honoree_name', true);
-			$honoreeEmailName = get_post_meta($donationID, '_dgx_donate_honoree_email_name', true);
-			$honoreePostName = get_post_meta($donationID, '_dgx_donate_honoree_post_name', true);			
-			$honoreeEmail = get_post_meta($donationID, '_dgx_donate_honoree_email', true);
-			$honoreeAddress = get_post_meta($donationID, '_dgx_donate_honoree_address', true);
-			$honoreeCity = get_post_meta($donationID, '_dgx_donate_honoree_city', true);
-			$honoreeState = get_post_meta($donationID, '_dgx_donate_honoree_state', true);
-			$honoreeZip = get_post_meta($donationID, '_dgx_donate_honoree_zip', true);
-			$memorialGift = get_post_meta($donationID, '_dgx_donate_memorial_gift', true);
-			if (empty($memorialGift))
+			$addToMailingList = get_post_meta($donationID, '_dgx_donate_add_to_mailing_list', true);
+			if (!empty($addToMailingList))
 			{
-				$tributeGiftMessage .= "in honor of ";
+				$addToMailingList = "Yes";
 			}
 			else
 			{
-				$tributeGiftMessage .= "in memory of ";
+				$addToMailingList = "No";
 			}
+			echo "<tr><th>Add to Mailing List?</th><td>$addToMailingList</td></tr>\n";
+
+			$anonymous = get_post_meta($donationID, '_dgx_donate_anonymous', true);
+			if (empty($anonymous))
+			{
+				$anonymous = "No";
+			}
+			else
+			{
+				$anonymous = "Yes";
+			}
+			echo "<tr><th>Would like to remain anonymous?</th><td>$anonymous</td></tr>\n";
+
+			$fundName = "Undesignated";
+			$designated = get_post_meta($donationID, '_dgx_donate_designated', true);
+			if (!empty($designated))
+			{
+				$fundName = get_post_meta($donationID, '_dgx_donate_designated_fund', true);
+			}
+			echo "<tr><th>Designated Fund</th><td>$fundName</td></tr>\n";
+
+			$tributeGift = get_post_meta($donationID, '_dgx_donate_tribute_gift', true);
+			if (empty($tributeGift))
+			{
+				$tributeGiftMessage = "No";
+			}
+			else
+			{
+				$tributeGiftMessage = "Yes - ";
+
+				$honoreeName = get_post_meta($donationID, '_dgx_donate_honoree_name', true);
+				$honoreeEmailName = get_post_meta($donationID, '_dgx_donate_honoree_email_name', true);
+				$honoreePostName = get_post_meta($donationID, '_dgx_donate_honoree_post_name', true);			
+				$honoreeEmail = get_post_meta($donationID, '_dgx_donate_honoree_email', true);
+				$honoreeAddress = get_post_meta($donationID, '_dgx_donate_honoree_address', true);
+				$honoreeCity = get_post_meta($donationID, '_dgx_donate_honoree_city', true);
+				$honoreeState = get_post_meta($donationID, '_dgx_donate_honoree_state', true);
+				$honoreeZip = get_post_meta($donationID, '_dgx_donate_honoree_zip', true);
+				$memorialGift = get_post_meta($donationID, '_dgx_donate_memorial_gift', true);
+				if (empty($memorialGift))
+				{
+					$tributeGiftMessage .= "in honor of ";
+				}
+				else
+				{
+					$tributeGiftMessage .= "in memory of ";
+				}
+				
+				$tributeGiftMessage .= "$honoreeName<br/><br/>";
+				if (!empty($honoreeEmail))
+				{
+					$tributeGiftMessage .= "Send acknowledgement via email to<br/>";
+					$tributeGiftMessage .= "$honoreeEmailName<br/>";
+					$tributeGiftMessage .= "$honoreeEmail<br/>";
+				}
+				if (!empty($honoreeAddress))
+				{
+					$tributeGiftMessage .= "Send acknowledgement via postal mail to<br/>";
+					$tributeGiftMessage .= "$honoreePostName<br/>";
+					$tributeGiftMessage .= "$honoreeAddress<br/>";
+					$tributeGiftMessage .= "$honoreeCity $honoreeState $honoreeZip";				
+				}			
+			}
+			echo "<tr><th>Tribute Gift</th><td>$tributeGiftMessage</td></tr>\n";
+
+			$paymentMethod = get_post_meta($donationID, '_dgx_donate_payment_method', true);
+			echo "<tr><th>Payment Method</th><td>$paymentMethod</td></tr>\n";
 			
-			$tributeGiftMessage .= "$honoreeName<br/><br/>";
-			if (!empty($honoreeEmail))
+			echo "</tbody></table>\n";
+
+			do_action('dgx_donate_donation_detail_right', $donationID);
+
+			do_action('dgx_donate_admin_footer');
+		
+			echo "</div> <!-- col-wrap -->\n";
+			echo "</div> <!-- col-right -->\n";
+		
+			echo "<div id=\"col-left\">\n";
+			echo "<div class=\"col-wrap\">\n";
+		
+			$firstName = get_post_meta($donationID, '_dgx_donate_donor_first_name', true);
+			$lastName = get_post_meta($donationID, '_dgx_donate_donor_last_name', true);
+			$company = get_post_meta($donationID, '_dgx_donate_donor_company_name', true);
+			$address1 = get_post_meta($donationID, '_dgx_donate_donor_address', true);
+			$address2 = get_post_meta($donationID, '_dgx_donate_donor_address2', true);
+			$city = get_post_meta($donationID, '_dgx_donate_donor_city', true);
+			$state =  get_post_meta($donationID, '_dgx_donate_donor_state', true);
+			$zip = get_post_meta($donationID, '_dgx_donate_donor_zip', true);
+			$phone =  get_post_meta($donationID, '_dgx_donate_donor_phone', true);
+			$email = get_post_meta($donationID, '_dgx_donate_donor_email', true);
+			
+			echo "<h3>Donor Information</h3>\n";
+			echo "<table class=\"widefat\"><tbody>\n";
+			echo "<tr><td>";
+			echo "$firstName $lastName<br/>";
+			if (!empty($company))
 			{
-				$tributeGiftMessage .= "Send acknowledgement via email to<br/>";
-				$tributeGiftMessage .= "$honoreeEmailName<br/>";
-				$tributeGiftMessage .= "$honoreeEmail<br/>";
+				echo "$company<br/>";
 			}
-			if (!empty($honoreeAddress))
+			echo "$address1<br/>";
+			if (!empty($address2))
 			{
-				$tributeGiftMessage .= "Send acknowledgement via postal mail to<br/>";
-				$tributeGiftMessage .= "$honoreePostName<br/>";
-				$tributeGiftMessage .= "$honoreeAddress<br/>";
-				$tributeGiftMessage .= "$honoreeCity $honoreeState $honoreeZip";				
-			}			
-		}
-		echo "<tr><th>Tribute Gift</th><td>$tributeGiftMessage</td></tr>\n";
+				echo "$address2<br/>";
+			}
+			echo "$city $state $zip<br/>";
+			echo "$phone<br/>";
+			echo "$email";
+			echo "</td></tr>";
+			echo "</tbody></table>\n";
 
-		$paymentMethod = get_post_meta($donationID, '_dgx_donate_payment_method', true);
-		echo "<tr><th>Payment Method</th><td>$paymentMethod</td></tr>\n";
+			echo "<h3>Delete this Donation</h3>";
+			echo "<p>Click the following button to delete this donation.  This will also remove this ";
+			echo "donation from all reports.  This operation cannot be undone.</p>";
+
+			echo "<form method=\"POST\" action=\"\">\n";
+			$nonce = wp_create_nonce( 'dgx_donate_donation_detail_nonce' );
+			echo "<input type=\"hidden\" name=\"dgx_donate_donation_detail_nonce\" id=\"dgx_donate_donation_report_nonce\" value=\"$nonce\" />\n";	
+			echo "<input type=\"hidden\" name=\"delete_donation\" value=\"true\" />";
+			echo "<p><input class=\"button\" type=\"submit\" value=\"Delete Donation\" ></p>\n";
+			echo "</form>";
+
+			do_action('dgx_donate_donation_detail_left', $donationID);
 		
-		echo "</tbody></table>\n";
-
-		do_action('dgx_donate_donation_detail_right', $donationID);
-
-		do_action('dgx_donate_admin_footer');
-	
-		echo "</div> <!-- col-wrap -->\n";
-		echo "</div> <!-- col-right -->\n";
-	
-		echo "<div id=\"col-left\">\n";
-		echo "<div class=\"col-wrap\">\n";
-	
-		$firstName = get_post_meta($donationID, '_dgx_donate_donor_first_name', true);
-		$lastName = get_post_meta($donationID, '_dgx_donate_donor_last_name', true);
-		$company = get_post_meta($donationID, '_dgx_donate_donor_company_name', true);
-		$address1 = get_post_meta($donationID, '_dgx_donate_donor_address', true);
-		$address2 = get_post_meta($donationID, '_dgx_donate_donor_address2', true);
-		$city = get_post_meta($donationID, '_dgx_donate_donor_city', true);
-		$state =  get_post_meta($donationID, '_dgx_donate_donor_state', true);
-		$zip = get_post_meta($donationID, '_dgx_donate_donor_zip', true);
-		$phone =  get_post_meta($donationID, '_dgx_donate_donor_phone', true);
-		$email = get_post_meta($donationID, '_dgx_donate_donor_email', true);
-		
-		echo "<h3>Donor Information</h3>\n";
-		echo "<table class=\"widefat\"><tbody>\n";
-		echo "<tr><td>";
-		echo "$firstName $lastName<br/>";
-		if (!empty($company))
-		{
-			echo "$company<br/>";
+			echo "</div> <!-- col-wrap -->\n";
+			echo "</div> <!-- col-left -->\n";
+			echo "</div> <!-- col-container -->\n";
 		}
-		echo "$address1<br/>";
-		if (!empty($address2))
-		{
-			echo "$address2<br/>";
-		}
-		echo "$city $state $zip<br/>";
-		echo "$phone<br/>";
-		echo "$email";
-		echo "</td></tr>";
-		echo "</tbody></table>\n";
-
-		do_action('dgx_donate_donation_detail_left', $donationID);
-	
-		echo "</div> <!-- col-wrap -->\n";
-		echo "</div> <!-- col-left -->\n";
-		echo "</div> <!-- col-container -->\n";
 	}
 	
 	echo "</div> <!-- wrap -->\n"; 
@@ -520,7 +578,7 @@ function dgx_donate_main_page()
 {
 	echo "<div class=\"wrap\">\n";
 	echo "<div id=\"icon-edit-pages\" class=\"icon32\"></div>\n";
-	echo "<h2>Seamless Donations by Designgeneers!</h2>\n";
+	echo "<h2>Seamless Donations for WordPress</h2>\n";
 	
 	echo "<div id=\"col-container\">\n";
 	echo "<div id=\"col-right\">\n";
@@ -860,8 +918,23 @@ function dgx_donate_donation_report_page()
 	echo "</div> <!-- col-right -->\n";
 	
 	echo "<div id=\"col-left\">\n";
-	echo "<div class=\"col-wrap\">\n";	
-	
+	echo "<div class=\"col-wrap\">\n";
+
+	if ( count( $myDonations ) > 0 )
+	{
+		$exportUrl = plugins_url( '/dgx-donate-export.php', __FILE__ );
+		echo "<h3>Export Report as Spreadsheet (CSV)</h3>\n";
+		echo "<p>Click the following button to export detailed information for each donation in this report to a ";
+		echo "comma-separated-value (CSV) file compatible with most spreadsheet software.</p>";
+		echo "<form method=\"POST\" action=\"$exportUrl\">\n";
+		echo "<input type=\"hidden\" name=\"startdate\" value=\"$startDate\" size=\"12\"/>";
+		echo "<input type=\"hidden\" name=\"enddate\" value=\"$endDate\" size=\"12\"/>";
+		echo "</p><p>";
+		echo "<input id=\"submit\" class=\"button\" type=\"submit\" value=\"Export Report\" name=\"submit\"></p>\n";
+		echo "</form>";	
+		echo "<hr/>";
+	}
+
 	echo "<h3>Date Range</h3>\n";
 	echo "<form method=\"POST\" action=\"\">\n";
 	
@@ -1523,6 +1596,17 @@ function dgx_donate_settings_page()
     	$message = "Settings updated.";
     }
 
+    // Whether to show the tribute section or not
+    $show_tribute_section = $_POST['show_tribute_section'];
+    if ( ! empty( $show_tribute_section ) ) {
+    	if ( "true" == $show_tribute_section ) {
+			update_option( 'dgx_donate_show_tribute_section', 'true' );
+    	} else {
+			update_option( 'dgx_donate_show_tribute_section', 'false' );
+    	}
+    	$message = "Settings updated.";
+    }
+
     // Save default state
     $defaultState = $_POST['dgx_donate_default_state'];
     if (!empty($defaultState))
@@ -1567,7 +1651,7 @@ function dgx_donate_settings_page()
 	echo "<p class=\"description\">Email address(es) that should be notified of new donations.</p>\n";
 	echo "</div> <!-- form-field --> \n";
 	
-	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update Notification Settings\" name=\"submit\"></p>\n";
+	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update\" name=\"submit\"></p>\n";
 	echo "</form>";
 	echo "<br/>";
 
@@ -1580,7 +1664,7 @@ function dgx_donate_settings_page()
 
 		do_action('dgx_donate_show_settings_forms');
 			
-		echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update Gateway Settings\" name=\"submit\"></p>\n";	
+		echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update\" name=\"submit\"></p>\n";	
 		
 		echo "</form>";
 	}
@@ -1617,12 +1701,12 @@ function dgx_donate_settings_page()
 		echo "<p><input type=\"checkbox\" name=\"$key\" value=\"yes\" $checked /> $givingLevel </p>";
 	}	
 
-	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update Levels\" name=\"submit\" /></p>\n";
+	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update\" name=\"submit\" /></p>\n";
 	echo "</form>";
 	echo "<br/>";
 
 	// Default state for donor
-	echo "<h3>Donation Defaults</h3>";
+	echo "<h3>Default State</h3>";
 	echo "<p>Select the default state for the donation form.</p>";
 	echo "<form method=\"POST\" action=\"\">\n";
 	echo "<input type=\"hidden\" name=\"dgx_donate_settings_nonce\" id=\"dgx_donate_settings_nonce\" value=\"$nonce\" />\n";
@@ -1631,8 +1715,28 @@ function dgx_donate_settings_page()
 	$selector = dgx_donate_get_state_selector('dgx_donate_default_state', $defaultState);
 	echo "<p>$selector</p>";
 
-	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update Defaults\" name=\"submit\" /></p>\n";
+	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update\" name=\"submit\" /></p>\n";
 	echo "</form>";
+	echo "<br/>";
+
+	// Show Tribute Section?
+	echo "<h3>Tribute Gift Section</h3>";
+	echo "<p>Show or hide the Tribute Gift section of the donation form.</p>";
+	echo "<form method=\"POST\" action=\"\">\n";
+	echo "<input type=\"hidden\" name=\"dgx_donate_settings_nonce\" id=\"dgx_donate_settings_nonce\" value=\"$nonce\" />\n";
+
+	$show_tribute_section = get_option('dgx_donate_show_tribute_section');
+	if ( "true" == $show_tribute_section ) {
+		$true_checked = "checked";
+	} else {
+		$false_checked = "checked";
+	}
+
+	echo '<p><input type="radio" name="show_tribute_section" value="true" ' . $true_checked . '/> Show the Tribute Gift form section </p>';
+	echo '<p><input type="radio" name="show_tribute_section" value="false" ' . $false_checked . '/> Do not show the Tribute Gift form section</p>';
+
+	echo "<p><input id=\"submit\" class=\"button\" type=\"submit\" value=\"Update\" name=\"submit\" /></p>\n";
+	echo "</form>";	
 
 	do_action('dgx_donate_settings_page_left');
 	

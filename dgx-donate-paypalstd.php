@@ -1,7 +1,7 @@
 <?php
 
 /* PayPal Website Payments Standard Module for Seamless Donations */
-/* Copyright 2012 Designgeneers!  (email: info@designgeneers.com) */
+/* Copyright 2013 Allen Snook (email: allen@allensnook.com) */
 
 define('DGXDONATEPAYPALSTD', 'DGXDONATEPAYPALSTD');
 
@@ -111,7 +111,12 @@ function dgx_donate_show_paypalstd_donation_form($content)
 		// Pick and choose the built in sections this gateway supports
 		$content = dgx_donate_paypalstd_warning_section($content);
 		$content = dgx_donate_get_donation_section($content);
-		$content = dgx_donate_get_tribute_section($content);
+
+		$show_tribute_section = get_option( 'dgx_donate_show_tribute_section' );
+		if ( "true" == $show_tribute_section ) {
+			$content = dgx_donate_get_tribute_section($content);
+		}
+		
 		$content = dgx_donate_get_donor_section($content);
 		$content = dgx_donate_get_billing_section($content);
 		$content = dgx_donate_paypalstd_payment_section($content);
@@ -181,7 +186,7 @@ function dgx_donate_paypalstd_get_hidden_form()
 	$output .= "<input type=\"hidden\" name=\"cmd\" value=\"_donations\" />";
 	$output .= "<input type=\"hidden\" name=\"business\" value=\"$paypalEmail\" />";
 	$output .= "<input type=\"hidden\" name=\"return\" value=\"$successUrl\" />";
-	
+
 	$output .= "<input type=\"hidden\" name=\"first_name\" value=\"\" /> ";
 	$output .= "<input type=\"hidden\" name=\"last_name\" value=\"\" />";
 	$output .= "<input type=\"hidden\" name=\"address1\" value=\"\" />";
@@ -363,6 +368,7 @@ function dgx_donate_paypalstd_ajax_checkout()
 	dgx_donate_debug_log( 'Donation transaction started' );
 	dgx_donate_debug_log( 'Name: ' . $postData['FIRSTNAME'] . ' ' . $postData['LASTNAME'] );
 	dgx_donate_debug_log( 'Amount: ' . $postData['AMOUNT'] );
+	dgx_donate_debug_log( 'IPN: ' . plugins_url( '/dgx-donate-paypalstd-ipn.php', __FILE__ ) );
 	
 	// Return success to AJAX caller as " code | message "
 	// A return code of 0 indicates success, and the returnMessage is ignored

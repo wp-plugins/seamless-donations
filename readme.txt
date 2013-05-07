@@ -3,8 +3,8 @@ Contributors: allendav, designgeneers
 Donate link: http://www.designgeneers.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
-Tested up to: 3.5
-Stable tag: 2.1.7
+Tested up to: 3.5.1
+Stable tag: 2.4.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,7 +54,16 @@ Yes!
 5. Dashboard >> Donors
 6. Dashboard >> Thank You Email Templates
 
-== Changelog =
+== Changelog ==
+
+= 2.4.0 =
+* Added the ability to export donation information to spreadsheet (CSV - comma separated values)
+
+= 2.3.0 =
+* Added a setting to allow you to turn the Tribute Gift section of the form off if you'd like
+
+= 2.2.0 =
+* Added the ability to delete a donation (e.g. if you create a test donation)
 
 = 2.1.7 =
 * Rolled back change in 2.1.6 for ajax display due to unanticipated problem with search
