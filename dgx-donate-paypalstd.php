@@ -186,7 +186,7 @@ function dgx_donate_paypalstd_get_hidden_form()
 	$output .= "<input type=\"hidden\" name=\"cmd\" value=\"_donations\" />";
 	$output .= "<input type=\"hidden\" name=\"business\" value=\"$paypalEmail\" />";
 	$output .= "<input type=\"hidden\" name=\"return\" value=\"$successUrl\" />";
-	
+
 	$output .= "<input type=\"hidden\" name=\"first_name\" value=\"\" /> ";
 	$output .= "<input type=\"hidden\" name=\"last_name\" value=\"\" />";
 	$output .= "<input type=\"hidden\" name=\"address1\" value=\"\" />";
@@ -368,6 +368,7 @@ function dgx_donate_paypalstd_ajax_checkout()
 	dgx_donate_debug_log( 'Donation transaction started' );
 	dgx_donate_debug_log( 'Name: ' . $postData['FIRSTNAME'] . ' ' . $postData['LASTNAME'] );
 	dgx_donate_debug_log( 'Amount: ' . $postData['AMOUNT'] );
+	dgx_donate_debug_log( 'IPN: ' . plugins_url( '/dgx-donate-paypalstd-ipn.php', __FILE__ ) );
 	
 	// Return success to AJAX caller as " code | message "
 	// A return code of 0 indicates success, and the returnMessage is ignored

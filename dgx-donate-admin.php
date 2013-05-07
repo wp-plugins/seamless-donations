@@ -918,8 +918,23 @@ function dgx_donate_donation_report_page()
 	echo "</div> <!-- col-right -->\n";
 	
 	echo "<div id=\"col-left\">\n";
-	echo "<div class=\"col-wrap\">\n";	
-	
+	echo "<div class=\"col-wrap\">\n";
+
+	if ( count( $myDonations ) > 0 )
+	{
+		$exportUrl = plugins_url( '/dgx-donate-export.php', __FILE__ );
+		echo "<h3>Export Report as Spreadsheet (CSV)</h3>\n";
+		echo "<p>Click the following button to export detailed information for each donation in this report to a ";
+		echo "comma-separated-value (CSV) file compatible with most spreadsheet software.</p>";
+		echo "<form method=\"POST\" action=\"$exportUrl\">\n";
+		echo "<input type=\"hidden\" name=\"startdate\" value=\"$startDate\" size=\"12\"/>";
+		echo "<input type=\"hidden\" name=\"enddate\" value=\"$endDate\" size=\"12\"/>";
+		echo "</p><p>";
+		echo "<input id=\"submit\" class=\"button\" type=\"submit\" value=\"Export Report\" name=\"submit\"></p>\n";
+		echo "</form>";	
+		echo "<hr/>";
+	}
+
 	echo "<h3>Date Range</h3>\n";
 	echo "<form method=\"POST\" action=\"\">\n";
 	
