@@ -78,11 +78,14 @@ function dgx_donate_save_paypalstd_settings_form()
     	update_option('dgx_donate_payment_gateway', $paymentGateway);
     }
 
-    // If they set the paypalemail, record the setting
-    if (!empty($payPalEmail))
-    {
-    	update_option('dgx_donate_paypal_email', $payPalEmail);
-    }
+	// If they set the paypalemail, record the setting
+	if ( ! empty( $payPalEmail ) )
+	{
+		$payPalEmail = trim( $payPalEmail );
+		if ( is_email( $payPalEmail ) ) {
+			update_option( 'dgx_donate_paypal_email', $payPalEmail );
+		}
+	}
 
     // If they set the paypal server type (sandbox or live), record the setting
     if (!empty($payPalServer))

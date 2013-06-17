@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://www.allensnook.com/plugins/seamless-donations/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.
-Version: 2.4.0
+Version: 2.4.2
 Author: allendav
 Author URI: http://www.allensnook.com
 License: GPL2
@@ -789,7 +789,13 @@ function dgx_donate_send_thank_you_email($donationID, $testAddress="")
 	
     $headers = "From: $replyEmail\r\n";
 
-    mail($toEmail, $subject, $emailBody, $headers); 
+	$mail_sent = wp_mail( $toEmail, $subject, $emailBody, $headers );
+
+	if ( ! $mail_sent ) {
+		dgx_donate_debug_log( "Error: Could NOT send mail." );
+		dgx_donate_debug_log( "Subject: $subject" );
+		dgx_donate_debug_log( "To Email: $toEmail" );
+	}
 }
 
 /******************************************************************************************************/
@@ -841,10 +847,16 @@ function dgx_donate_send_donation_notification($donationID)
 		$notifyEmail = trim($notifyEmail);
 		if (!empty($notifyEmail))
 		{
-    		$headers = "From: $fromEmail\r\n";
+			$headers = "From: $fromEmail\r\n";
 
-    		mail($notifyEmail, $subject, $body, $headers);
-    	}
-    }
+			$mail_sent = wp_mail( $notifyEmail, $subject, $body, $headers );
+
+			if ( ! $mail_sent ) {
+				dgx_donate_debug_log( "Error: Could NOT send mail." );
+				dgx_donate_debug_log( "Subject: $subject" );
+				dgx_donate_debug_log( "To Email: $notifyEmail" );
+			}
+		}
+	}
 }
 
