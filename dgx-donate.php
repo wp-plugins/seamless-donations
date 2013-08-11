@@ -1,15 +1,15 @@
 <?php
 /*
 Plugin Name: Seamless Donations
-Plugin URI: http://www.allensnook.com/plugins/seamless-donations/
+Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.
-Version: 2.4.0
+Version: 2.4.3
 Author: allendav
-Author URI: http://www.allensnook.com
+Author URI: http://www.allendav.com/
 License: GPL2
 */
 
-/*  Copyright 2013 Allen Snook (email: allen@allensnook.com)
+/*  Copyright 2013 Allen Snook (email: allendav@allendav.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as 
@@ -789,7 +789,13 @@ function dgx_donate_send_thank_you_email($donationID, $testAddress="")
 	
     $headers = "From: $replyEmail\r\n";
 
-    mail($toEmail, $subject, $emailBody, $headers); 
+	$mail_sent = wp_mail( $toEmail, $subject, $emailBody, $headers );
+
+	if ( ! $mail_sent ) {
+		dgx_donate_debug_log( "Error: Could NOT send mail." );
+		dgx_donate_debug_log( "Subject: $subject" );
+		dgx_donate_debug_log( "To Email: $toEmail" );
+	}
 }
 
 /******************************************************************************************************/
@@ -841,10 +847,16 @@ function dgx_donate_send_donation_notification($donationID)
 		$notifyEmail = trim($notifyEmail);
 		if (!empty($notifyEmail))
 		{
-    		$headers = "From: $fromEmail\r\n";
+			$headers = "From: $fromEmail\r\n";
 
-    		mail($notifyEmail, $subject, $body, $headers);
-    	}
-    }
+			$mail_sent = wp_mail( $notifyEmail, $subject, $body, $headers );
+
+			if ( ! $mail_sent ) {
+				dgx_donate_debug_log( "Error: Could NOT send mail." );
+				dgx_donate_debug_log( "Subject: $subject" );
+				dgx_donate_debug_log( "To Email: $notifyEmail" );
+			}
+		}
+	}
 }
 

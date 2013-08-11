@@ -78,11 +78,14 @@ function dgx_donate_save_paypalstd_settings_form()
     	update_option('dgx_donate_payment_gateway', $paymentGateway);
     }
 
-    // If they set the paypalemail, record the setting
-    if (!empty($payPalEmail))
-    {
-    	update_option('dgx_donate_paypal_email', $payPalEmail);
-    }
+	// If they set the paypalemail, record the setting
+	if ( ! empty( $payPalEmail ) )
+	{
+		$payPalEmail = trim( $payPalEmail );
+		if ( is_email( $payPalEmail ) ) {
+			update_option( 'dgx_donate_paypal_email', $payPalEmail );
+		}
+	}
 
     // If they set the paypal server type (sandbox or live), record the setting
     if (!empty($payPalServer))
@@ -182,7 +185,7 @@ function dgx_donate_paypalstd_get_hidden_form()
 	$successUrl .= "thanks=1&sessionid=";
 	$successUrl .= "$sessionID";
 
-	$output .= "<form id=\"dgx-donate-hidden-form\" action=\"$formAction\" method=\"post\">";
+	$output .= "<form id='dgx-donate-hidden-form' action='$formAction' method='post' target='_top' >";
 	$output .= "<input type=\"hidden\" name=\"cmd\" value=\"_donations\" />";
 	$output .= "<input type=\"hidden\" name=\"business\" value=\"$paypalEmail\" />";
 	$output .= "<input type=\"hidden\" name=\"return\" value=\"$successUrl\" />";

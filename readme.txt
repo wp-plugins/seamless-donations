@@ -1,10 +1,10 @@
 === Plugin Name ===
 Contributors: allendav, designgeneers
-Donate link: http://www.designgeneers.com/
+Donate link: http://www.allendav.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
-Tested up to: 3.5.1
-Stable tag: 2.4.0
+Tested up to: 3.6
+Stable tag: 2.4.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,6 +55,16 @@ Yes!
 6. Dashboard >> Thank You Email Templates
 
 == Changelog ==
+
+= 2.4.3 =
+* Fixed: Changed form submit target to _top most window (in case theme places content in iframes)
+* Fixed: Updated plugin URI to point to allendav.com
+
+= 2.4.2 =
+* Automatically trim whitespace from PayPal email address to avoid common validation error and improve usability.
+
+= 2.4.1 =
+* Changed mail function to use WordPress wp_mail instead of PHP mail - this should help avoid dropped emails
 
 = 2.4.0 =
 * Added the ability to export donation information to spreadsheet (CSV - comma separated values)
