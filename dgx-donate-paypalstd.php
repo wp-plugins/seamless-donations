@@ -185,7 +185,7 @@ function dgx_donate_paypalstd_get_hidden_form()
 	$successUrl .= "thanks=1&sessionid=";
 	$successUrl .= "$sessionID";
 
-	$output .= "<form id=\"dgx-donate-hidden-form\" action=\"$formAction\" method=\"post\">";
+	$output .= "<form id='dgx-donate-hidden-form' action='$formAction' method='post' target='_top' >";
 	$output .= "<input type=\"hidden\" name=\"cmd\" value=\"_donations\" />";
 	$output .= "<input type=\"hidden\" name=\"business\" value=\"$paypalEmail\" />";
 	$output .= "<input type=\"hidden\" name=\"return\" value=\"$successUrl\" />";

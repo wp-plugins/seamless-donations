@@ -1,15 +1,15 @@
 <?php
 /*
 Plugin Name: Seamless Donations
-Plugin URI: http://www.allensnook.com/plugins/seamless-donations/
+Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.
-Version: 2.4.2
+Version: 2.4.3
 Author: allendav
-Author URI: http://www.allensnook.com
+Author URI: http://www.allendav.com/
 License: GPL2
 */
 
-/*  Copyright 2013 Allen Snook (email: allen@allensnook.com)
+/*  Copyright 2013 Allen Snook (email: allendav@allendav.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as 
