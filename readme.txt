@@ -4,7 +4,7 @@ Donate link: http://www.allendav.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
 Tested up to: 3.6
-Stable tag: 2.4.2
+Stable tag: 2.4.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,6 +55,9 @@ Yes!
 6. Dashboard >> Thank You Email Templates
 
 == Changelog ==
+
+= 2.4.4 =
+* Fixed: Cleaned up warnings when run with WP_DEBUG
 
 = 2.4.3 =
 * Fixed: Changed form submit target to _top most window (in case theme places content in iframes)

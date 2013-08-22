@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.
-Version: 2.4.3
+Version: 2.4.4
 Author: allendav
 Author URI: http://www.allendav.com/
 License: GPL2
@@ -298,7 +298,10 @@ function dgx_donate_get_donor_detail_link($donorEmail)
 function dgx_donate_init () {
 
 	// Start Session
-	$sessionID = $_COOKIE['dgxdonate'];
+	$sessionID = "";
+	if ( isset( $_COOKIE['dgxdonate'] ) ) {
+		$sessionID = $_COOKIE['dgxdonate'];
+	}
 
 	if (!empty($sessionID))
 	{
@@ -439,6 +442,7 @@ function dgx_donate_get_donation_section($formContent)
 	
 	$anonymous = false;
 	
+	$output = "";
 	$output .= "<div class=\"dgx-donate-form-section\">\n";
 	$output .= "<h2>Donation Information</h2>\n";
 	
@@ -446,6 +450,7 @@ function dgx_donate_get_donation_section($formContent)
 
 	$output .= "<p>";
 	$checked = " checked=\"checked\" ";
+	$checkOTHER = "";
 	$classmod = "";
 	$givingLevels = dgx_donate_get_giving_levels();
 	foreach ($givingLevels as $givingLevel)
@@ -487,6 +492,12 @@ function dgx_donate_get_tribute_section($formContent)
 	$honoreeState = 'WA';
 	$honoreeZip = '';
 
+	$checkTribute = "";
+	$honoreeEmailRecipient = "";
+	$checkHonorEmail = "";
+	$checkHonorPostal = "";
+	$honoreePostalRecipient = "";
+
 	if ($isTributeGift)
 	{
 		$checkTribute = " checked ";
@@ -500,6 +511,7 @@ function dgx_donate_get_tribute_section($formContent)
 		$checkHonorPostal = " checked ";
 	}
 
+	$output = "";
 	$output .= "<div class=\"dgx-donate-form-section\">\n";
 	$output .= "<h2>Tribute Gift</h2>\n";
 	$output .= "<div class=\"dgx-donate-form-expander\">\n";	
@@ -571,6 +583,14 @@ function dgx_donate_get_donor_section($formContent)
 		$checkAddMailingList = " checked ";
 	}
 
+	$donorFirstName = "";
+	$donorLastName = "";
+	$donorPhone = "";
+	$donorEmail = "";
+	$checkAddMailingList = "";
+	$anonymous = "";
+
+	$output = "";
 	$output .= "<div class=\"dgx-donate-form-section\">\n";
 	$output .= "<h2>Donor Information</h2>\n";
 	$output .= "<p>";
@@ -609,6 +629,13 @@ function dgx_donate_get_billing_section($formContent)
 {
 	$donorState = get_option('dgx_donate_default_state');
 
+	$donorAddress = "";
+	$donorAddress2 = "";
+	$donorCity = "";
+	$donorZip = "";
+
+
+	$output = "";
 	$output .= "<div class=\"dgx-donate-form-section\">\n";
 	$output .= "<h2>Billing Information</h2>\n";
 	
@@ -645,7 +672,10 @@ add_shortcode('dgx-donate', 'dgx_donate_shortcode');
 
 function dgx_donate_shortcode($atts)
 {
-	$thanks = $_GET['thanks'];
+	$thanks = "";
+	if ( isset( $_GET['thanks'] ) ) {
+		$thanks = $_GET['thanks'];
+	}
 	
 	// Sanitize
 	$thanks = trim($thanks);
