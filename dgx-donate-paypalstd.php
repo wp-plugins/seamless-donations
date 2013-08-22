@@ -41,6 +41,8 @@ function dgx_donate_show_paypalstd_settings_form()
 	echo "\" $checked /> <b>PayPal Standard</b></p>";
 
 	// Now show our form content
+	$checkSandbox = "";
+	$checkLive = "";
 	$payPalServer = get_option('dgx_donate_paypal_server');
 	if (strcasecmp($payPalServer, "SANDBOX") == 0)
 	{
@@ -67,9 +69,19 @@ function dgx_donate_show_paypalstd_settings_form()
 /******************************************************************************************************/
 function dgx_donate_save_paypalstd_settings_form()
 {
-    $paymentGateway = $_POST['paymentgateway'];
-    $payPalServer = $_POST['paypalserver'];
-    $payPalEmail = $_POST['paypalemail'];
+	$paymentGateway = "";
+	$payPalServer = "";
+	$payPalEmail = "";
+
+	if ( isset( $_POST['paymentgateway'] ) ) {
+	    $paymentGateway = $_POST['paymentgateway'];
+	}	
+	if ( isset( $_POST['paypalserver'] ) ) {
+	    $payPalServer = $_POST['paypalserver'];
+	}
+	if ( isset( $_POST['paypalemail'] ) ) {
+	    $payPalEmail = $_POST['paypalemail'];
+	}
 
     // If they set the paymentGateway, record the setting
     // It is OK for all gateways to do this (so at least one does)
@@ -185,6 +197,7 @@ function dgx_donate_paypalstd_get_hidden_form()
 	$successUrl .= "thanks=1&sessionid=";
 	$successUrl .= "$sessionID";
 
+	$output = "";
 	$output .= "<form id='dgx-donate-hidden-form' action='$formAction' method='post' target='_top' >";
 	$output .= "<input type=\"hidden\" name=\"cmd\" value=\"_donations\" />";
 	$output .= "<input type=\"hidden\" name=\"business\" value=\"$paypalEmail\" />";
@@ -248,6 +261,7 @@ function dgx_donate_paypalstd_payment_section($formContent)
 
 	$processingImage = plugins_url('/images/ajax-loader.gif', __FILE__);
 	$buttonImage = plugins_url('/images/paypal_btn_donate_lg.gif', __FILE__);
+	$output = "";
 	$output .= "<div class=\"dgx-donate-form-section\">";
 	$output .= "<p>";
 	$output .= "<input class=\"dgx-donate-pay-enabled\" type=\"image\" src=\"$buttonImage\" value=\"Donate Now\"/> <img class=\"dgx-donate-busy\" src=\"$processingImage\" />\n";

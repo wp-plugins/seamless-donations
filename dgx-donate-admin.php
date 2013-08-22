@@ -28,31 +28,31 @@ add_action('dgx_donate_admin_footer', 'dgx_donate_echo_admin_footer');
 /******************************************************************************************************/
 function dgx_donate_donation_report_menu()
 {
-	add_submenu_page("dgx_donate_menu_page", __('Donations'), __('Donations'), 'manage_options', 'dgx_donate_donation_report_page', dgx_donate_donation_report_page);	
+	add_submenu_page("dgx_donate_menu_page", __('Donations'), __('Donations'), 'manage_options', 'dgx_donate_donation_report_page', 'dgx_donate_donation_report_page');	
 }
 
 function dgx_donate_donor_report_menu()
 {
-	add_submenu_page("dgx_donate_menu_page", __('Donors'), __('Donors'), 'manage_options', 'dgx_donate_donor_report_page', dgx_donate_donor_report_page);
+	add_submenu_page("dgx_donate_menu_page", __('Donors'), __('Donors'), 'manage_options', 'dgx_donate_donor_report_page', 'dgx_donate_donor_report_page');
 }
 
 function dgx_donate_email_template_menu()
 {
-	add_submenu_page("dgx_donate_menu_page", __('Thank You Emails'), __('Thank You Emails'), 'manage_options', 'dgx_donate_template_page', dgx_donate_template_page);
+	add_submenu_page("dgx_donate_menu_page", __('Thank You Emails'), __('Thank You Emails'), 'manage_options', 'dgx_donate_template_page', 'dgx_donate_template_page');
 }
 
 function dgx_donate_thank_you_menu()
 {
-	add_submenu_page("dgx_donate_menu_page", __('Thank You Page'), __('Thank You Page'), 'manage_options', 'dgx_donate_thank_you_page', dgx_donate_thank_you_page);
+	add_submenu_page("dgx_donate_menu_page", __('Thank You Page'), __('Thank You Page'), 'manage_options', 'dgx_donate_thank_you_page', 'dgx_donate_thank_you_page');
 }
 
 function dgx_donate_settings_menu()
 {
-	add_submenu_page("dgx_donate_menu_page", __('Settings'), __('Settings'), 'manage_options', 'dgx_donate_settings_page', dgx_donate_settings_page);
+	add_submenu_page("dgx_donate_menu_page", __('Settings'), __('Settings'), 'manage_options', 'dgx_donate_settings_page', 'dgx_donate_settings_page');
 }
 
 function dgx_donate_debug_log_menu() {
-	add_submenu_page( "dgx_donate_menu_page", __('Log'), __('Log'), 'manage_options', 'dgx_donate_debug_log_page', dgx_donate_debug_log_page);
+	add_submenu_page( "dgx_donate_menu_page", __('Log'), __('Log'), 'manage_options', 'dgx_donate_debug_log_page', 'dgx_donate_debug_log_page');
 }
 
 /******************************************************************************************************/
@@ -220,9 +220,15 @@ function dgx_donate_menu_page()
     {
       wp_die( __('You do not have sufficient permissions to access this page.') );
     }
-    
-	$donorID = $_GET['donor'];
-	$donationID = $_GET['donation'];
+
+	$donorID = "";
+	if ( isset( $_GET['donor'] ) ) {
+		$donorID = $_GET['donor'];
+	}
+	$donationID = "";
+	if ( isset( $_GET['donation'] ) ) {
+		$donationID = $_GET['donation'];
+	}    
 	
 	if (!empty($donorID))
 	{
@@ -373,7 +379,10 @@ function dgx_donate_donation_detail_page($donationID)
     }
 	
 	// Get form arguments
-	$delete_donation = $_POST['delete_donation'];
+	$delete_donation = "";
+	if ( isset( $_POST['delete_donation'] ) ) {
+		$delete_donation = $_POST['delete_donation'];
+	}
 
 	// If we have form arguments, we must validate the nonce
 	if ( count( $_POST ) > 0 )
@@ -684,8 +693,15 @@ function dgx_donate_donation_report_page()
     }
 	
 	// Get form arguments
-	$startDate = $_POST['startdate'];
-	$endDate = $_POST['enddate'];
+	$startDate = "";
+	$endDate = "";
+
+	if ( isset( $_POST['startdate'] ) ) {
+		$startDate = $_POST['startdate'];
+	}
+	if ( isset( $_POST['enddate'] ) ) {
+		$endDate = $_POST['enddate'];
+	}
 
 	// If we have form arguments, we must validate the nonce
 	if (count($_POST) > 0)
@@ -974,8 +990,15 @@ function dgx_donate_donor_report_page()
     }
 	
 	// Get form arguments
-	$startDate = $_POST['startdate'];
-	$endDate = $_POST['enddate'];
+	$startDate = "";
+	$endDate = "";
+
+	if ( isset( $_POST['startdate'] ) ) {
+		$startDate = $_POST['startdate'];
+	}
+	if ( isset( $_POST['enddate'] ) ) {
+		$endDate = $_POST['enddate'];
+	}
 
 	// If we have form arguments, we must validate the nonce
 	if (count($_POST) > 0)
@@ -1448,7 +1471,10 @@ function dgx_donate_thank_you_page()
     }
 
 	// Get form arguments
-	$thankYouText = $_POST['thankstext'];
+	$thankYouText = "";
+	if ( isset( $_POST['thankstext'] ) ) {
+		$thankYouText = $_POST['thankstext'];
+	}
 
 	// If we have form arguments, we must validate the nonce
 	if (count($_POST) > 0)
@@ -1581,7 +1607,10 @@ function dgx_donate_settings_page()
 	}
 
 	// Save our global settings
-    $notificationEmails = $_POST['notifyemails'];
+	$notificationEmails = "";
+	if ( isset( $_POST['notifyemails'] ) ) {
+	    $notificationEmails = $_POST['notifyemails'];
+	}
     if (!empty($notificationEmails))
     {
     	update_option('dgx_donate_notify_emails', $notificationEmails);
@@ -1589,7 +1618,10 @@ function dgx_donate_settings_page()
     }
 
     // Save giving level selections
-    $givingLevels = $_POST['dgx_donate_giving_levels'];
+    $givingLevels = "";
+	if ( isset( $_POST['dgx_donate_giving_levels'] ) ) {
+	    $givingLevels = $_POST['dgx_donate_giving_levels'];
+	}    
     if (!empty($givingLevels))
     {
     	dgx_donate_save_giving_levels_settings();
@@ -1597,7 +1629,10 @@ function dgx_donate_settings_page()
     }
 
     // Whether to show the tribute section or not
-    $show_tribute_section = $_POST['show_tribute_section'];
+    $show_tribute_section = "";
+    if ( isset( $_POST['show_tribute_section'] ) ) {
+	    $show_tribute_section = $_POST['show_tribute_section'];
+    }
     if ( ! empty( $show_tribute_section ) ) {
     	if ( "true" == $show_tribute_section ) {
 			update_option( 'dgx_donate_show_tribute_section', 'true' );
@@ -1608,7 +1643,10 @@ function dgx_donate_settings_page()
     }
 
     // Save default state
-    $defaultState = $_POST['dgx_donate_default_state'];
+    $defaultState = "";
+    if ( isset( $_POST['dgx_donate_default_state'] ) ) {
+	    $defaultState = $_POST['dgx_donate_default_state'];
+    }
     if (!empty($defaultState))
     {
     	update_option('dgx_donate_default_state', $defaultState);
@@ -1726,6 +1764,8 @@ function dgx_donate_settings_page()
 	echo "<input type=\"hidden\" name=\"dgx_donate_settings_nonce\" id=\"dgx_donate_settings_nonce\" value=\"$nonce\" />\n";
 
 	$show_tribute_section = get_option('dgx_donate_show_tribute_section');
+	$true_checked = "";
+	$false_checked = "";
 	if ( "true" == $show_tribute_section ) {
 		$true_checked = "checked";
 	} else {
@@ -1766,7 +1806,11 @@ function dgx_donate_debug_log_page() {
 	}
 
     // Save default state
-    $log_command = $_POST['dgx_donate_log_cmd'];
+    $log_command = "";
+    if ( isset( $_POST['dgx_donate_log_cmd'] ) ) {
+	    $log_command = $_POST['dgx_donate_log_cmd'];
+    }
+
     if (!empty($log_command))
     {
     	delete_option( 'dgx_donate_log' );

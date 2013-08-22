@@ -56,6 +56,9 @@ Yes!
 
 == Changelog ==
 
+= 2.4.4 =
+* Fixed: Cleaned up warnings when run with WP_DEBUG
+
 = 2.4.3 =
 * Fixed: Changed form submit target to _top most window (in case theme places content in iframes)
 * Fixed: Updated plugin URI to point to allendav.com
