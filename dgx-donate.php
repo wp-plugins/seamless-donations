@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.
-Version: 2.4.4
+Version: 2.5.0
 Author: allendav
 Author URI: http://www.allendav.com/
 License: GPL2
@@ -471,9 +471,43 @@ function dgx_donate_get_donation_section($formContent)
 	$output .= "<input type=\"text\" class=\"aftertext\" id=\"dgx-donate-other-input\" name=\"_dgx_donate_user_amount\" />";
 	$output .= "</p>\n";
 	
-	// $output .= "<hr/>";
+	// Designated Funds
+	$showFundCount = 0;
+	$fundArray = get_option( 'dgx_donate_designated_funds' );
+
+	if ( ! empty( $fundArray ) ) {
+		ksort( $fundArray );
+
+		foreach ( (array) $fundArray as $key => $value ) {
+			if ( strcasecmp( $fundArray[$key], "SHOW" ) == 0 ) {
+				$showFundCount = $showFundCount + 1;
+			}
+		}
+	}
+
+	if ( $showFundCount > 0 ) {
+		$output .= "<p>";
+		$output .= "<input type='checkbox' id='dgx-donate-designated' name='_dgx_donate_designated'/>";
+		$output .= esc_html__( "I would like to designate this donation to a specific fund", "dgx-donate" );
+		$output .= "</p>";
+		
+		$output .= "<div class='dgx-donate-form-designated-box'>";
+		$output .= "<p>" . esc_html__( 'Designated Fund: ', 'dgx-donate' ) . " ";
+		$output .= "<select class='aftertext' name='_dgx_donate_designated_fund'>";
+		
+		foreach ( (array) $fundArray as $key => $value ) {
+			if ( strcasecmp( $fundArray[$key], "SHOW" ) == 0 ) {
+				$fundName = stripslashes( $key );
+				$output .= "<option value='" . esc_attr( $fundName ) . "' > " . esc_html( $fundName ) . "</option>";
+			}
+		}
+
+		$output .= "</select>";
+		$output .= "</p>";
+		$output .= "</div>"; /* dgx-donate-form-designated-box */
+	}
 	
-	$output .= "</div>\n"; /* dgx-donate-form-section */
+	$output .= "</div>"; /* dgx-donate-form-section */
 
 	$formContent .= $output;
 
@@ -524,7 +558,7 @@ function dgx_donate_get_tribute_section($formContent)
 	$output .= "<hr/>";
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_honoree_name\">Honoree's Name: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_name\" size=\"30\" value=\"$honoreeName\" />";
+	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_name\" size=\"20\" value=\"$honoreeName\" />";
 	$output .= "</p>";
 	$output .= "<p>";
 	$output .= "<input type=\"radio\" name=\"_dgx_donate_honor_by_email\" value=\"TRUE\" $checkHonorEmail /> Send acknowledgement via email to ";
@@ -532,11 +566,11 @@ function dgx_donate_get_tribute_section($formContent)
 	$output .= "<div class=\"dgx-donate-form-subsection\">";
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_honoree_address\">Name: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_email_name\" size=\"30\" value=\"$honoreeEmailRecipient\" />";
+	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_email_name\" size=\"20\" value=\"$honoreeEmailRecipient\" />";
 	$output .= "</p>";
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_honoree_email\">Email: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_email\" size=\"30\" value=\"$honoreeEmail\" />";
+	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_email\" size=\"20\" value=\"$honoreeEmail\" />";
 	$output .= "</p>";
 	$output .= "</div>";
 	$output .= "<p>";	
@@ -545,11 +579,11 @@ function dgx_donate_get_tribute_section($formContent)
 	$output .= "<div class=\"dgx-donate-form-subsection\">";
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_honoree_address\">Name: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_post_name\" size=\"30\" value=\"$honoreePostalRecipient\" />";
+	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_post_name\" size=\"20\" value=\"$honoreePostalRecipient\" />";
 	$output .= "</p>";
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_honoree_address\">Address: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_address\" size=\"30\" value=\"$honoreeAddress\" />";
+	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_address\" size=\"20\" value=\"$honoreeAddress\" />";
 	$output .= "</p>";	
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_honoree_city\">City: </label>";
@@ -607,7 +641,7 @@ function dgx_donate_get_donor_section($formContent)
 	$output .= "</p>";
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_donor_email\">Email: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_donor_email\"  size=\"40\" value=\"$donorEmail\" />";
+	$output .= "<input type=\"text\" name=\"_dgx_donate_donor_email\"  size=\"20\" value=\"$donorEmail\" />";
 	$output .= "</p>";
 
 	$output .= "<p><input type=\"checkbox\" name=\"_dgx_donate_add_to_mailing_list\" $checkAddMailingList /> Add me to your mailing list</p>\n";
@@ -641,11 +675,11 @@ function dgx_donate_get_billing_section($formContent)
 	
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_donor_address\">Address: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_donor_address\"  size=\"40\" value=\"$donorAddress\" />";
+	$output .= "<input type=\"text\" name=\"_dgx_donate_donor_address\"  size=\"20\" value=\"$donorAddress\" />";
 	$output .= "</p>";	
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_donor_address2\">Address 2: <span class=\"dgx-donate-comment\">(optional)</span> </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_donor_address2\"  size=\"40\" value=\"$donorAddress2\" />";
+	$output .= "<input type=\"text\" name=\"_dgx_donate_donor_address2\"  size=\"20\" value=\"$donorAddress2\" />";
 	$output .= "</p>";
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_donor_city\">City: </label>";
@@ -774,14 +808,14 @@ function dgx_donate_send_thank_you_email($donationID, $testAddress="")
     //	$emailBody .= "\n\n";
 	// }
 
-    // if (!empty($designated))
-    // {
-    //	$text = get_option('dgx_donate_email_desig');
-    //	$text = str_replace("[fund]", $fund, $text);
-    //	$text = stripslashes($text);
-    //	$emailBody .= $text;
-    //	$emailBody .= "\n\n";
-	// }	
+	if ( ! empty( $designated ) )
+	{
+		$text = get_option( 'dgx_donate_email_desig' );
+		$text = str_replace( "[fund]", $fund, $text );
+		$text = stripslashes ($text );
+		$emailBody .= $text;
+		$emailBody .= "\n\n";
+	}	
 	
     if (!empty($anonymous))
     {
