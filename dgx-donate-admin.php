@@ -7,6 +7,7 @@ function dgx_donate_add_menus()
 {
 	add_action( 'dgx_donate_menu', 'dgx_donate_donation_report_menu', 1 );
 	add_action( 'dgx_donate_menu', 'dgx_donate_donor_report_menu', 3 );
+	add_action( 'dgx_donate_menu', 'dgx_donate_funds_menu', 7 );
 	add_action( 'dgx_donate_menu', 'dgx_donate_email_template_menu', 9 );
 	add_action( 'dgx_donate_menu', 'dgx_donate_thank_you_menu', 11 );
 	add_action( 'dgx_donate_menu', 'dgx_donate_settings_menu', 13 );
@@ -28,31 +29,36 @@ add_action('dgx_donate_admin_footer', 'dgx_donate_echo_admin_footer');
 /******************************************************************************************************/
 function dgx_donate_donation_report_menu()
 {
-	add_submenu_page("dgx_donate_menu_page", __('Donations'), __('Donations'), 'manage_options', 'dgx_donate_donation_report_page', dgx_donate_donation_report_page);	
+	add_submenu_page("dgx_donate_menu_page", __('Donations'), __('Donations'), 'manage_options', 'dgx_donate_donation_report_page', 'dgx_donate_donation_report_page');	
 }
 
 function dgx_donate_donor_report_menu()
 {
-	add_submenu_page("dgx_donate_menu_page", __('Donors'), __('Donors'), 'manage_options', 'dgx_donate_donor_report_page', dgx_donate_donor_report_page);
+	add_submenu_page("dgx_donate_menu_page", __('Donors'), __('Donors'), 'manage_options', 'dgx_donate_donor_report_page', 'dgx_donate_donor_report_page');
+}
+
+function dgx_donate_funds_menu()
+{
+	add_submenu_page("dgx_donate_menu_page", __('Designated Funds'), __('Designated Funds'), 'manage_options', 'dgx_donate_funds_page', 'dgx_donate_funds_page');	
 }
 
 function dgx_donate_email_template_menu()
 {
-	add_submenu_page("dgx_donate_menu_page", __('Thank You Emails'), __('Thank You Emails'), 'manage_options', 'dgx_donate_template_page', dgx_donate_template_page);
+	add_submenu_page("dgx_donate_menu_page", __('Thank You Emails'), __('Thank You Emails'), 'manage_options', 'dgx_donate_template_page', 'dgx_donate_template_page');
 }
 
 function dgx_donate_thank_you_menu()
 {
-	add_submenu_page("dgx_donate_menu_page", __('Thank You Page'), __('Thank You Page'), 'manage_options', 'dgx_donate_thank_you_page', dgx_donate_thank_you_page);
+	add_submenu_page("dgx_donate_menu_page", __('Thank You Page'), __('Thank You Page'), 'manage_options', 'dgx_donate_thank_you_page', 'dgx_donate_thank_you_page');
 }
 
 function dgx_donate_settings_menu()
 {
-	add_submenu_page("dgx_donate_menu_page", __('Settings'), __('Settings'), 'manage_options', 'dgx_donate_settings_page', dgx_donate_settings_page);
+	add_submenu_page("dgx_donate_menu_page", __('Settings'), __('Settings'), 'manage_options', 'dgx_donate_settings_page', 'dgx_donate_settings_page');
 }
 
 function dgx_donate_debug_log_menu() {
-	add_submenu_page( "dgx_donate_menu_page", __('Log'), __('Log'), 'manage_options', 'dgx_donate_debug_log_page', dgx_donate_debug_log_page);
+	add_submenu_page( "dgx_donate_menu_page", __('Log'), __('Log'), 'manage_options', 'dgx_donate_debug_log_page', 'dgx_donate_debug_log_page');
 }
 
 /******************************************************************************************************/
@@ -220,9 +226,15 @@ function dgx_donate_menu_page()
     {
       wp_die( __('You do not have sufficient permissions to access this page.') );
     }
-    
-	$donorID = $_GET['donor'];
-	$donationID = $_GET['donation'];
+
+	$donorID = "";
+	if ( isset( $_GET['donor'] ) ) {
+		$donorID = $_GET['donor'];
+	}
+	$donationID = "";
+	if ( isset( $_GET['donation'] ) ) {
+		$donationID = $_GET['donation'];
+	}    
 	
 	if (!empty($donorID))
 	{
@@ -373,7 +385,10 @@ function dgx_donate_donation_detail_page($donationID)
     }
 	
 	// Get form arguments
-	$delete_donation = $_POST['delete_donation'];
+	$delete_donation = "";
+	if ( isset( $_POST['delete_donation'] ) ) {
+		$delete_donation = $_POST['delete_donation'];
+	}
 
 	// If we have form arguments, we must validate the nonce
 	if ( count( $_POST ) > 0 )
@@ -653,6 +668,13 @@ function dgx_donate_main_page()
 	echo "<p><input class=\"button\" type=\"button\" value=\"View Donors\" onClick=\"parent.location=$actionUrl\"></p>\n";
 	echo "</form>";
 
+	echo "<h3>" . esc_html__( 'Manage Designated Funds', 'dgx-donate' ) . "</h3>\n";
+	echo "<p>" . esc_html__( 'Add, remove and configure designated funds.', 'dgx-donate' ) . "</p>\n";	
+	$actionUrl = get_admin_url() . "admin.php?page=dgx_donate_funds_page";
+	echo "<form>\n";
+	echo "<p><input class='button' type='button' value='" . esc_attr__( 'Manage Designated Funds', 'dgx-donate' ) . "' onClick=\"parent.location='" . esc_attr( $actionUrl ) . "'\"></p>";
+	echo "</form>";
+
 	echo "<h3>Settings</h3>\n";
 	echo "<p>Update giving levels, payment gateway and email settings</p>\n";	
 	$actionUrl = "'" . get_admin_url() . "admin.php?page=dgx_donate_settings_page" . "'";
@@ -684,8 +706,15 @@ function dgx_donate_donation_report_page()
     }
 	
 	// Get form arguments
-	$startDate = $_POST['startdate'];
-	$endDate = $_POST['enddate'];
+	$startDate = "";
+	$endDate = "";
+
+	if ( isset( $_POST['startdate'] ) ) {
+		$startDate = $_POST['startdate'];
+	}
+	if ( isset( $_POST['enddate'] ) ) {
+		$endDate = $_POST['enddate'];
+	}
 
 	// If we have form arguments, we must validate the nonce
 	if (count($_POST) > 0)
@@ -974,8 +1003,15 @@ function dgx_donate_donor_report_page()
     }
 	
 	// Get form arguments
-	$startDate = $_POST['startdate'];
-	$endDate = $_POST['enddate'];
+	$startDate = "";
+	$endDate = "";
+
+	if ( isset( $_POST['startdate'] ) ) {
+		$startDate = $_POST['startdate'];
+	}
+	if ( isset( $_POST['enddate'] ) ) {
+		$endDate = $_POST['enddate'];
+	}
 
 	// If we have form arguments, we must validate the nonce
 	if (count($_POST) > 0)
@@ -1237,6 +1273,188 @@ function dgx_donate_donor_report_page()
 }
 
 /******************************************************************************************************/
+function dgx_donate_funds_page()
+{
+	// Validate user
+	if ( ! current_user_can( 'manage_options' ) ) {
+      wp_die( __( 'You do not have sufficient permissions to access this page.', 'dgx-donate' ) );
+    }
+	
+	// Get form arguments
+	$fundToAdd = isset( $_POST['addfund'] ) ? $_POST['addfund'] : '';
+	$fundToAdd = strip_tags( $fundToAdd );
+	$fundToAdd = htmlspecialchars( $fundToAdd );
+
+	$editFunds = isset( $_POST['editfunds'] ) ? $_POST['editfunds'] : '';
+
+	// If we have form arguments, we must validate the nonce
+	if ( count( $_POST ) > 0 )
+	{
+		$nonce = $_POST['dgx_donate_fund_nonce'];
+		if ( ! wp_verify_nonce( $nonce, 'dgx_donate_fund_nonce' ) )
+		{
+			wp_die( __( 'You do not have sufficient permissions to access this page.', 'dgx-donate' ) );
+		}
+	}
+
+	echo "<div class='wrap'>";
+	echo "<div id='icon-edit-pages' class='icon32'></div>";
+	echo "<h2>" . esc_html__( 'Designated Funds', 'dgx-donate' ) . "</h2>";
+	
+	// Did they use the add form on the page?
+	if ( ! empty( $fundToAdd ) ) {
+		$message = __( "Fund added.", "dgx-donate" );
+		$showInList = "SHOW"; /* default for new funds */
+	
+		$fundArray = get_option( 'dgx_donate_designated_funds' );
+		if ( empty( $fundArray ) ) {
+			$fundArray = array();
+			$fundArray[$fundToAdd] = $showInList;
+		}
+		else {
+			$fundArray[$fundToAdd] = $showInList;
+		}
+		
+		ksort( $fundArray );
+		update_option( 'dgx_donate_designated_funds', $fundArray );	
+	}
+	
+	// Did they use the edit form on the page?
+	if ( ! empty( $editFunds ) ) {
+		$fundArray = get_option( 'dgx_donate_designated_funds' );
+		ksort($fundArray);
+		
+		// update display status
+		$fundNum = 0;
+		foreach ( (array) $fundArray as $key => $value ) {
+			$displayName = "display_" . $fundNum;
+
+			if ( isset( $_POST[$displayName] ) ) {
+				if ( strcasecmp( $fundArray[$key], "HIDE" ) == 0 ) {
+					$fundArray[$key] = "SHOW";
+					$message = __( "Fund(s) updated.", "dgx-donate" );
+				}
+			}
+			else {
+				if ( strcasecmp( $fundArray[$key], "SHOW" ) == 0 ) {
+					$fundArray[$key] = "HIDE";
+					$message = __( "Fund(s) updated.", "dgx-donate" );
+				}
+			}
+			
+			$fundNum = $fundNum + 1;
+		}
+		
+		// any to delete?
+		$fundNum = 0;
+		$tempArray = $fundArray;
+		foreach ( (array) $fundArray as $key => $value ) {
+			$deleteName = "delete_" . $fundNum;
+			
+			if ( isset( $_POST[$deleteName] ) ) {
+				unset( $tempArray[$key] );
+				$message = __( "Fund(s) deleted.", "dgx-donate" );
+			}
+			
+			$fundNum = $fundNum + 1;
+		}
+		$fundArray = $tempArray;
+		
+		// save the result back
+		update_option( 'dgx_donate_designated_funds', $fundArray );
+	}
+	
+	// Display any message
+	if ( ! empty( $message ) ) {
+		echo "<div id='message' class='updated below-h2'>";
+		echo "<p>" . esc_html( $message ) . "</p>";
+		echo "</div>";
+	}
+	
+	// Start the form
+	$fundArray = get_option( 'dgx_donate_designated_funds' );
+	if ( ! empty( $fundArray ) ) {
+		ksort( $fundArray );
+	}
+	else {
+		$fundArray = array();
+	}
+	
+	// Display the designated funds
+	$fundNonce = wp_create_nonce( 'dgx_donate_fund_nonce' );
+	
+	echo "<div id='col-container'>";
+	echo "<div id='col-right'>";
+	echo "<div class='col-wrap'>";
+	
+	echo "<h3>" . esc_html__( "Designated Funds", "dgx-donate" ) . "</h3>";
+	
+	if ( count( $fundArray ) > 0 ) {
+		echo "<form method='POST' action=''>";
+		echo "<input type='hidden' name='dgx_donate_fund_nonce' id='dgx_donate_fund_nonce' value='" . esc_attr( $fundNonce ) . "' />";	
+		echo "<input type='hidden' name='editfunds' value='1' />";
+		echo "<table class='widefat'><tbody>";
+		echo "<tr><th>" . esc_html__( 'Fund Name', 'dgx-donate' ) . "</th>";
+		echo "<th class='dgxdonatecentered'>" . esc_html__( 'Display on Donation Form', 'dgx-donate' ) . "</th>";
+		echo "<th class='dgxdonatecentered'>" . esc_html__( 'Delete', 'dgx-donate' ) . "</th></tr>";
+	
+		$fundNum = 0;
+		
+		foreach ( (array) $fundArray as $key => $value ) {
+			$displayName = "display_" . $fundNum;
+			$deleteName = "delete_" . $fundNum;
+			echo "<tr>";
+			$fundName = stripslashes($key);
+			echo "<td>" . esc_html( $fundName ) . "</td>";
+			$checked = "";
+			if (strcasecmp($value, "SHOW") == 0) {
+				$checked = " checked ";
+			}
+			echo "<td class='dgxdonatecentered'><input type='checkbox' name='" . esc_attr( $displayName ) . "' value='1' $checked /></td>";
+			echo "<td class='dgxdonatecentered'><input type='checkbox' name='" . esc_attr( $deleteName ) . "' value='1' /></td>";
+			echo "</tr>";
+			$fundNum = $fundNum + 1;
+		}
+	
+		echo "</tbody></table>";
+
+		echo "<p class='description'>";
+		echo esc_html__( 'Note:  Deleting a fund from this list does NOT affect any donations already made to that fund, or any reports for that fund.', 'dgx-donate' );
+		echo "</p>";
+		echo "<p><input id='submit' class='button' type='submit' value='" . esc_attr__( 'Save Changes', 'dgx-donate' ) . "' name='submit'></p>";
+		echo "</form>";
+	}
+	else {
+		echo "<p>" . esc_html__( 'You have no designated funds defined', 'dgx-donate' ) . "</p>";
+	}
+	
+	echo "</div> <!-- col-wrap -->";
+	echo "</div> <!-- col-right -->";
+	
+	echo "<div id='col-left'>";
+	echo "<div class='col-wrap'>";
+	
+	echo "<h3>" . esc_html__( 'Add New Designated Fund', 'dgx-donate' ) . "</h3>";
+	echo "<form method='POST' action=''>";
+	echo "<input type='hidden' name='dgx_donate_fund_nonce' id='dgx_donate_fund_nonce' value='" . esc_attr( $fundNonce ) . "' />";	
+	
+	echo "<div class='form-field'>";
+	echo "<label for='addfund'>" . esc_html__( 'Name', 'dgx-donate' ) . "</label>";
+	echo "<input type='text' name='addfund' size='40' />";
+	echo "<p class='description'>" . esc_html( 'The name of the desginated fund, as you want it to appear to visitors.', 'dgx-donate' ) . "</p>";
+	echo "</div> <!-- form-field -->";
+	
+	echo "<p><input id='submit' class='button' type='submit' value='" . esc_attr__( 'Add New Designated Fund', 'dgx-donate' ) . "' name='submit'></p>";
+	echo "</form>";
+	
+	echo "</div> <!-- col-wrap -->";
+	echo "</div> <!-- col-left -->";
+	echo "</div> <!-- col-container -->";
+	echo "</div> <!-- wrap -->"; 
+}
+
+
+/******************************************************************************************************/
 function dgx_donate_template_page()
 {
 	if (!current_user_can('manage_options'))
@@ -1254,16 +1472,16 @@ function dgx_donate_template_page()
 		}
 		
 		// Otherwise, proceed - get form arguments
-		$fromMail = $_POST['frommail'];
-		$subject = $_POST['subject'];
-		$bodyText = $_POST['bodytext'];
-		$recurringText = $_POST['recurringtext'];
-		$designatedText = $_POST['designatedtext'];
-		$anonymousText = $_POST['anonymoustext'];
-		$mailingListJoinText = $_POST['mailinglistjointext'];
-		$tributeText = $_POST['tributetext'];
-		$closingText = $_POST['closingtext'];
-		$signature = $_POST['signature'];
+		$fromMail            = isset( $_POST['frommail'] )            ? $_POST['frommail']            : '';
+		$subject             = isset( $_POST['subject'] )             ? $_POST['subject']             : '';
+		$bodyText            = isset( $_POST['bodytext'] )            ? $_POST['bodytext']            : '';
+		$recurringText       = isset( $_POST['recurringtext'] )       ? $_POST['recurringtext']       : '';
+		$designatedText      = isset( $_POST['designatedtext'] )      ? $_POST['designatedtext']      : '';
+		$anonymousText       = isset( $_POST['anonymoustext'] )       ? $_POST['anonymoustext']       : '';
+		$mailingListJoinText = isset( $_POST['mailinglistjointext'] ) ? $_POST['mailinglistjointext'] : '';
+		$tributeText         = isset( $_POST['tributetext'] )         ? $_POST['tributetext']         : '';
+		$closingText         = isset( $_POST['closingtext'] )         ? $_POST['closingtext']         : '';
+		$signature           = isset( $_POST['signature'] )           ? $_POST['signature']           : '';
 
     	// If they made changes, save them
 		if (!empty($fromMail))
@@ -1282,7 +1500,7 @@ function dgx_donate_template_page()
 		}
 	
     	// If they asked for a test email, send it
-    	$testMail = $_POST['testmail'];
+    	$testMail = isset( $_POST['testmail'] ) ? $_POST['testmail'] : '';
     	if (!empty($testMail))
     	{
     		dgx_donate_send_thank_you_email(0, $testMail);
@@ -1311,8 +1529,8 @@ function dgx_donate_template_page()
     $subject = stripslashes($subject);
     $bodyText = get_option('dgx_donate_email_body');
     $bodyText = stripslashes($bodyText);
-    $recurringText = get_option('dgx_donate_email_recur');
-    $recurringText = stripslashes($recurringText);
+    //$recurringText = get_option('dgx_donate_email_recur');
+    //$recurringText = stripslashes($recurringText);
     $designatedText = get_option('dgx_donate_email_desig');
     $designatedText = stripslashes($designatedText);
     $anonymousText = get_option('dgx_donate_email_anon');
@@ -1365,11 +1583,11 @@ function dgx_donate_template_page()
 	// echo "<p class=\"description\">This message will be included when the donor elects to make their donation recurring.</p>\n";
 	// echo "</div> <!-- form-field --> \n";
 
-	// echo "<div class=\"form-field\">\n";
-	// echo "<label for=\"designatedtext\">Designated Fund</label><br/>\n";
-	// echo "<textarea name=\"designatedtext\" rows=\"3\" cols=\"40\">$designatedText</textarea>\n";
-	// echo "<p class=\"description\">This message will be included when the donor designates their donation to a specific fund.</p>\n";
-	// echo "</div> <!-- form-field --> \n";
+	echo "<div class='form-field'>";
+	echo "<label for='designatedtext'>" . esc_html__( 'Designated Fund', 'dgx-donate' ) . "</label><br/>";
+	echo "<textarea name='designatedtext' rows='3' cols='40'>" . esc_html( $designatedText ) . "</textarea>";
+	echo "<p class='description'>" . esc_html( 'This message will be included when the donor designates their donation to a specific fund.', 'dgx-donate' ) . "</p>";
+	echo "</div> <!-- form-field -->";
 	
 	echo "<div class=\"form-field\">\n";
 	echo "<label for=\"anonymoustext\">Anonymous Donations</label><br/>\n";
@@ -1448,7 +1666,10 @@ function dgx_donate_thank_you_page()
     }
 
 	// Get form arguments
-	$thankYouText = $_POST['thankstext'];
+	$thankYouText = "";
+	if ( isset( $_POST['thankstext'] ) ) {
+		$thankYouText = $_POST['thankstext'];
+	}
 
 	// If we have form arguments, we must validate the nonce
 	if (count($_POST) > 0)
@@ -1581,7 +1802,10 @@ function dgx_donate_settings_page()
 	}
 
 	// Save our global settings
-    $notificationEmails = $_POST['notifyemails'];
+	$notificationEmails = "";
+	if ( isset( $_POST['notifyemails'] ) ) {
+	    $notificationEmails = $_POST['notifyemails'];
+	}
     if (!empty($notificationEmails))
     {
     	update_option('dgx_donate_notify_emails', $notificationEmails);
@@ -1589,7 +1813,10 @@ function dgx_donate_settings_page()
     }
 
     // Save giving level selections
-    $givingLevels = $_POST['dgx_donate_giving_levels'];
+    $givingLevels = "";
+	if ( isset( $_POST['dgx_donate_giving_levels'] ) ) {
+	    $givingLevels = $_POST['dgx_donate_giving_levels'];
+	}    
     if (!empty($givingLevels))
     {
     	dgx_donate_save_giving_levels_settings();
@@ -1597,7 +1824,10 @@ function dgx_donate_settings_page()
     }
 
     // Whether to show the tribute section or not
-    $show_tribute_section = $_POST['show_tribute_section'];
+    $show_tribute_section = "";
+    if ( isset( $_POST['show_tribute_section'] ) ) {
+	    $show_tribute_section = $_POST['show_tribute_section'];
+    }
     if ( ! empty( $show_tribute_section ) ) {
     	if ( "true" == $show_tribute_section ) {
 			update_option( 'dgx_donate_show_tribute_section', 'true' );
@@ -1608,7 +1838,10 @@ function dgx_donate_settings_page()
     }
 
     // Save default state
-    $defaultState = $_POST['dgx_donate_default_state'];
+    $defaultState = "";
+    if ( isset( $_POST['dgx_donate_default_state'] ) ) {
+	    $defaultState = $_POST['dgx_donate_default_state'];
+    }
     if (!empty($defaultState))
     {
     	update_option('dgx_donate_default_state', $defaultState);
@@ -1726,6 +1959,8 @@ function dgx_donate_settings_page()
 	echo "<input type=\"hidden\" name=\"dgx_donate_settings_nonce\" id=\"dgx_donate_settings_nonce\" value=\"$nonce\" />\n";
 
 	$show_tribute_section = get_option('dgx_donate_show_tribute_section');
+	$true_checked = "";
+	$false_checked = "";
 	if ( "true" == $show_tribute_section ) {
 		$true_checked = "checked";
 	} else {
@@ -1766,7 +2001,11 @@ function dgx_donate_debug_log_page() {
 	}
 
     // Save default state
-    $log_command = $_POST['dgx_donate_log_cmd'];
+    $log_command = "";
+    if ( isset( $_POST['dgx_donate_log_cmd'] ) ) {
+	    $log_command = $_POST['dgx_donate_log_cmd'];
+    }
+
     if (!empty($log_command))
     {
     	delete_option( 'dgx_donate_log' );

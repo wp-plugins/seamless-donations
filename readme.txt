@@ -3,8 +3,8 @@ Contributors: allendav, designgeneers
 Donate link: http://www.allendav.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
-Tested up to: 3.6
-Stable tag: 2.4.2
+Tested up to: 3.7
+Stable tag: 2.4.4
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,10 +13,10 @@ Receive donations, track donors and send customized thank you messages with Seam
 == Description ==
 
 Need more than just a PayPal donation button?  Would you like to allow your visitors to donate in honor of
-someone?  Invite them to subscribe to your mailing list?  Allow them to mark their donation anonymous?  Track
-donors and donations?  Seamless Donations by Designgeneers does all this and more - and all you need to do
-is embed a simple shortcode and supply your PayPal Website Payments Standard email address to start receiving
-donations today.
+someone?  Invite them to subscribe to your mailing list?  Choose from desginated funds?  Allow them to mark
+their donation anonymous?  Track donors and donations?  Seamless Donations by Designgeneers does all this
+and more - and all you need to do is embed a simple shortcode and supply your PayPal Website Payments
+Standard email address to start receiving donations today.
 
 == Installation ==
 
@@ -55,6 +55,13 @@ Yes!
 6. Dashboard >> Thank You Email Templates
 
 == Changelog ==
+
+= 2.5.0 =
+* Added support for designated funds
+* Fixed: A couple warnings when saving changes to thank you email templates.
+
+= 2.4.4 =
+* Fixed: Cleaned up warnings when run with WP_DEBUG
 
 = 2.4.3 =
 * Fixed: Changed form submit target to _top most window (in case theme places content in iframes)
