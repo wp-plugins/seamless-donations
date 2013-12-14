@@ -100,19 +100,19 @@
 	background: #faa;
 }
 
-.dgx-donate-busy, .dgx-donate-error-msg
+.dgx-donate-busy, .dgx-donate-error-msg, .dgx-donate-pay-disabled
 {
-	visibility: hidden;
+	display: none;
 }
 
 .dgx-donate-form-section input.dgx-donate-pay-enabled
 {
 	padding: 10px;
 	cursor: pointer;
+	border: none;
 }
 
-.dgx-donate-form-section input.dgx-donate-pay-disabled
-{
+.dgx-donate-pay-disabled {
 	padding: 10px;
-	cursor: not-allowed;
 }
+
