@@ -1,7 +1,7 @@
 <?php
 
 /* PayPal Website Payments Standard Module for Seamless Donations */
-/* Copyright 2013 Allen Snook (email: allen@allensnook.com) */
+/* Copyright 2013 Allen Snook (email: allendav@allendav.com) */
 
 define('DGXDONATEPAYPALSTD', 'DGXDONATEPAYPALSTD');
 
@@ -14,13 +14,18 @@ function dgx_donate_paypalstd_init()
 
 	// The donation form content uses a filter since it must return the form to the caller
 	add_filter('dgx_donate_donation_form','dgx_donate_show_paypalstd_donation_form');
-
-	wp_enqueue_script('jquery');
-	$scripturl = plugins_url('/js/paypalstd-script.js',__FILE__); 
-	wp_enqueue_script('dgx_donate_paypalstd_script', $scripturl, array('jquery'));
 }
 
 add_action('init', 'dgx_donate_paypalstd_init');
+
+/******************************************************************************************************/
+function dgx_donate_paypalstd_enqueue_scripts() {
+	$load_in_footer = ( 'true' == get_option( 'dgx_donate_scripts_in_footer' ) );
+	wp_enqueue_script( 'jquery' );
+	$script_url = plugins_url( '/js/paypalstd-script.js', __FILE__ ); 
+	wp_enqueue_script( 'dgx_donate_paypalstd_script', $script_url, array( 'jquery' ), false, $load_in_footer );
+}
+add_action( 'wp_enqueue_scripts', 'dgx_donate_paypalstd_enqueue_scripts' );
 
 /******************************************************************************************************/
 function dgx_donate_show_paypalstd_settings_form()
@@ -63,7 +68,11 @@ function dgx_donate_show_paypalstd_settings_form()
 
 	echo "<p>Mode: \n";
 	echo "<input type=\"radio\" name=\"paypalserver\" value=\"SANDBOX\" $checkSandbox /> Sandbox (Test Server) ";
-	echo "<input type=\"radio\" name=\"paypalserver\" value=\"LIVE\" $checkLive /> Live (Production Server)</p>";	
+	echo "<input type=\"radio\" name=\"paypalserver\" value=\"LIVE\" $checkLive /> Live (Production Server)</p>";
+
+	echo "<p>" . __( 'IPN URL', 'dgx-donate' ) . "<p>";
+	$notify_url = plugins_url( '/dgx-donate-paypalstd-ipn.php', __FILE__ );
+	echo "<pre>$notify_url</pre>";
 }
 
 /******************************************************************************************************/
@@ -117,8 +126,8 @@ function dgx_donate_show_paypalstd_donation_form($content)
 		$content .= "<form id=\"dgx-donate-form\" method=\"post\" onsubmit=\"return DgxDonateDoCheckout();\" >";
 	
 		// Save the session ID as a hidden input
-		$sessionID = session_id();
-		$content .= "<input type=\"hidden\" name=\"_dgx_donate_session_id\" value=\"$sessionID\" />";
+		$session_id = 'dgxdonate_' . substr( session_id(), 0, 10 ) . '_' . time();
+		$content .= "<input type=\"hidden\" name=\"_dgx_donate_session_id\" value=\"$session_id\" />";
 
 		// Start the outermost container
 		$content .= "<div id=\"dgx-donate-container\">\n";
@@ -198,32 +207,38 @@ function dgx_donate_paypalstd_get_hidden_form()
 	$successUrl .= "$sessionID";
 
 	$output = "";
-	$output .= "<form id='dgx-donate-hidden-form' action='$formAction' method='post' target='_top' >";
-	$output .= "<input type=\"hidden\" name=\"cmd\" value=\"_donations\" />";
-	$output .= "<input type=\"hidden\" name=\"business\" value=\"$paypalEmail\" />";
-	$output .= "<input type=\"hidden\" name=\"return\" value=\"$successUrl\" />";
+	$output .= "<form id='dgx-donate-hidden-form' action='" . esc_attr( $formAction ) . "' method='post' target='_top' >";
+	$output .= "<input type='hidden' name='cmd' value='_donations' />";
+	$output .= "<input type='hidden' name='business' value='" . esc_attr( $paypalEmail ) . "' />";
+	$output .= "<input type='hidden' name='return' value='" . esc_attr( $successUrl ) ."' />";
 
-	$output .= "<input type=\"hidden\" name=\"first_name\" value=\"\" /> ";
-	$output .= "<input type=\"hidden\" name=\"last_name\" value=\"\" />";
-	$output .= "<input type=\"hidden\" name=\"address1\" value=\"\" />";
-	$output .= "<input type=\"hidden\" name=\"address2\" value=\"\" />";
-	$output .= "<input type=\"hidden\" name=\"city\" value=\"\" />";
+	$output .= "<input type='hidden' name='first_name' value='' /> ";
+	$output .= "<input type='hidden' name='last_name' value='' />";
+	$output .= "<input type='hidden' name='address1' value='' />";
+	$output .= "<input type='hidden' name='address2' value='' />";
+	$output .= "<input type='hidden' name='city' value='' />";
 
-	$output .= "<input type=\"hidden\" name=\"state\" value=\"\" />";		
+	$output .= "<input type='hidden' name='state' value='' />";		
 
-	$output .= "<input type=\"hidden\" name=\"zip\" value=\"\" />";
-	// $output .= "<input type=\"hidden\" name=\"country\" value=\"\" />";
-	$output .= "<input type=\"hidden\" name=\"email\" value=\"\" />";
+	$output .= "<input type='hidden' name='zip' value='' />";
+	// $output .= "<input type='hidden' name='country' value='' />";
+	$output .= "<input type='hidden' name='email' value='' />";
 	
-	$output .= "<input type=\"hidden\" name=\"custom\" value=\"\" />";
-	$output .= "<input type=\"hidden\" name=\"notify_url\" value=\"$notifyUrl\" />";
-	// $output .= "<input type=\"hidden\" name=\"tax_cart\" value=\"\" />";
-		
-	$output .= "<input type=\"hidden\" name=\"item_name\" value=\"Donation\" />";
-	$output .= "<input type=\"hidden\" name=\"amount\" value=\"1.00\" />";
-	$output .= "<input type=\"hidden\" name=\"quantity\" value=\"1\" />";
+	$output .= "<input type='hidden' name='custom' value='' />";
+	$output .= "<input type='hidden' name='notify_url' value='" . esc_attr( $notifyUrl ) . "' />";
 
-	$output .= "<input type=\"hidden\" name=\"currency_code\" value=\"USD\" />";
+	$output .= "<input type='hidden' name='item_name' value='" . esc_attr__( 'Donation', 'dgx-donate' ) . "' />";
+	$output .= "<input type='hidden' name='amount' value='1.00' />";
+	$output .= "<input type='hidden' name='quantity' value='1' />";
+
+	$output .= "<input type='hidden' name='currency_code' value='USD' />";
+
+	$output .= "<input type='hidden' name='no_note' value='1' />";
+
+	$output .= "<input type='hidden' name='src' value='1' />"; // removed when not repeating
+	$output .= "<input type='hidden' name='p3' value='1' />";  // removed when not repeating
+	$output .= "<input type='hidden' name='t3' value='1' />";  // removed when not repeating
+	$output .= "<input type='hidden' name='a3' value='1' />";  // removed when not repeating
 
 	$output .= "</form>";
 
@@ -255,23 +270,25 @@ function dgx_donate_paypalstd_warning_section($formContent)
 }
 
 /******************************************************************************************************/
-function dgx_donate_paypalstd_payment_section($formContent)
-{
+function dgx_donate_paypalstd_payment_section( $form_content ) {
 	// Show the button that kicks it all off
 
-	$processingImage = plugins_url('/images/ajax-loader.gif', __FILE__);
-	$buttonImage = plugins_url('/images/paypal_btn_donate_lg.gif', __FILE__);
-	$output = "";
-	$output .= "<div class=\"dgx-donate-form-section\">";
-	$output .= "<p>";
-	$output .= "<input class=\"dgx-donate-pay-enabled\" type=\"image\" src=\"$buttonImage\" value=\"Donate Now\"/> <img class=\"dgx-donate-busy\" src=\"$processingImage\" />\n";
-	$output .= "</p>";
-	$output .= "<p class=\"dgx-donate-error-msg\"></p>";
-	$output .= "</div>\n";	
-	
-	$formContent .= $output;
+	$processing_image_url = plugins_url( '/images/ajax-loader.gif', __FILE__ );
+	$button_image_url = plugins_url( '/images/paypal_btn_donate_lg.gif', __FILE__ );
+	$disabled_button_image_url = plugins_url( '/images/paypal_btn_donate_lg_disabled.gif', __FILE__ );
 
-	return $formContent;
+	$section = "<div class='dgx-donate-form-section'>"
+		. "<p>"
+		. "<input class='dgx-donate-pay-enabled' type='image' src='" . esc_url( $button_image_url ) . "' value='" . esc_attr__( 'Donate Now', 'dgx-donate' ) . "'/>"
+		. "<img class='dgx-donate-pay-disabled' src='" . esc_url( $disabled_button_image_url ) . "' />"
+		. "<img class='dgx-donate-busy' src='" . esc_url( $processing_image_url ) . "' />"
+		. "</p>"
+		. "<p class='dgx-donate-error-msg'></p>"
+		. "</div>\n";
+
+	$form_content .= $section;
+
+	return $form_content;
 }
 
 /******************************************************************************************************/
@@ -379,9 +396,10 @@ function dgx_donate_paypalstd_ajax_checkout()
 	
 	// Save it all in a transient
 	$transientToken = $postData['SESSIONID'];
-	set_transient($transientToken, $postData, 60*60); // 60*60 = 1 hour
+	set_transient($transientToken, $postData, 7*24*60*60); // 7 days
 
 	// Log
+	dgx_donate_debug_log( '----------------------------------------' );
 	dgx_donate_debug_log( 'Donation transaction started' );
 	dgx_donate_debug_log( 'Name: ' . $postData['FIRSTNAME'] . ' ' . $postData['LASTNAME'] );
 	dgx_donate_debug_log( 'Amount: ' . $postData['AMOUNT'] );

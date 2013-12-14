@@ -2,8 +2,8 @@
 /*
 Plugin Name: Seamless Donations
 Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
-Description: Making online donations easy for your visitors; making donor and donation management easy for you.
-Version: 2.5.0
+Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts.
+Version: 2.6.0
 Author: allendav
 Author URI: http://www.allendav.com/
 License: GPL2
@@ -118,7 +118,7 @@ function dgx_donate_queue_stylesheet() {
 	wp_register_style('dgx_donate_css', $styleurl);
 	wp_enqueue_style('dgx_donate_css');
 }
-add_action('wp_print_styles', 'dgx_donate_queue_stylesheet');
+add_action('wp_enqueue_scripts', 'dgx_donate_queue_stylesheet');
 
 /**********************************************************************************************************/
 function dgx_donate_queue_admin_stylesheet() {
@@ -131,22 +131,20 @@ add_action('admin_print_styles', 'dgx_donate_queue_admin_stylesheet');
 
 /******************************************************************************************************/
 function dgx_donate_queue_scripts() {
-
-	// This queues the scripts used by the core and by paypalstd
-
-	wp_enqueue_script('jquery');
-	$scripturl = plugins_url('/js/script.js',__FILE__); 
-	wp_enqueue_script('dgx_donate_script', $scripturl, array('jquery'));
+	$load_in_footer = ( 'true' == get_option( 'dgx_donate_scripts_in_footer' ) );
+	wp_enqueue_script( 'jquery' );
+	$script_url = plugins_url( '/js/script.js', __FILE__ ); 
+	wp_enqueue_script( 'dgx_donate_script', $script_url, array( 'jquery' ), false, $load_in_footer );
 
 	// declare the URL to the file that handles the AJAX request (wp-admin/admin-ajax.php)
-	wp_localize_script('dgx_donate_script', 'dgxDonateAjax',
+	wp_localize_script( 'dgx_donate_script', 'dgxDonateAjax',
 		array(
-			'ajaxurl' => admin_url('admin-ajax.php'),
-			'nonce' => wp_create_nonce('dgx-donate-nonce')
+			'ajaxurl' => admin_url( 'admin-ajax.php' ),
+			'nonce' => wp_create_nonce( 'dgx-donate-nonce' )
 		)
 	);
 }
-add_action('init','dgx_donate_queue_scripts');
+add_action( 'wp_enqueue_scripts', 'dgx_donate_queue_scripts' );
 
 /******************************************************************************************************/
 function dgx_donate_get_version()
@@ -161,7 +159,7 @@ function dgx_donate_get_version()
 /******************************************************************************************************/
 function dgx_donate_display_thank_you()
 {
-	$output .= "<p>";
+	$output = "<p>";
 	$thankYouText = get_option('dgx_donate_thanks_text');
 	$thankYouText = nl2br($thankYouText);
 	$output .= $thankYouText;
@@ -181,7 +179,7 @@ function dgx_donate_debug_log($message)
 		$debug_log = array();
 	}
 
-	$timestamp = strftime("%m-%d-%G %H:%M:%S");
+	$timestamp = current_time( 'mysql' );
 
 	$debug_log[] = $timestamp . ' ' . $message;
 
@@ -193,86 +191,147 @@ function dgx_donate_debug_log($message)
 }
 
 /******************************************************************************************************/
-function dgx_donate_create_post($postData)
-{
-	// Create a new donation record
-	
+function dgx_donate_get_meta_map() {
+	return array(
+		'SESSIONID' => '_dgx_donate_session_id',
+		'AMOUNT' => '_dgx_donate_amount',
+		'REPEATING' => '_dgx_donate_repeating',
+		'DESIGNATED' => '_dgx_donate_designated',
+		'DESIGNATEDFUND' => '_dgx_donate_designated_fund',
+		'TRIBUTEGIFT' => '_dgx_donate_tribute_gift',
+		'MEMORIALGIFT' => '_dgx_donate_memorial_gift',
+		'HONOREENAME' => '_dgx_donate_honoree_name',
+		'HONORBYEMAIL' => '_dgx_donate_honor_by_email',
+		'HONOREEEMAILNAME' => '_dgx_donate_honoree_email_name',
+		'HONOREEEMAIL' => '_dgx_donate_honoree_email',
+		'HONOREEPOSTNAME' => '_dgx_donate_honoree_post_name',
+		'HONOREEADDRESS' => '_dgx_donate_honoree_address',
+		'HONOREECITY' => '_dgx_donate_honoree_city',
+		'HONOREESTATE' => '_dgx_donate_honoree_state',
+		'HONOREEZIP' => '_dgx_donate_honoree_zip',
+		'FIRSTNAME' => '_dgx_donate_donor_first_name',
+		'LASTNAME' => '_dgx_donate_donor_last_name',
+		'PHONE' => '_dgx_donate_donor_phone',
+		'EMAIL' => '_dgx_donate_donor_email',
+		'ADDTOMAILINGLIST' => '_dgx_donate_add_to_mailing_list',
+		'ADDRESS' => '_dgx_donate_donor_address',
+		'ADDRESS2' => '_dgx_donate_donor_address2',
+		'CITY' => '_dgx_donate_donor_city',
+		'STATE' => '_dgx_donate_donor_state',
+		'ZIP' => '_dgx_donate_donor_zip',
+		'INCREASETOCOVER' => '_dgx_donate_increase_to_cover',
+		'ANONYMOUS' => '_dgx_donate_anonymous',
+		'PAYMENTMETHOD' => '_dgx_donate_payment_method'
+	);
+}
+
+/******************************************************************************************************/
+function dgx_donate_create_empty_donation_record() {
+
 	// Get all the dates - timezone fix thanks to pkwooster
-	$gmtOffset = -get_option('gmt_offset');
-	$phpTimezone = date_default_timezone_get();
-	if ($gmtOffset > 0)
+	$gmt_offset = -get_option( 'gmt_offset' );
+	$php_time_zone = date_default_timezone_get();
+	if ($gmt_offset > 0)
 	{
-		$timezone = 'Etc/GMT+' . $gmtOffset;
+		$time_zone = 'Etc/GMT+' . $gmt_offset;
 	}
 	else
 	{
-		$timezone = 'Etc/GMT' . $gmtOffset;
+		$time_zone = 'Etc/GMT' . $gmt_offset;
 	}
-	date_default_timezone_set($timezone);
+	date_default_timezone_set( $time_zone );
 	
-	$year = date('Y');
-	$month = date('m');
-	$day = date('d');
-	$yearMonthDay = date('Y-m-d');
-	$time = date('g:i:s A');
-	$dateTime = date('Y-m-d H:i:s');
+	$year = date( 'Y' );
+	$month = date( 'm' );
+	$day = date( 'd' );
+	$year_month_day = date( 'Y-m-d' );
+	$time = date( 'g:i:s A' );
+	$date_time = date( 'Y-m-d H:i:s' );
 	
 	// set the PHP timezone back the way it was
-	date_default_timezone_set($phpTimezone);
+	date_default_timezone_set( $php_time_zone );
 	
 	// the title is Lastname, Firstname (YYYY-MM-dd)
-	$postTitle = $lastName . ", " . $firstName . " (" . $yearMonthDay . ")";
+	$post_title = $date_time;
 
-	$newDonation = array(
-		'post_title' => $postTitle,
+	$new_donation = array(
+		'post_title' => $post_title,
 		'post_content' => '',
 		'post_status' => 'publish',
-		'post_date' => $dateTime,
+		'post_date' => $date_time,
 		'post_author' => 1,
 		'post_type' => 'dgx-donation'
 	);
 
-	$donationID = wp_insert_post($newDonation);
+	$donation_id = wp_insert_post( $new_donation );
+
+	// Save some meta
+	update_post_meta( $donation_id, '_dgx_donate_year', $year );
+	update_post_meta( $donation_id, '_dgx_donate_month', $month );
+	update_post_meta( $donation_id, '_dgx_donate_day', $day );
+	update_post_meta( $donation_id, '_dgx_donate_time', $time );
+
+	return $donation_id;
+}
+
+/******************************************************************************************************/
+function dgx_donate_create_donation_from_transient_data( $transient_data )
+{
+	// Create a new donation record
+	$donation_id = dgx_donate_create_empty_donation_record();
+
+	$meta_map = dgx_donate_get_meta_map();
+
+	foreach ( (array) $meta_map as $transient_data_key => $postmeta_key ) {
+		update_post_meta( $donation_id, $postmeta_key, $transient_data[ $transient_data_key ] );
+	}	
 	
-	// Save all the meta
-	update_post_meta($donationID, '_dgx_donate_year', $year);
-	update_post_meta($donationID, '_dgx_donate_month', $month);
-	update_post_meta($donationID, '_dgx_donate_day', $day);	
-	update_post_meta($donationID, '_dgx_donate_time', $time);	
+	return $donation_id;
+}
+
+/******************************************************************************************************/
+function dgx_donate_create_donation_from_donation( $old_donation_id )
+{
+	// Create a new donation record by cloning an old one (useful for repeating donations)
+	dgx_donate_debug_log( "about to create donation from old donation $old_donation_id" );
+	$new_donation_id = dgx_donate_create_empty_donation_record();
+	dgx_donate_debug_log( "new donation id = $new_donation_id" );
+
+	$meta_map = dgx_donate_get_meta_map();
+
+	foreach ( (array) $meta_map as $transient_data_key => $postmeta_key ) {
+		$old_donation_meta_value = get_post_meta( $old_donation_id, $postmeta_key, true );
+		update_post_meta( $new_donation_id, $postmeta_key, $old_donation_meta_value );
+	}
 	
-	update_post_meta($donationID, '_dgx_donate_amount', $postData['AMOUNT']);
-	update_post_meta($donationID, '_dgx_donate_repeating', $postData['REPEATING']);
-	update_post_meta($donationID, '_dgx_donate_designated', $postData['DESIGNATED']);
-	update_post_meta($donationID, '_dgx_donate_designated_fund', $postData['DESIGNATEDFUND']);
-	
-	update_post_meta($donationID, '_dgx_donate_tribute_gift', $postData['TRIBUTEGIFT']);
-	update_post_meta($donationID, '_dgx_donate_memorial_gift', $postData['MEMORIALGIFT']);
-	update_post_meta($donationID, '_dgx_donate_honoree_name', $postData['HONOREENAME']);
-	update_post_meta($donationID, '_dgx_donate_honor_by_email', $postData['HONORBYEMAIL']);
-	update_post_meta($donationID, '_dgx_donate_honoree_email_name', $postData['HONOREEEMAILNAME']);
-	update_post_meta($donationID, '_dgx_donate_honoree_email', $postData['HONOREEEMAIL']);
-	update_post_meta($donationID, '_dgx_donate_honoree_post_name', $postData['HONOREEPOSTNAME']);
-	update_post_meta($donationID, '_dgx_donate_honoree_address', $postData['HONOREEADDRESS']);
-	update_post_meta($donationID, '_dgx_donate_honoree_city', $postData['HONOREECITY']);
-	update_post_meta($donationID, '_dgx_donate_honoree_state', $postData['HONOREESTATE']);	
-	update_post_meta($donationID, '_dgx_donate_honoree_zip', $postData['HONOREEZIP']);
-	
-	update_post_meta($donationID, '_dgx_donate_donor_first_name', $postData['FIRSTNAME']);
-	update_post_meta($donationID, '_dgx_donate_donor_last_name', $postData['LASTNAME']);
-	update_post_meta($donationID, '_dgx_donate_donor_phone', $postData['PHONE']);
-	update_post_meta($donationID, '_dgx_donate_donor_email', $postData['EMAIL']);
-	update_post_meta($donationID, '_dgx_donate_add_to_mailing_list', $postData['ADDTOMAILINGLIST']);
-	update_post_meta($donationID, '_dgx_donate_donor_address', $postData['ADDRESS']);
-	update_post_meta($donationID, '_dgx_donate_donor_address2', $postData['ADDRESS2']);
-	update_post_meta($donationID, '_dgx_donate_donor_city', $postData['CITY']);
-	update_post_meta($donationID, '_dgx_donate_donor_state', $postData['STATE']);
-	update_post_meta($donationID, '_dgx_donate_donor_zip', $postData['ZIP']);
-	
-	update_post_meta($donationID, '_dgx_donate_increase_to_cover', $postData['INCREASETOCOVER']);
-	update_post_meta($donationID, '_dgx_donate_anonymous', $postData['ANONYMOUS']);
-	update_post_meta($donationID, '_dgx_donate_payment_method', $postData['PAYMENTMETHOD']);
-	
-	return $donationID;
+	dgx_donate_debug_log( "done with dgx_donate_create_donation_from_donation, returning new id $new_donation" );
+	return $new_donation_id;
+}
+
+/******************************************************************************************************/
+function dgx_donate_create_donation_from_paypal_data( $post_data )
+{
+	// Create a new donation record by cloning an old one (useful for repeating donations)
+	dgx_donate_debug_log( "about to create donation from paypal post data" );
+	$new_donation_id = dgx_donate_create_empty_donation_record();
+	dgx_donate_debug_log( "new donation id = $new_donation_id" );
+
+	// @todo - loop over the meta map translating paypal keys into our keys
+	// @todo ADDRESS
+
+	$payment_gross = isset( $_POST['payment_gross'] ) ? $_POST['payment_gross'] : ''; 
+	$mc_gross = isset( $_POST['mc_gross'] ) ? $_POST['mc_gross'] : ''; 
+
+	$amount = empty( $payment_gross ) ? $mc_gross : $payment_gross;
+
+	update_post_meta( $new_donation_id, '_dgx_donate_donor_first_name', $_POST['first_name'] );
+	update_post_meta( $new_donation_id, '_dgx_donate_donor_last_name', $_POST['last_name'] );
+	update_post_meta( $new_donation_id, '_dgx_donate_donor_email', $_POST['payer_email'] );
+	update_post_meta( $new_donation_id, '_dgx_donate_amount', $amount );
+
+
+	dgx_donate_debug_log( "done with dgx_donate_create_donation_from_paypal_data, returning new id $new_donation" );
+	return $new_donation_id;
 }
 
 /******************************************************************************************************/
@@ -506,7 +565,13 @@ function dgx_donate_get_donation_section($formContent)
 		$output .= "</p>";
 		$output .= "</div>"; /* dgx-donate-form-designated-box */
 	}
-	
+
+	// Repeating donations
+	$output .= "<p>";
+	$output .= "<input type='checkbox' id='dgx-donate-repeating' name='_dgx_donate_repeating'/>";
+	$output .= esc_html__( "I would like this donation to automatically repeat each month", "dgx-donate" );
+	$output .= "</p>";
+		
 	$output .= "</div>"; /* dgx-donate-form-section */
 
 	$formContent .= $output;
@@ -671,7 +736,7 @@ function dgx_donate_get_billing_section($formContent)
 
 	$output = "";
 	$output .= "<div class=\"dgx-donate-form-section\">\n";
-	$output .= "<h2>Billing Information</h2>\n";
+	$output .= "<h2>Donor Address</h2>\n";
 	
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_donor_address\">Address: </label>";
@@ -706,23 +771,17 @@ add_shortcode('dgx-donate', 'dgx_donate_shortcode');
 
 function dgx_donate_shortcode($atts)
 {
-	$thanks = "";
+	$show_thanks = false;
 	if ( isset( $_GET['thanks'] ) ) {
-		$thanks = $_GET['thanks'];
+		$show_thanks = true;
+	} else if ( isset( $_GET['auth'] ) ) {
+		$show_thanks = true;
 	}
-	
-	// Sanitize
-	$thanks = trim($thanks);
-	$thanks = strip_tags($thanks);
-	$thanks = htmlspecialchars($thanks);
 	
 	// Switch
-	if (!empty($thanks))
-	{
+	if ( $show_thanks ) {
 		$output = dgx_donate_display_thank_you();
-	}
-	else
-	{
+	} else {
 		$output = "";
 		$output = apply_filters('dgx_donate_donation_form', $output);
 
@@ -750,8 +809,8 @@ function dgx_donate_send_thank_you_email($donationID, $testAddress="")
 		$amount = "$100.00";
 		// fundname
 		$fund = "Tesla Scholarship";
-		// recurring y/n
-		$recurring = "TRUE";
+		// repeating y/n
+		$repeating = "TRUE";
 		// designated y/n
 		$designated = "TRUE";
 		// anonymous y/n
@@ -775,7 +834,7 @@ function dgx_donate_send_thank_you_email($donationID, $testAddress="")
 		// fundname
 		$fund = get_post_meta($donationID, '_dgx_donate_designated_fund', true);
 		// recurring y/n
-		$recurring = get_post_meta($donationID, '_dgx_donate_repeating', true);
+		$repeating = get_post_meta($donationID, '_dgx_donate_repeating', true);
 		// designated y/n
 		$designated = get_post_meta($donationID, '_dgx_donate_designated', true);
 		// anonymous y/n
@@ -798,15 +857,14 @@ function dgx_donate_send_thank_you_email($donationID, $testAddress="")
     $body = stripslashes($body);
     $emailBody = $body;
     $emailBody .= "\n\n";
-    
-    // if (!empty($recurring))
-    // {
-    //	$text = get_option('dgx_donate_email_recur');
-    //	$text = str_replace("[amount]", $amount, $text);
-    //	$text = stripslashes($text);
-    //	$emailBody .= $text;
-    //	$emailBody .= "\n\n";
-	// }
+
+	if ( ! empty( $repeating ) ) {
+		$text = get_option( 'dgx_donate_email_recur' );
+		$text = str_replace( "[amount]", $amount, $text );
+		$text = stripslashes( $text );
+		$emailBody .= $text;
+		$emailBody .= "\n\n";
+		}
 
 	if ( ! empty( $designated ) )
 	{
