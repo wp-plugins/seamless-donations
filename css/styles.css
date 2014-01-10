@@ -54,9 +54,13 @@
     vertical-align: middle;
 }
 
-.dgx-donate-form-section p:last-child
+.dgx-donate-form-section > p:last-child
 {
 	margin-bottom: 0;
+}
+
+.dgx-donate-form-section select {
+	max-width: 200px;
 }
 
 .dgx-donate-form-section input.horiz

@@ -147,7 +147,8 @@ function DgxDonateDoCheckout()
 	var honoreeAddress = DgxDonateTrim(values['_dgx_donate_honoree_address']);
 	var honoreeCity = DgxDonateTrim(values['_dgx_donate_honoree_city']);
 	var honoreeState = DgxDonateTrim(values['_dgx_donate_honoree_state']);
-	var honoreeCity = DgxDonateTrim(values['_dgx_donate_honoree_city']);
+	var honoreeProvince = DgxDonateTrim(values['_dgx_donate_honoree_province']);
+	var honoreeCountry = DgxDonateTrim(values['_dgx_donate_honoree_country']);
 	var honoreeZip = DgxDonateTrim(values['_dgx_donate_honoree_zip']);
 	var firstName = DgxDonateTrim(values['_dgx_donate_donor_first_name']);
 	var lastName = DgxDonateTrim(values['_dgx_donate_donor_last_name']);
@@ -158,6 +159,8 @@ function DgxDonateDoCheckout()
 	var address2 = DgxDonateTrim(values['_dgx_donate_donor_address2']);
 	var city = DgxDonateTrim(values['_dgx_donate_donor_city']);
 	var state = DgxDonateTrim(values['_dgx_donate_donor_state']);
+	var province = DgxDonateTrim(values['_dgx_donate_donor_province']);
+	var country = DgxDonateTrim(values['_dgx_donate_donor_country']);
 	var zip = DgxDonateTrim(values['_dgx_donate_donor_zip']);
 	var increaseToCover = DgxDonateTrim(values['_dgx_donate_increase_to_cover']);
 	var paymentMethod = DgxDonateTrim(values['_dgx_donate_payment_method']);
@@ -287,6 +290,15 @@ function DgxDonateDoCheckout()
 	hiddenForm.find('input[name="city"]').val(city);
 	hiddenForm.find('input[name="state"]').val(state);
 	hiddenForm.find('input[name="zip"]').val(zip);
+
+	if ( 'US' == country ) {
+		hiddenForm.find( 'input[name="state"]' ).val( state );
+	} else if ( 'CA' == country ) {
+		hiddenForm.find( 'input[name="state"]' ).val( province );
+	} else {
+		hiddenForm.find( 'input[name="state"]' ).remove();
+	}
+
 	// jQuery('#dgx-donate-hidden-form').find('input[name="country"]').val("xxx");
 	hiddenForm.find('input[name="email"]').val(email);
 	hiddenForm.find('input[name="custom"]').val(sessionID);
@@ -313,10 +325,11 @@ function DgxDonateDoCheckout()
 		designatedFund: designatedFund, increaseToCover: increaseToCover, anonymous: anonymous,
 		tributeGift: tributeGift, honoreeName: honoreeName, honorByEmail: honorByEmail, honoreeEmail: honoreeEmail,
 		memorialGift: memorialGift, honoreeEmailName: honoreeEmailName, honoreePostName: honoreePostName,
-		honoreeAddress: honoreeAddress, honoreeCity: honoreeCity, honoreeState: honoreeState, honoreeZip: honoreeZip,
+		honoreeAddress: honoreeAddress, honoreeCity: honoreeCity, honoreeState: honoreeState, honoreeProvince: honoreeProvince,
+		honoreeCountry: honoreeCountry, honoreeZip: honoreeZip,
 		firstName: firstName, lastName: lastName, phone: phone, email: email, addToMailingList: addToMailingList,
-		address: address, address2: address2, city: city, state: state, zip: zip, increaseToCover: increaseToCover,
-		paymentMethod: paymentMethod };
+		address: address, address2: address2, city: city, state: state, province: province, country: country,
+		zip: zip, increaseToCover: increaseToCover, paymentMethod: paymentMethod };
 
 	jQuery.post( dgxDonateAjax.ajaxurl, data, DgxDonateCallback );
 

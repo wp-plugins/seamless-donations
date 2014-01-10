@@ -1,4 +1,4 @@
-=== Plugin Name ===
+=== Seamless Donations ===
 Contributors: allendav, designgeneers
 Donate link: http://www.allendav.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
@@ -18,6 +18,8 @@ automatically repeat each month?  Allow them to mark their donation anonymous?  
 
 Seamless Donations by Designgeneers does all this and more - and all you need to do is embed a simple shortcode
 and supply your PayPal Website Payments Standard email address to start receiving donations today.
+
+Now supporting donations by US and non-US donors (all donations are in USD - other currencies will be supported soon)
 
 == Installation ==
 
@@ -56,6 +58,9 @@ Yes!
 6. Dashboard >> Thank You Email Templates
 
 == Changelog ==
+
+= 2.7.0 =
+* Added: Support for donors located outside the United States
 
 = 2.6.0 =
 * Added: Support for repeating donations

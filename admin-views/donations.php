@@ -140,7 +140,7 @@ class Dgx_Donate_Admin_Donations_View {
 					$last_name = get_post_meta( $donation_id, '_dgx_donate_donor_last_name', true );
 					$amount = get_post_meta( $donation_id, '_dgx_donate_amount', true );
 					$fund_total = $fund_total + floatval( $amount );
-					$formatted_amount = "$" . number_format( $amount, 2 );
+					$formatted_amount =dgx_donate_get_escaped_formatted_amount( $amount );
 				
 					$donation_detail = dgx_donate_get_donation_detail_link( $donation_id );
 					$donor_email = get_post_meta( $donation_id, '_dgx_donate_donor_email', true );
@@ -149,23 +149,23 @@ class Dgx_Donate_Admin_Donations_View {
 					echo "<tr>";
 					echo "<td><a href='" . esc_url( $donation_detail ) . "'>" . esc_html( $year . "-" . $month . "-" . $day . " " . $time ) . "</a></td>";
 					echo "<td><a href='" . esc_url( $donor_detail ) . "'>" . esc_html( $first_name . " " . $last_name ) . "</a></td>";
-					echo "<td>" . esc_html( $formatted_amount ) . "</td>";
+					echo "<td>" . $formatted_amount . "</td>";
 					echo "</tr>\n";
 				}
-				$formatted_fund_total = "$" . number_format( $fund_total, 2 );
+				$formatted_fund_total = dgx_donate_get_escaped_formatted_amount( $fund_total );
 				echo "<tr>";
 				echo "<th>&nbsp;</th>";
 				echo "<th>" . esc_html__( 'Fund Subtotal', 'dgx-donate' ) . "</th>";
-				echo "<td>" . esc_html( $formatted_fund_total ) . "</td>";
+				echo "<td>" . $formatted_fund_total . "</td>";
 				echo "</tr>\n";
 				$grand_total = $grand_total + $fund_total;
 			}
 		
-			$formatted_grand_total = "$" . number_format( $grand_total, 2 );
+			$formatted_grand_total = dgx_donate_get_escaped_formatted_amount( $grand_total );
 			echo "<tr>";
 			echo "<th>&nbsp</th>";
 			echo "<th>" . esc_html__( 'Grand Total', 'dgx-donate' ) . "</th>";
-			echo "<td>$formatted_grand_total</td>";
+			echo "<td>" . $formatted_grand_total . "</td>";
 			echo "</tr>\n";
 		
 			echo "</tbody></table>\n";

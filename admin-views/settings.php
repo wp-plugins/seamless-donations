@@ -5,6 +5,7 @@
 class Dgx_Donate_Admin_Settings_View {
 	function __construct() {
 		add_action( 'dgx_donate_menu', array( $this, 'menu_item' ), 13 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 	}
 	
 	function menu_item() {
@@ -67,10 +68,31 @@ class Dgx_Donate_Admin_Settings_View {
 			$message = __( 'Settings updated.', 'dgx-donate' );
 		}
 
+		// Save currency
+		$currency = ( isset( $_POST['dgx_donate_currency'] ) ) ? $_POST['dgx_donate_currency'] : '';
+		if ( ! empty( $currency ) ) {
+			update_option( 'dgx_donate_currency', $currency );
+			$message = __( 'Settings updated.', 'dgx-donate' );
+		}
+
+		// Save default country
+		$default_country = ( isset( $_POST['dgx_donate_default_country'] ) ) ? $_POST['dgx_donate_default_country'] : '';
+		if ( ! empty( $default_country ) ) {
+			update_option( 'dgx_donate_default_country', $default_country );
+			$message = __( 'Settings updated.', 'dgx-donate' );
+		}
+
 		// Save default state
 		$default_state = ( isset( $_POST['dgx_donate_default_state'] ) ) ? $_POST['dgx_donate_default_state'] : '';
 		if ( ! empty( $default_state ) ) {
 			update_option( 'dgx_donate_default_state', $default_state );
+			$message = __( 'Settings updated.', 'dgx-donate' );
+		}
+
+		// Save default province
+		$default_province = ( isset( $_POST['dgx_donate_default_province'] ) ) ? $_POST['dgx_donate_default_province'] : '';
+		if ( ! empty( $default_province ) ) {
+			update_option( 'dgx_donate_default_province', $default_province );
 			$message = __( 'Settings updated.', 'dgx-donate' );
 		}
 
@@ -153,19 +175,46 @@ class Dgx_Donate_Admin_Settings_View {
 		echo "</form>";
 		echo "<br/>";
 
-		// Default state for donor
-		echo "<h3>" . esc_html__( 'Default State', 'dgx-donate' ) . "</h3>";
-		echo "<p>" . esc_html__( 'Select the default state for the donation form.', 'dgx-donate' ) . "</p>";
+		// Currency
+		// echo "<h3>" . esc_html__( 'Currency', 'dgx-donate' ) . " <strong>(BETA)</strong>" . "</h3>";
+		// echo "<p>" . esc_html__( "Select the currency you'd like to receive donations in.", 'dgx-donate' ) . "</p>";
+		// echo "<form method='POST' action=''>\n";
+		// echo "<input type='hidden' name='dgx_donate_settings_nonce' value='" . esc_attr( $nonce ) . "' />\n";
+		// $currency = get_option( 'dgx_donate_currency' );
+		// echo "<p>";
+		// echo dgx_donate_get_currency_selector( 'dgx_donate_currency', $currency );
+		// echo "</p>";
+		// echo "<p><input id='submit' class='button' type='submit' value='" . esc_attr__( 'Update', 'dgx-donate' ) . "' name='submit' /></p>\n";
+		// echo "</form>";
+		// echo "<br/>";
+
+		// Default country/state/province for donor
+		// jQuery will take care of hiding / showing the state and province selector based on the country code
+		echo "<h3>" . esc_html__( 'Default Country / State / Province', 'dgx-donate' ) . "</h3>";
+		echo "<p>" . esc_html__( 'Select the default country / state / province for the donation form.', 'dgx-donate' ) . "</p>";
+
+		echo "<div class='dgx_donate_geography_selects'>";
 		echo "<form method='POST' action=''>\n";
 		echo "<input type='hidden' name='dgx_donate_settings_nonce' value='" . esc_attr( $nonce ) . "' />\n";
+
+		$default_country = get_option( 'dgx_donate_default_country' );
+		echo "<p>";
+		echo dgx_donate_get_country_selector( 'dgx_donate_default_country', $default_country );
+		echo "</p>";
 
 		$default_state = get_option( 'dgx_donate_default_state' );
 		echo "<p>";
 		echo dgx_donate_get_state_selector( 'dgx_donate_default_state', $default_state );
 		echo "</p>";
 
+		$default_province = get_option( 'dgx_donate_default_province' );
+		echo "<p>";
+		echo dgx_donate_get_province_selector( 'dgx_donate_default_province', $default_province );
+		echo "</p>";
+
 		echo "<p><input id='submit' class='button' type='submit' value='" . esc_attr__( 'Update', 'dgx-donate' ) . "' name='submit' /></p>\n";
 		echo "</form>";
+		echo "</div>"; // dgx_donate_geography_selects
 		echo "<br/>";
 
 		// Show Tribute Section?
@@ -207,6 +256,12 @@ class Dgx_Donate_Admin_Settings_View {
 		echo "</div>\n";
 		echo "</div>\n";
 		echo "</div>\n"; 
+	}
+
+	function admin_enqueue_scripts() {
+		wp_enqueue_script( 'jquery' );
+		$script_url = plugins_url( '../js/geo-selects.js', __FILE__ ); 
+		wp_enqueue_script( 'dgx_donate_geo_selects_script', $script_url, array( 'jquery' ) );
 	}
 }
 

@@ -157,12 +157,30 @@ function dgx_donate_init_defaults()
 		dgx_donate_enable_giving_level(50);
 	}
 
-	// State default
-	$defaultState = get_option('dgx_donate_default_state');
-	if (empty($defaultState))
-	{
-		update_option('dgx_donate_default_state', 'WA');
+	// Currency
+	$currency = get_option( 'dgx_donate_currency' );
+	if ( empty( $currency ) ) {
+		update_option( 'dgx_donate_currency', 'USD' );
 	}
+
+	// Country default
+	$default_country = get_option( 'dgx_donate_default_country' );
+	if ( empty( $default_country ) ) {
+		update_option( 'dgx_donate_default_country', 'US' );
+	}
+
+	// State default
+	$default_state = get_option( 'dgx_donate_default_state' );
+	if ( empty( $default_state ) ) {
+		update_option( 'dgx_donate_default_state', 'WA' );
+	}
+
+	// Province default
+	$default_province = get_option( 'dgx_donate_default_province' );
+	if ( empty( $default_province ) ) {
+		update_option( 'dgx_donate_default_province', 'AB' );
+	}
+
 
 	// Show Tribute Gift section default
 	$show_tribute_section = get_option( 'dgx_donate_show_tribute_section' );

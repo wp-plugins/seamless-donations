@@ -206,6 +206,8 @@ function dgx_donate_paypalstd_get_hidden_form()
 	$successUrl .= "thanks=1&sessionid=";
 	$successUrl .= "$sessionID";
 
+	$currency_code = get_option( 'dgx_donate_currency' );
+
 	$output = "";
 	$output .= "<form id='dgx-donate-hidden-form' action='" . esc_attr( $formAction ) . "' method='post' target='_top' >";
 	$output .= "<input type='hidden' name='cmd' value='_donations' />";
@@ -218,10 +220,9 @@ function dgx_donate_paypalstd_get_hidden_form()
 	$output .= "<input type='hidden' name='address2' value='' />";
 	$output .= "<input type='hidden' name='city' value='' />";
 
-	$output .= "<input type='hidden' name='state' value='' />";		
-
+	$output .= "<input type='hidden' name='state' value='' />"; // removed if country not US or Canada
 	$output .= "<input type='hidden' name='zip' value='' />";
-	// $output .= "<input type='hidden' name='country' value='' />";
+	$output .= "<input type='hidden' name='country' value='' />";
 	$output .= "<input type='hidden' name='email' value='' />";
 	
 	$output .= "<input type='hidden' name='custom' value='' />";
@@ -231,7 +232,7 @@ function dgx_donate_paypalstd_get_hidden_form()
 	$output .= "<input type='hidden' name='amount' value='1.00' />";
 	$output .= "<input type='hidden' name='quantity' value='1' />";
 
-	$output .= "<input type='hidden' name='currency_code' value='USD' />";
+	$output .= "<input type='hidden' name='currency_code' value='" . esc_attr( $currency_code ) . "' />";
 
 	$output .= "<input type='hidden' name='no_note' value='1' />";
 
@@ -322,6 +323,18 @@ function dgx_donate_paypalstd_ajax_checkout()
 	$honoreeAddress = $_POST['honoreeAddress'];
 	$honoreeCity = $_POST['honoreeCity'];
 	$honoreeState = $_POST['honoreeState'];
+	$honoreeProvince = $_POST['honoreeProvince'];
+	$honoreeCountry = $_POST['honoreeCountry'];
+
+	if ( 'US' == $honoreeCountry ) {
+		$honoreeProvince = '';
+	} else if ( 'CA' == $honoreeCountry ) {
+		$honoreeState = '';
+	} else {
+		$honoreeState = '';
+		$honoreeProvince = '';
+	}
+
 	$honoreeZip = $_POST['honoreeZip'];
 	$honoreeEmailName = $_POST['honoreeEmailName'];
 	$honoreePostName = $_POST['honoreePostName'];
@@ -334,6 +347,18 @@ function dgx_donate_paypalstd_ajax_checkout()
 	$address2 = $_POST['address2'];
 	$city = $_POST['city'];
 	$state = $_POST['state'];
+	$province = $_POST['province'];
+	$country = $_POST['country'];
+
+	if ( 'US' == $country ) {
+		$province = '';
+	} else if ( 'CA' == $country ) {
+		$state = '';
+	} else {
+		$state = '';
+		$province = '';
+	}
+
 	$zip = $_POST['zip'];
 	$increaseToCover = $_POST['increaseToCover'];
 	$anonymous = $_POST['anonymous'];
@@ -368,6 +393,8 @@ function dgx_donate_paypalstd_ajax_checkout()
 	$postData['HONOREEADDRESS'] = $honoreeAddress;
 	$postData['HONOREECITY'] = $honoreeCity;
 	$postData['HONOREESTATE'] = $honoreeState;
+	$postData['HONOREEPROVINCE'] = $honoreeProvince;
+	$postData['HONOREECOUNTRY'] = $honoreeCountry;
 	$postData['HONOREEZIP'] = $honoreeZip;
 	$postData['HONOREEEMAILNAME'] = $honoreeEmailName;
 	$postData['HONOREEPOSTNAME'] = $honoreePostName;
@@ -380,6 +407,8 @@ function dgx_donate_paypalstd_ajax_checkout()
 	$postData['ADDRESS2'] = $address2;
 	$postData['CITY'] = $city;
 	$postData['STATE'] = $state;
+	$postData['PROVINCE'] = $province;
+	$postData['COUNTRY'] = $country;
 	$postData['ZIP'] = $zip;
 	$postData['INCREASETOCOVER'] = $increaseToCover;
 	$postData['ANONYMOUS'] = $anonymous;

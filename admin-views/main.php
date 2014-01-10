@@ -125,7 +125,7 @@ class Dgx_Donate_Admin_Main_View {
 				$donor_detail = dgx_donate_get_donor_detail_link( $donor_email );
 			
 				$amount = get_post_meta( $donation_id, '_dgx_donate_amount', true );
-				$formatted_amount = "$" . number_format( $amount, 2 );
+				$formatted_amount = dgx_donate_get_escaped_formatted_amount( $amount );
 			
 				$donation_detail = dgx_donate_get_donation_detail_link( $donation_id );
 				echo "<tr>";
@@ -137,7 +137,7 @@ class Dgx_Donate_Admin_Main_View {
 				echo "<a href='" . esc_url( $donor_detail ) . "'>";
 				echo esc_html( $first_name . ' ' . $last_name ) . "</a>";
 				echo "</td>";
-				echo "<td>" . esc_html( $formatted_amount ) . "</td>";
+				echo "<td>" . $formatted_amount . "</td>";
 				echo "</tr>\n";
 		}
 

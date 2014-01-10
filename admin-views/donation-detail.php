@@ -60,10 +60,10 @@ class Dgx_Donate_Admin_Donation_Detail_View {
 			echo "<td>" . esc_html( $month . "/" . $day . "/" . $year . " " . $time ) . "</td></tr>\n";
 			
 			$amount = get_post_meta( $donation_id, '_dgx_donate_amount', true );
-			$formatted_amount = "$" . number_format( $amount, 2 );	
+			$formatted_amount = dgx_donate_get_escaped_formatted_amount( $amount );
 			echo "<tr>";
 			echo "<th>" . esc_html__( 'Amount', 'dgx-donate' ) . "</th>";
-			echo "<td>" . esc_html( $formatted_amount ) . "</td></tr>\n";
+			echo "<td>" . $formatted_amount . "</td></tr>\n";
 
 			$add_to_mailing_list = get_post_meta( $donation_id, '_dgx_donate_add_to_mailing_list', true );
 			if ( ! empty( $add_to_mailing_list ) ) {

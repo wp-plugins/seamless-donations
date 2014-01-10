@@ -61,18 +61,18 @@ class Dgx_Donate_Admin_Donor_Detail_View {
 				}
 				$amount = get_post_meta( $donation_id, '_dgx_donate_amount', true );
 				$donor_total = $donor_total + floatval( $amount );
-				$formatted_amount = "$" . number_format( $amount, 2 );
+				$formatted_amount = dgx_donate_get_escaped_formatted_amount( $amount );
 
 				$donation_detail = dgx_donate_get_donation_detail_link( $donation_id );
 				echo "<tr><td><a href='" . esc_url( $donation_detail ) . "'>" . esc_html( $year . "-" . $month . "- " . $day . " " . $time ) . "</a></td>";
 				echo "<td>" . esc_html( $fund_name ) . "</td>";
-				echo "<td>" . esc_html( $formatted_amount ) . "</td>";
+				echo "<td>" . $formatted_amount . "</td>";
 				echo "</tr>\n";
 			}
-			$formatted_donor_total = "$" . number_format( $donor_total, 2 );
+			$formatted_donor_total = dgx_donate_get_escaped_formatted_amount( $donor_total );
 			echo "<tr>";
 			echo "<th>&nbsp</th><th>" . esc_html__( 'Donor Total', 'dgx-donate' ) . "</th>";
-			echo "<td>" . esc_html( $formatted_donor_total ) . "</td></tr>\n";
+			echo "<td>" . $formatted_donor_total . "</td></tr>\n";
 		
 			echo "</tbody></table>\n";
 
@@ -107,10 +107,16 @@ class Dgx_Donate_Admin_Donor_Detail_View {
 		$address2 = get_post_meta( $donation_id, '_dgx_donate_donor_address2', true );
 		$city = get_post_meta( $donation_id, '_dgx_donate_donor_city', true );
 		$state =  get_post_meta( $donation_id, '_dgx_donate_donor_state', true );
+		$province =  get_post_meta( $donation_id, '_dgx_donate_donor_province', true );
+		$country =  get_post_meta( $donation_id, '_dgx_donate_donor_country', true );
+		if ( empty( $country ) ) { /* older versions only did US */
+			$country = 'US';
+			update_post_meta( $donation_id, '_dgx_donate_donor_country', 'US' );
+		}
 		$zip = get_post_meta( $donation_id, '_dgx_donate_donor_zip', true );
 		$phone =  get_post_meta( $donation_id, '_dgx_donate_donor_phone', true );
 		$email = get_post_meta( $donation_id, '_dgx_donate_donor_email', true );
-	
+
 		echo "<h3>" . esc_html__( 'Donor Information', 'dgx-donate' ) . "</h3>\n";
 		echo "<table class='widefat'><tbody>\n";
 		echo "<tr>";
@@ -125,7 +131,15 @@ class Dgx_Donate_Admin_Donor_Detail_View {
 			echo esc_html( $address2 ) . "<br/>";;
 		}
 		if ( ! empty( $city ) ) {
-			echo esc_html( $city . " " . $state . " " . $zip ) . "<br/>";
+			if ( 'US' == $country ) {
+				echo esc_html( $city . " " . $state . " " . $zip ) . "<br/>";
+			} else if ( 'CA' == $country ) {
+				echo esc_html( $city . " " . $province . " " . $zip ) . "<br/>";
+			} else {
+				echo esc_html( $city . " " . $zip ) . "<br/>";
+			}
+			$countries = dgx_donate_get_countries();
+			echo esc_html( $countries[$country] ) . "<br/><br/>";
 		}
 		if ( ! empty( $phone ) ) {
 			echo esc_html( $phone ) . "<br/>";

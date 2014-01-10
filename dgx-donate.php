@@ -3,13 +3,13 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts.
-Version: 2.6.0
+Version: 2.7.0
 Author: allendav
 Author URI: http://www.allendav.com/
 License: GPL2
 */
 
-/*  Copyright 2013 Allen Snook (email: allendav@allendav.com)
+/*  Copyright 2014 Allen Snook (email: allendav@allendav.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as 
@@ -27,6 +27,8 @@ License: GPL2
  
 include 'dgx-donate-admin.php';
 include 'dgx-donate-paypalstd.php';
+include 'inc/geography.php';
+include 'inc/currency.php';
 
 /******************************************************************************************************/
 function dgx_donate_get_giving_levels()
@@ -105,14 +107,6 @@ function dgx_donate_get_giving_level_key($amount)
 }
 
 /******************************************************************************************************/
-function dgx_donate_format_amount($amount)
-{
-	$formattedAmount = "$" . $amount;
-
-	return $formattedAmount;
-}
-
-/******************************************************************************************************/
 function dgx_donate_queue_stylesheet() {
 	$styleurl = plugins_url('/css/styles.css', __FILE__);
 	wp_register_style('dgx_donate_css', $styleurl);
@@ -135,6 +129,9 @@ function dgx_donate_queue_scripts() {
 	wp_enqueue_script( 'jquery' );
 	$script_url = plugins_url( '/js/script.js', __FILE__ ); 
 	wp_enqueue_script( 'dgx_donate_script', $script_url, array( 'jquery' ), false, $load_in_footer );
+
+	$script_url = plugins_url( '/js/geo-selects.js', __FILE__ ); 
+	wp_enqueue_script( 'dgx_donate_geo_selects_script', $script_url, array( 'jquery' ), false, $load_in_footer );
 
 	// declare the URL to the file that handles the AJAX request (wp-admin/admin-ajax.php)
 	wp_localize_script( 'dgx_donate_script', 'dgxDonateAjax',
@@ -208,6 +205,8 @@ function dgx_donate_get_meta_map() {
 		'HONOREEADDRESS' => '_dgx_donate_honoree_address',
 		'HONOREECITY' => '_dgx_donate_honoree_city',
 		'HONOREESTATE' => '_dgx_donate_honoree_state',
+		'HONOREEPROVINCE' => '_dgx_donate_honoree_province',
+		'HONOREECOUNTRY' => '_dgx_donate_honoree_country',
 		'HONOREEZIP' => '_dgx_donate_honoree_zip',
 		'FIRSTNAME' => '_dgx_donate_donor_first_name',
 		'LASTNAME' => '_dgx_donate_donor_last_name',
@@ -218,6 +217,8 @@ function dgx_donate_get_meta_map() {
 		'ADDRESS2' => '_dgx_donate_donor_address2',
 		'CITY' => '_dgx_donate_donor_city',
 		'STATE' => '_dgx_donate_donor_state',
+		'PROVINCE' => '_dgx_donate_donor_province',
+		'COUNTRY' => '_dgx_donate_donor_country',
 		'ZIP' => '_dgx_donate_donor_zip',
 		'INCREASETOCOVER' => '_dgx_donate_increase_to_cover',
 		'ANONYMOUS' => '_dgx_donate_anonymous',
@@ -421,35 +422,7 @@ function dgx_donate_admin_sandbox_msg()
 	echo "<p>";
 	echo "Warning - Seamless Donations is currently configured to use the Sandbox (Test Server).  ";
 	echo "</p>";
-    echo "</div>";
-}
-
-/******************************************************************************************************/
-function dgx_donate_get_state_selector($selectName, $selectInitialValue)
-{
-	$output = "<select name=\"$selectName\">";
-	
-	$states = array(
-		'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL',
-		'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME',
-		'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH',
-		'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI',
-		'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI',
-		'WY');
-
-	foreach ($states as $state)
-	{
-		$selected = "";
-		if (strcasecmp($selectInitialValue, $state) == 0)
-		{
-			$selected = " selected ";
-		}
-		$output .= "<option value=\"$state\" $selected> $state </option>\n";
-	}
-	
-	$output .= "</select>";
-	
-	return $output;
+	echo "</div>";
 }
 
 /******************************************************************************************************/
@@ -518,7 +491,7 @@ function dgx_donate_get_donation_section($formContent)
 
 		if (dgx_donate_is_giving_level_enabled($givingLevel))
 		{
-			$formattedAmount = dgx_donate_format_amount($givingLevel);
+			$formattedAmount = dgx_donate_get_escaped_formatted_amount( $givingLevel, 0 );
 			$output .= "<input $classmod type=\"radio\" name=\"_dgx_donate_amount\" value=\"$givingLevel\" $checked /> $formattedAmount ";
 			$checked = ""; // only select the first one
 			$classmod = " class=\"horiz\" "; // only classmod the second and higher ones
@@ -588,8 +561,11 @@ function dgx_donate_get_tribute_section($formContent)
 	$honoreeEmail = '';
 	$honoreeAddress = '';
 	$honoreeCity = '';
-	$honoreeState = 'WA';
 	$honoreeZip = '';
+
+	$honoree_state = get_option('dgx_donate_default_state');
+	$honoree_province = get_option('dgx_donate_default_province');
+	$honoree_country = get_option('dgx_donate_default_country');
 
 	$checkTribute = "";
 	$honoreeEmailRecipient = "";
@@ -654,13 +630,25 @@ function dgx_donate_get_tribute_section($formContent)
 	$output .= "<label for=\"_dgx_donate_honoree_city\">City: </label>";
 	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_city\" value=\"$honoreeCity\" />";
 	$output .= "</p>";
+
+	$output .= "<div class='dgx_donate_geography_selects'>";
 	$output .= "<p>";
-	$output .= "<label for=\"_dgx_donate_honoree_state\">State: </label>";
-	$output .= dgx_donate_get_state_selector("_dgx_donate_honoree_state", $honoreeState);
+	$output .= "<label for='_dgx_donate_honoree_state'>" . esc_html__( 'State:', 'dgx-donate' ) . "</label>";
+	$output .= dgx_donate_get_state_selector( "_dgx_donate_honoree_state", $honoree_state );
 	$output .= "</p>";
 	$output .= "<p>";
-	$output .= "<label for=\"_dgx_donate_honoree_zip\">Zip: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_zip\"  size=\"10\" value=\"$honoreeZip\" />";
+	$output .= "<label for='_dgx_donate_honoree_province'>" . esc_html__( 'Province:', 'dgx-donate' ) . "</label>";
+	$output .= dgx_donate_get_province_selector( "_dgx_donate_honoree_province", $honoree_province );
+	$output .= "</p>";
+	$output .= "<p>";
+	$output .= "<label for='_dgx_donate_honoree_country'>" . esc_html__( 'Country:', 'dgx-donate' ) ."</label>";
+	$output .= dgx_donate_get_country_selector( "_dgx_donate_honoree_country", $honoree_country );
+	$output .= "</p>";
+	$output .= "</div>";
+
+	$output .= "<p>";
+	$output .= "<label for='_dgx_donate_honoree_zip'>" . esc_html__( 'Postal Code:', 'dgx-donate' ) . "</label>";
+	$output .= "<input type='text' name='_dgx_donate_honoree_zip' size='10' value='' />";
 	$output .= "</p>";
 	$output .= "</div>"; /* dgx-donate-form-subsection */
 	$output .= "</div>"; /* dgx-donate-form-tribute-box */
@@ -726,13 +714,14 @@ function dgx_donate_get_donor_section($formContent)
 /******************************************************************************************************/
 function dgx_donate_get_billing_section($formContent)
 {
-	$donorState = get_option('dgx_donate_default_state');
+	$donor_state = get_option('dgx_donate_default_state');
+	$donor_province = get_option('dgx_donate_default_province');
+	$donor_country = get_option('dgx_donate_default_country');
 
 	$donorAddress = "";
 	$donorAddress2 = "";
 	$donorCity = "";
 	$donorZip = "";
-
 
 	$output = "";
 	$output .= "<div class=\"dgx-donate-form-section\">\n";
@@ -750,13 +739,25 @@ function dgx_donate_get_billing_section($formContent)
 	$output .= "<label for=\"_dgx_donate_donor_city\">City: </label>";
 	$output .= "<input type=\"text\" name=\"_dgx_donate_donor_city\" value=\"$donorCity\" /> ";
 	$output .= "</p>";
-	$output .= "<p>";	
-	$output .= "<label for=\"_dgx_donate_donor_state\">State: </label>";
-	$output .= dgx_donate_get_state_selector("_dgx_donate_donor_state", $donorState);
+
+	$output .= "<div class='dgx_donate_geography_selects'>";
+	$output .= "<p>";
+	$output .= "<label for='_dgx_donate_donor_state'>" . esc_html__( 'State:', 'dgx-donate' ) . "</label>";
+	$output .= dgx_donate_get_state_selector( "_dgx_donate_donor_state", $donor_state );
 	$output .= "</p>";
 	$output .= "<p>";
-	$output .= "<label for=\"_dgx_donate_donor_zip\">Zip: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_donor_zip\"  size=\"10\" value=\"$donorZip\" />";
+	$output .= "<label for='_dgx_donate_donor_province'>" . esc_html__( 'Province:', 'dgx-donate' ) . "</label>";
+	$output .= dgx_donate_get_province_selector( "_dgx_donate_donor_province", $donor_province );
+	$output .= "</p>";
+	$output .= "<p>";
+	$output .= "<label for='_dgx_donate_donor_country'>" . esc_html__( 'Country:', 'dgx-donate' ) . "</label>";
+	$output .= dgx_donate_get_country_selector( "_dgx_donate_donor_country", $donor_country );
+	$output .= "</p>";
+	$output .= "</div>";
+
+	$output .= "<p>";
+	$output .= "<label for='_dgx_donate_donor_zip'>" . esc_html__( 'Postal Code:', 'dgx-donate' ) . "</label>";
+	$output .= "<input type='text' name='_dgx_donate_donor_zip'  size='10' value='' />";
 	$output .= "</p>";	
 	
 	$output .= "</div>\n";
@@ -830,7 +831,7 @@ function dgx_donate_send_thank_you_email($donationID, $testAddress="")
 		$lastName = get_post_meta($donationID, '_dgx_donate_donor_last_name', true);
 		// amount
 		$amount = get_post_meta($donationID, '_dgx_donate_amount', true);
-		$amount = "$" . number_format($amount, 2);
+		$amount = dgx_donate_get_escaped_formatted_amount( $amount );
 		// fundname
 		$fund = get_post_meta($donationID, '_dgx_donate_designated_fund', true);
 		// recurring y/n
@@ -949,7 +950,7 @@ function dgx_donate_send_donation_notification($donationID)
 	}
 	
 	$amount = get_post_meta($donationID, '_dgx_donate_amount', true);
-	$formattedDonationAmount = "$" . number_format($amount, 2);
+	$formattedDonationAmount = dgx_donate_get_escaped_formatted_amount( $amount );
 	$body .= "Donation:\n";
 	$body .= "Amount: $formattedDonationAmount\n";
 	
