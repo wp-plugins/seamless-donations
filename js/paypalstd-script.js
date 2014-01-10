@@ -83,8 +83,31 @@ function DgxDonateIsValidAmount(amount)
 	return true;
 }
 
+function DgxDonateUpdateControls( controlStates ) {
+	if ( 'undefined' != typeof controlStates.donateButton ) {
+		if ( controlStates.donateButton ) {
+			jQuery( '.dgx-donate-pay-enabled' ).show();
+			jQuery( '.dgx-donate-pay-disabled' ).hide();
+		} else {
+			jQuery( '.dgx-donate-pay-enabled' ).hide();
+			jQuery( '.dgx-donate-pay-disabled' ).show();
+		}
+	}
+
+	if ( 'undefined' != typeof controlStates.ajaxSpinner ) {
+		if ( controlStates.ajaxSpinner ) {
+			jQuery( '.dgx-donate-busy' ).show();
+		} else {
+			jQuery( '.dgx-donate-busy' ).hide();
+		}
+	}
+}
+
 function DgxDonateDoCheckout()
 {
+	// Set control visibility
+	DgxDonateUpdateControls( { donateButton: false, ajaxSpinner: false } );
+
 	// First we do a client side validation
 	// We should also do a server side validation in the ajax handler
 	
@@ -124,7 +147,8 @@ function DgxDonateDoCheckout()
 	var honoreeAddress = DgxDonateTrim(values['_dgx_donate_honoree_address']);
 	var honoreeCity = DgxDonateTrim(values['_dgx_donate_honoree_city']);
 	var honoreeState = DgxDonateTrim(values['_dgx_donate_honoree_state']);
-	var honoreeCity = DgxDonateTrim(values['_dgx_donate_honoree_city']);
+	var honoreeProvince = DgxDonateTrim(values['_dgx_donate_honoree_province']);
+	var honoreeCountry = DgxDonateTrim(values['_dgx_donate_honoree_country']);
 	var honoreeZip = DgxDonateTrim(values['_dgx_donate_honoree_zip']);
 	var firstName = DgxDonateTrim(values['_dgx_donate_donor_first_name']);
 	var lastName = DgxDonateTrim(values['_dgx_donate_donor_last_name']);
@@ -135,14 +159,11 @@ function DgxDonateDoCheckout()
 	var address2 = DgxDonateTrim(values['_dgx_donate_donor_address2']);
 	var city = DgxDonateTrim(values['_dgx_donate_donor_city']);
 	var state = DgxDonateTrim(values['_dgx_donate_donor_state']);
+	var province = DgxDonateTrim(values['_dgx_donate_donor_province']);
+	var country = DgxDonateTrim(values['_dgx_donate_donor_country']);
 	var zip = DgxDonateTrim(values['_dgx_donate_donor_zip']);
 	var increaseToCover = DgxDonateTrim(values['_dgx_donate_increase_to_cover']);
 	var paymentMethod = DgxDonateTrim(values['_dgx_donate_payment_method']);
-	var cardNumber = DgxDonateTrim(values['_dgx_donate_card_number']);
-	var cardCCV = DgxDonateTrim(values['_dgx_donate_card_ccv']);
-	var cardExpMonth = DgxDonateTrim(values['_dgx_donate_card_exp_month']);
-	var cardExpYear = DgxDonateTrim(values['_dgx_donate_card_exp_year']);
-	var nameOnCard = DgxDonateTrim(values['_dgx_donate_card_name_on_card']);
 	var referringUrl = location.href;
 
 	var amount = "";
@@ -252,35 +273,51 @@ function DgxDonateDoCheckout()
 	if (!formValidates)
 	{
 		alert('Some required information is missing or invalid.  Please complete the fields highlighted in red');
+		DgxDonateUpdateControls( { donateButton: true, ajaxSpinner: false } );
 		return false;
 	}
 	
 	// If validation succeeds, post the data to ajax to create a transient
 	// and update the hidden form with the visible form values that PayPal cares about
+	DgxDonateUpdateControls( { donateButton: false, ajaxSpinner: true } );
 
-	jQuery('#dgx-donate-hidden-form').find('input[name="first_name"]').val(firstName);
-	jQuery('#dgx-donate-hidden-form').find('input[name="last_name"]').val(lastName);
-	jQuery('#dgx-donate-hidden-form').find('input[name="address1"]').val(address);
-	jQuery('#dgx-donate-hidden-form').find('input[name="address2"]').val(address2);
-	jQuery('#dgx-donate-hidden-form').find('input[name="city"]').val(city);
-	jQuery('#dgx-donate-hidden-form').find('input[name="state"]').val(state);
-	jQuery('#dgx-donate-hidden-form').find('input[name="zip"]').val(zip);
+	var hiddenForm = jQuery('#dgx-donate-hidden-form');
+
+	hiddenForm.find('input[name="first_name"]').val(firstName);
+	hiddenForm.find('input[name="last_name"]').val(lastName);
+	hiddenForm.find('input[name="address1"]').val(address);
+	hiddenForm.find('input[name="address2"]').val(address2);
+	hiddenForm.find('input[name="city"]').val(city);
+	hiddenForm.find('input[name="state"]').val(state);
+	hiddenForm.find('input[name="zip"]').val(zip);
+
+	if ( 'US' == country ) {
+		hiddenForm.find( 'input[name="state"]' ).val( state );
+	} else if ( 'CA' == country ) {
+		hiddenForm.find( 'input[name="state"]' ).val( province );
+	} else {
+		hiddenForm.find( 'input[name="state"]' ).remove();
+	}
+
 	// jQuery('#dgx-donate-hidden-form').find('input[name="country"]').val("xxx");
-	jQuery('#dgx-donate-hidden-form').find('input[name="email"]').val(email);
-	jQuery('#dgx-donate-hidden-form').find('input[name="custom"]').val(sessionID);
-	jQuery('#dgx-donate-hidden-form').find('input[name="amount"]').val(amount);
+	hiddenForm.find('input[name="email"]').val(email);
+	hiddenForm.find('input[name="custom"]').val(sessionID);
+	hiddenForm.find('input[name="amount"]').val(amount);
 
-	// Disable the pay button
-	var payButton = jQuery('#dgx-donate-form').find("input[type='submit']");
-	payButton.attr("disabled", "disabled"); // To disable
-	payButton.removeClass("dgx-donate-pay-enabled");
-	payButton.addClass("dgx-donate-pay-disabled");
+	if ( ! repeating ) {
+		hiddenForm.find( 'input[name="src"]' ).remove();
+		hiddenForm.find( 'input[name="p3"]' ).remove();
+		hiddenForm.find( 'input[name="t3"]' ).remove();
+		hiddenForm.find( 'input[name="a3"]' ).remove();
+	} else {
+		hiddenForm.find( 'input[name="cmd"]' ).val( '_xclick-subscriptions' );
+		hiddenForm.find( 'input[name="p3"]' ).val( '1' ); // 1, M = monthly
+		hiddenForm.find( 'input[name="t3"]' ).val( 'M' );
+		hiddenForm.find( 'input[name="a3"]' ).val( amount );
+		hiddenForm.find( 'input[name="amount"]' ).remove();
+	}
 
-	// Turn on the busy graphic
-	jQuery('.dgx-donate-busy').css('visibility', 'visible');
-	
 	// Send the request
-	
 	var nonce = dgxDonateAjax.nonce;
 
 	var data = { action: 'dgx_donate_paypalstd_ajax_checkout', referringUrl: referringUrl, nonce: nonce, sessionID: sessionID,
@@ -288,24 +325,20 @@ function DgxDonateDoCheckout()
 		designatedFund: designatedFund, increaseToCover: increaseToCover, anonymous: anonymous,
 		tributeGift: tributeGift, honoreeName: honoreeName, honorByEmail: honorByEmail, honoreeEmail: honoreeEmail,
 		memorialGift: memorialGift, honoreeEmailName: honoreeEmailName, honoreePostName: honoreePostName,
-		honoreeAddress: honoreeAddress, honoreeCity: honoreeCity, honoreeState: honoreeState, honoreeZip: honoreeZip,
+		honoreeAddress: honoreeAddress, honoreeCity: honoreeCity, honoreeState: honoreeState, honoreeProvince: honoreeProvince,
+		honoreeCountry: honoreeCountry, honoreeZip: honoreeZip,
 		firstName: firstName, lastName: lastName, phone: phone, email: email, addToMailingList: addToMailingList,
-		address: address, address2: address2, city: city, state: state, zip: zip, increaseToCover: increaseToCover,
-		paymentMethod: paymentMethod };
+		address: address, address2: address2, city: city, state: state, province: province, country: country,
+		zip: zip, increaseToCover: increaseToCover, paymentMethod: paymentMethod };
 
 	jQuery.post( dgxDonateAjax.ajaxurl, data, DgxDonateCallback );
 
 	return false;
 }
 
-function DgxDonateCallback(data)
-{	
-	// Turn off the processing graphic
-	jQuery('.dgx-donate-busy').css('visibility', 'hidden');
-
+function DgxDonateCallback( data ) {
 	// Submit the hidden form to take the user to PayPal
-	jQuery('#dgx-donate-hidden-form').submit();
-
+	jQuery( '#dgx-donate-hidden-form' ).submit();
 }
 
 function DgxDonateMarkInvalid(fieldname)
@@ -315,8 +348,8 @@ function DgxDonateMarkInvalid(fieldname)
 }
 
 function DgxDonateAjaxError( event, jqxhr, settings, exception ) {
-	// Turn off the processing graphic
-	jQuery('.dgx-donate-busy').css('visibility', 'hidden');
+	// Set control visibility
+	DgxDonateUpdateControls( { donateButton: true, ajaxSpinner: false } );
 
 	// Display the error
 	alert ( "An Ajax error occurred while requesting the resource - " + settings.url + " - No donation was completed.  Please try again later.");
@@ -324,19 +357,9 @@ function DgxDonateAjaxError( event, jqxhr, settings, exception ) {
 	return false;
 }
 
-jQuery(document).ready(function() {	
-	
-	// Make sure the payment button is rendered correctly and the payment
-	// progress ajax graphic is not visible on start
-	// Re-enable the submit button
-	
-	var payButton = jQuery('#dgx-donate-form').find("input[type='submit']");
-	payButton.removeAttr("disabled");
-	payButton.removeClass("dgx-donate-pay-disabled");
-	payButton.addClass("dgx-donate-pay-enabled");
-	
-	// Turn off the processing graphic
-	jQuery('.dgx-donate-busy').css('visibility', 'hidden');
+jQuery(document).ready(function() {
+	// Set control visibility
+	DgxDonateUpdateControls( { donateButton: true, ajaxSpinner: false } );
 
 	// Register our AJAX error handler
 	// jQuery(document).ajaxError( DgxDonateAjaxError );

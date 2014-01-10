@@ -1,22 +1,25 @@
-=== Plugin Name ===
+=== Seamless Donations ===
 Contributors: allendav, designgeneers
 Donate link: http://www.allendav.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
-Tested up to: 3.6
-Stable tag: 2.4.2
+Tested up to: 3.8
+Stable tag: 2.6.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Receive donations, track donors and send customized thank you messages with Seamless Donations for WordPress.
+Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts.
 
 == Description ==
 
 Need more than just a PayPal donation button?  Would you like to allow your visitors to donate in honor of
-someone?  Invite them to subscribe to your mailing list?  Allow them to mark their donation anonymous?  Track
-donors and donations?  Seamless Donations by Designgeneers does all this and more - and all you need to do
-is embed a simple shortcode and supply your PayPal Website Payments Standard email address to start receiving
-donations today.
+someone?  Invite them to subscribe to your mailing list?  Choose from desginated funds?  Do donations that
+automatically repeat each month?  Allow them to mark their donation anonymous?  Track donors and donations?
+
+Seamless Donations by Designgeneers does all this and more - and all you need to do is embed a simple shortcode
+and supply your PayPal Website Payments Standard email address to start receiving donations today.
+
+Now supporting donations by US and non-US donors (all donations are in USD - other currencies will be supported soon)
 
 == Installation ==
 
@@ -55,6 +58,30 @@ Yes!
 6. Dashboard >> Thank You Email Templates
 
 == Changelog ==
+
+= 2.7.0 =
+* Added: Support for donors located outside the United States
+
+= 2.6.0 =
+* Added: Support for repeating donations
+* Added: Support for loading scripts in footer
+* Added: Greyed out donate button on click
+* Added: Prompt to confirm before deleting a donation in admin
+* Added: Seamless Donations news feed to main plugin admin page
+* Added: Help/FAQ submenu
+* Added: Replaced main admin page buttons with Quick Links
+* Added: Display of PayPal IPN URL in Settings
+* Added: More logging to PayPal IPN for troubleshooting hosts that don't support fsockopen to PayPal on 443
+* Fixed: Bug in displaying thank you after completing donation
+* Fixed: Changed admin log formatting to make reading, cutting and pasting easier
+* Fixed: Major update to admin pages code in support of localization
+
+= 2.5.0 =
+* Added support for designated funds
+* Fixed: A couple warnings when saving changes to thank you email templates.
+
+= 2.4.4 =
+* Fixed: Cleaned up warnings when run with WP_DEBUG
 
 = 2.4.3 =
 * Fixed: Changed form submit target to _top most window (in case theme places content in iframes)

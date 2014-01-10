@@ -2,14 +2,14 @@
 /*
 Plugin Name: Seamless Donations
 Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
-Description: Making online donations easy for your visitors; making donor and donation management easy for you.
-Version: 2.4.3
+Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts.
+Version: 2.7.0
 Author: allendav
 Author URI: http://www.allendav.com/
 License: GPL2
 */
 
-/*  Copyright 2013 Allen Snook (email: allendav@allendav.com)
+/*  Copyright 2014 Allen Snook (email: allendav@allendav.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as 
@@ -27,6 +27,8 @@ License: GPL2
  
 include 'dgx-donate-admin.php';
 include 'dgx-donate-paypalstd.php';
+include 'inc/geography.php';
+include 'inc/currency.php';
 
 /******************************************************************************************************/
 function dgx_donate_get_giving_levels()
@@ -105,20 +107,12 @@ function dgx_donate_get_giving_level_key($amount)
 }
 
 /******************************************************************************************************/
-function dgx_donate_format_amount($amount)
-{
-	$formattedAmount = "$" . $amount;
-
-	return $formattedAmount;
-}
-
-/******************************************************************************************************/
 function dgx_donate_queue_stylesheet() {
 	$styleurl = plugins_url('/css/styles.css', __FILE__);
 	wp_register_style('dgx_donate_css', $styleurl);
 	wp_enqueue_style('dgx_donate_css');
 }
-add_action('wp_print_styles', 'dgx_donate_queue_stylesheet');
+add_action('wp_enqueue_scripts', 'dgx_donate_queue_stylesheet');
 
 /**********************************************************************************************************/
 function dgx_donate_queue_admin_stylesheet() {
@@ -131,22 +125,23 @@ add_action('admin_print_styles', 'dgx_donate_queue_admin_stylesheet');
 
 /******************************************************************************************************/
 function dgx_donate_queue_scripts() {
+	$load_in_footer = ( 'true' == get_option( 'dgx_donate_scripts_in_footer' ) );
+	wp_enqueue_script( 'jquery' );
+	$script_url = plugins_url( '/js/script.js', __FILE__ ); 
+	wp_enqueue_script( 'dgx_donate_script', $script_url, array( 'jquery' ), false, $load_in_footer );
 
-	// This queues the scripts used by the core and by paypalstd
-
-	wp_enqueue_script('jquery');
-	$scripturl = plugins_url('/js/script.js',__FILE__); 
-	wp_enqueue_script('dgx_donate_script', $scripturl, array('jquery'));
+	$script_url = plugins_url( '/js/geo-selects.js', __FILE__ ); 
+	wp_enqueue_script( 'dgx_donate_geo_selects_script', $script_url, array( 'jquery' ), false, $load_in_footer );
 
 	// declare the URL to the file that handles the AJAX request (wp-admin/admin-ajax.php)
-	wp_localize_script('dgx_donate_script', 'dgxDonateAjax',
+	wp_localize_script( 'dgx_donate_script', 'dgxDonateAjax',
 		array(
-			'ajaxurl' => admin_url('admin-ajax.php'),
-			'nonce' => wp_create_nonce('dgx-donate-nonce')
+			'ajaxurl' => admin_url( 'admin-ajax.php' ),
+			'nonce' => wp_create_nonce( 'dgx-donate-nonce' )
 		)
 	);
 }
-add_action('init','dgx_donate_queue_scripts');
+add_action( 'wp_enqueue_scripts', 'dgx_donate_queue_scripts' );
 
 /******************************************************************************************************/
 function dgx_donate_get_version()
@@ -161,7 +156,7 @@ function dgx_donate_get_version()
 /******************************************************************************************************/
 function dgx_donate_display_thank_you()
 {
-	$output .= "<p>";
+	$output = "<p>";
 	$thankYouText = get_option('dgx_donate_thanks_text');
 	$thankYouText = nl2br($thankYouText);
 	$output .= $thankYouText;
@@ -181,7 +176,7 @@ function dgx_donate_debug_log($message)
 		$debug_log = array();
 	}
 
-	$timestamp = strftime("%m-%d-%G %H:%M:%S");
+	$timestamp = current_time( 'mysql' );
 
 	$debug_log[] = $timestamp . ' ' . $message;
 
@@ -193,86 +188,151 @@ function dgx_donate_debug_log($message)
 }
 
 /******************************************************************************************************/
-function dgx_donate_create_post($postData)
-{
-	// Create a new donation record
-	
+function dgx_donate_get_meta_map() {
+	return array(
+		'SESSIONID' => '_dgx_donate_session_id',
+		'AMOUNT' => '_dgx_donate_amount',
+		'REPEATING' => '_dgx_donate_repeating',
+		'DESIGNATED' => '_dgx_donate_designated',
+		'DESIGNATEDFUND' => '_dgx_donate_designated_fund',
+		'TRIBUTEGIFT' => '_dgx_donate_tribute_gift',
+		'MEMORIALGIFT' => '_dgx_donate_memorial_gift',
+		'HONOREENAME' => '_dgx_donate_honoree_name',
+		'HONORBYEMAIL' => '_dgx_donate_honor_by_email',
+		'HONOREEEMAILNAME' => '_dgx_donate_honoree_email_name',
+		'HONOREEEMAIL' => '_dgx_donate_honoree_email',
+		'HONOREEPOSTNAME' => '_dgx_donate_honoree_post_name',
+		'HONOREEADDRESS' => '_dgx_donate_honoree_address',
+		'HONOREECITY' => '_dgx_donate_honoree_city',
+		'HONOREESTATE' => '_dgx_donate_honoree_state',
+		'HONOREEPROVINCE' => '_dgx_donate_honoree_province',
+		'HONOREECOUNTRY' => '_dgx_donate_honoree_country',
+		'HONOREEZIP' => '_dgx_donate_honoree_zip',
+		'FIRSTNAME' => '_dgx_donate_donor_first_name',
+		'LASTNAME' => '_dgx_donate_donor_last_name',
+		'PHONE' => '_dgx_donate_donor_phone',
+		'EMAIL' => '_dgx_donate_donor_email',
+		'ADDTOMAILINGLIST' => '_dgx_donate_add_to_mailing_list',
+		'ADDRESS' => '_dgx_donate_donor_address',
+		'ADDRESS2' => '_dgx_donate_donor_address2',
+		'CITY' => '_dgx_donate_donor_city',
+		'STATE' => '_dgx_donate_donor_state',
+		'PROVINCE' => '_dgx_donate_donor_province',
+		'COUNTRY' => '_dgx_donate_donor_country',
+		'ZIP' => '_dgx_donate_donor_zip',
+		'INCREASETOCOVER' => '_dgx_donate_increase_to_cover',
+		'ANONYMOUS' => '_dgx_donate_anonymous',
+		'PAYMENTMETHOD' => '_dgx_donate_payment_method'
+	);
+}
+
+/******************************************************************************************************/
+function dgx_donate_create_empty_donation_record() {
+
 	// Get all the dates - timezone fix thanks to pkwooster
-	$gmtOffset = -get_option('gmt_offset');
-	$phpTimezone = date_default_timezone_get();
-	if ($gmtOffset > 0)
+	$gmt_offset = -get_option( 'gmt_offset' );
+	$php_time_zone = date_default_timezone_get();
+	if ($gmt_offset > 0)
 	{
-		$timezone = 'Etc/GMT+' . $gmtOffset;
+		$time_zone = 'Etc/GMT+' . $gmt_offset;
 	}
 	else
 	{
-		$timezone = 'Etc/GMT' . $gmtOffset;
+		$time_zone = 'Etc/GMT' . $gmt_offset;
 	}
-	date_default_timezone_set($timezone);
+	date_default_timezone_set( $time_zone );
 	
-	$year = date('Y');
-	$month = date('m');
-	$day = date('d');
-	$yearMonthDay = date('Y-m-d');
-	$time = date('g:i:s A');
-	$dateTime = date('Y-m-d H:i:s');
+	$year = date( 'Y' );
+	$month = date( 'm' );
+	$day = date( 'd' );
+	$year_month_day = date( 'Y-m-d' );
+	$time = date( 'g:i:s A' );
+	$date_time = date( 'Y-m-d H:i:s' );
 	
 	// set the PHP timezone back the way it was
-	date_default_timezone_set($phpTimezone);
+	date_default_timezone_set( $php_time_zone );
 	
 	// the title is Lastname, Firstname (YYYY-MM-dd)
-	$postTitle = $lastName . ", " . $firstName . " (" . $yearMonthDay . ")";
+	$post_title = $date_time;
 
-	$newDonation = array(
-		'post_title' => $postTitle,
+	$new_donation = array(
+		'post_title' => $post_title,
 		'post_content' => '',
 		'post_status' => 'publish',
-		'post_date' => $dateTime,
+		'post_date' => $date_time,
 		'post_author' => 1,
 		'post_type' => 'dgx-donation'
 	);
 
-	$donationID = wp_insert_post($newDonation);
+	$donation_id = wp_insert_post( $new_donation );
+
+	// Save some meta
+	update_post_meta( $donation_id, '_dgx_donate_year', $year );
+	update_post_meta( $donation_id, '_dgx_donate_month', $month );
+	update_post_meta( $donation_id, '_dgx_donate_day', $day );
+	update_post_meta( $donation_id, '_dgx_donate_time', $time );
+
+	return $donation_id;
+}
+
+/******************************************************************************************************/
+function dgx_donate_create_donation_from_transient_data( $transient_data )
+{
+	// Create a new donation record
+	$donation_id = dgx_donate_create_empty_donation_record();
+
+	$meta_map = dgx_donate_get_meta_map();
+
+	foreach ( (array) $meta_map as $transient_data_key => $postmeta_key ) {
+		update_post_meta( $donation_id, $postmeta_key, $transient_data[ $transient_data_key ] );
+	}	
 	
-	// Save all the meta
-	update_post_meta($donationID, '_dgx_donate_year', $year);
-	update_post_meta($donationID, '_dgx_donate_month', $month);
-	update_post_meta($donationID, '_dgx_donate_day', $day);	
-	update_post_meta($donationID, '_dgx_donate_time', $time);	
+	return $donation_id;
+}
+
+/******************************************************************************************************/
+function dgx_donate_create_donation_from_donation( $old_donation_id )
+{
+	// Create a new donation record by cloning an old one (useful for repeating donations)
+	dgx_donate_debug_log( "about to create donation from old donation $old_donation_id" );
+	$new_donation_id = dgx_donate_create_empty_donation_record();
+	dgx_donate_debug_log( "new donation id = $new_donation_id" );
+
+	$meta_map = dgx_donate_get_meta_map();
+
+	foreach ( (array) $meta_map as $transient_data_key => $postmeta_key ) {
+		$old_donation_meta_value = get_post_meta( $old_donation_id, $postmeta_key, true );
+		update_post_meta( $new_donation_id, $postmeta_key, $old_donation_meta_value );
+	}
 	
-	update_post_meta($donationID, '_dgx_donate_amount', $postData['AMOUNT']);
-	update_post_meta($donationID, '_dgx_donate_repeating', $postData['REPEATING']);
-	update_post_meta($donationID, '_dgx_donate_designated', $postData['DESIGNATED']);
-	update_post_meta($donationID, '_dgx_donate_designated_fund', $postData['DESIGNATEDFUND']);
-	
-	update_post_meta($donationID, '_dgx_donate_tribute_gift', $postData['TRIBUTEGIFT']);
-	update_post_meta($donationID, '_dgx_donate_memorial_gift', $postData['MEMORIALGIFT']);
-	update_post_meta($donationID, '_dgx_donate_honoree_name', $postData['HONOREENAME']);
-	update_post_meta($donationID, '_dgx_donate_honor_by_email', $postData['HONORBYEMAIL']);
-	update_post_meta($donationID, '_dgx_donate_honoree_email_name', $postData['HONOREEEMAILNAME']);
-	update_post_meta($donationID, '_dgx_donate_honoree_email', $postData['HONOREEEMAIL']);
-	update_post_meta($donationID, '_dgx_donate_honoree_post_name', $postData['HONOREEPOSTNAME']);
-	update_post_meta($donationID, '_dgx_donate_honoree_address', $postData['HONOREEADDRESS']);
-	update_post_meta($donationID, '_dgx_donate_honoree_city', $postData['HONOREECITY']);
-	update_post_meta($donationID, '_dgx_donate_honoree_state', $postData['HONOREESTATE']);	
-	update_post_meta($donationID, '_dgx_donate_honoree_zip', $postData['HONOREEZIP']);
-	
-	update_post_meta($donationID, '_dgx_donate_donor_first_name', $postData['FIRSTNAME']);
-	update_post_meta($donationID, '_dgx_donate_donor_last_name', $postData['LASTNAME']);
-	update_post_meta($donationID, '_dgx_donate_donor_phone', $postData['PHONE']);
-	update_post_meta($donationID, '_dgx_donate_donor_email', $postData['EMAIL']);
-	update_post_meta($donationID, '_dgx_donate_add_to_mailing_list', $postData['ADDTOMAILINGLIST']);
-	update_post_meta($donationID, '_dgx_donate_donor_address', $postData['ADDRESS']);
-	update_post_meta($donationID, '_dgx_donate_donor_address2', $postData['ADDRESS2']);
-	update_post_meta($donationID, '_dgx_donate_donor_city', $postData['CITY']);
-	update_post_meta($donationID, '_dgx_donate_donor_state', $postData['STATE']);
-	update_post_meta($donationID, '_dgx_donate_donor_zip', $postData['ZIP']);
-	
-	update_post_meta($donationID, '_dgx_donate_increase_to_cover', $postData['INCREASETOCOVER']);
-	update_post_meta($donationID, '_dgx_donate_anonymous', $postData['ANONYMOUS']);
-	update_post_meta($donationID, '_dgx_donate_payment_method', $postData['PAYMENTMETHOD']);
-	
-	return $donationID;
+	dgx_donate_debug_log( "done with dgx_donate_create_donation_from_donation, returning new id $new_donation" );
+	return $new_donation_id;
+}
+
+/******************************************************************************************************/
+function dgx_donate_create_donation_from_paypal_data( $post_data )
+{
+	// Create a new donation record by cloning an old one (useful for repeating donations)
+	dgx_donate_debug_log( "about to create donation from paypal post data" );
+	$new_donation_id = dgx_donate_create_empty_donation_record();
+	dgx_donate_debug_log( "new donation id = $new_donation_id" );
+
+	// @todo - loop over the meta map translating paypal keys into our keys
+	// @todo ADDRESS
+
+	$payment_gross = isset( $_POST['payment_gross'] ) ? $_POST['payment_gross'] : ''; 
+	$mc_gross = isset( $_POST['mc_gross'] ) ? $_POST['mc_gross'] : ''; 
+
+	$amount = empty( $payment_gross ) ? $mc_gross : $payment_gross;
+
+	update_post_meta( $new_donation_id, '_dgx_donate_donor_first_name', $_POST['first_name'] );
+	update_post_meta( $new_donation_id, '_dgx_donate_donor_last_name', $_POST['last_name'] );
+	update_post_meta( $new_donation_id, '_dgx_donate_donor_email', $_POST['payer_email'] );
+	update_post_meta( $new_donation_id, '_dgx_donate_amount', $amount );
+
+
+	dgx_donate_debug_log( "done with dgx_donate_create_donation_from_paypal_data, returning new id $new_donation" );
+	return $new_donation_id;
 }
 
 /******************************************************************************************************/
@@ -298,7 +358,10 @@ function dgx_donate_get_donor_detail_link($donorEmail)
 function dgx_donate_init () {
 
 	// Start Session
-	$sessionID = $_COOKIE['dgxdonate'];
+	$sessionID = "";
+	if ( isset( $_COOKIE['dgxdonate'] ) ) {
+		$sessionID = $_COOKIE['dgxdonate'];
+	}
 
 	if (!empty($sessionID))
 	{
@@ -359,35 +422,7 @@ function dgx_donate_admin_sandbox_msg()
 	echo "<p>";
 	echo "Warning - Seamless Donations is currently configured to use the Sandbox (Test Server).  ";
 	echo "</p>";
-    echo "</div>";
-}
-
-/******************************************************************************************************/
-function dgx_donate_get_state_selector($selectName, $selectInitialValue)
-{
-	$output = "<select name=\"$selectName\">";
-	
-	$states = array(
-		'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL',
-		'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME',
-		'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH',
-		'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI',
-		'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI',
-		'WY');
-
-	foreach ($states as $state)
-	{
-		$selected = "";
-		if (strcasecmp($selectInitialValue, $state) == 0)
-		{
-			$selected = " selected ";
-		}
-		$output .= "<option value=\"$state\" $selected> $state </option>\n";
-	}
-	
-	$output .= "</select>";
-	
-	return $output;
+	echo "</div>";
 }
 
 /******************************************************************************************************/
@@ -439,6 +474,7 @@ function dgx_donate_get_donation_section($formContent)
 	
 	$anonymous = false;
 	
+	$output = "";
 	$output .= "<div class=\"dgx-donate-form-section\">\n";
 	$output .= "<h2>Donation Information</h2>\n";
 	
@@ -446,6 +482,7 @@ function dgx_donate_get_donation_section($formContent)
 
 	$output .= "<p>";
 	$checked = " checked=\"checked\" ";
+	$checkOTHER = "";
 	$classmod = "";
 	$givingLevels = dgx_donate_get_giving_levels();
 	foreach ($givingLevels as $givingLevel)
@@ -454,7 +491,7 @@ function dgx_donate_get_donation_section($formContent)
 
 		if (dgx_donate_is_giving_level_enabled($givingLevel))
 		{
-			$formattedAmount = dgx_donate_format_amount($givingLevel);
+			$formattedAmount = dgx_donate_get_escaped_formatted_amount( $givingLevel, 0 );
 			$output .= "<input $classmod type=\"radio\" name=\"_dgx_donate_amount\" value=\"$givingLevel\" $checked /> $formattedAmount ";
 			$checked = ""; // only select the first one
 			$classmod = " class=\"horiz\" "; // only classmod the second and higher ones
@@ -466,9 +503,49 @@ function dgx_donate_get_donation_section($formContent)
 	$output .= "<input type=\"text\" class=\"aftertext\" id=\"dgx-donate-other-input\" name=\"_dgx_donate_user_amount\" />";
 	$output .= "</p>\n";
 	
-	// $output .= "<hr/>";
-	
-	$output .= "</div>\n"; /* dgx-donate-form-section */
+	// Designated Funds
+	$showFundCount = 0;
+	$fundArray = get_option( 'dgx_donate_designated_funds' );
+
+	if ( ! empty( $fundArray ) ) {
+		ksort( $fundArray );
+
+		foreach ( (array) $fundArray as $key => $value ) {
+			if ( strcasecmp( $fundArray[$key], "SHOW" ) == 0 ) {
+				$showFundCount = $showFundCount + 1;
+			}
+		}
+	}
+
+	if ( $showFundCount > 0 ) {
+		$output .= "<p>";
+		$output .= "<input type='checkbox' id='dgx-donate-designated' name='_dgx_donate_designated'/>";
+		$output .= esc_html__( "I would like to designate this donation to a specific fund", "dgx-donate" );
+		$output .= "</p>";
+		
+		$output .= "<div class='dgx-donate-form-designated-box'>";
+		$output .= "<p>" . esc_html__( 'Designated Fund: ', 'dgx-donate' ) . " ";
+		$output .= "<select class='aftertext' name='_dgx_donate_designated_fund'>";
+		
+		foreach ( (array) $fundArray as $key => $value ) {
+			if ( strcasecmp( $fundArray[$key], "SHOW" ) == 0 ) {
+				$fundName = stripslashes( $key );
+				$output .= "<option value='" . esc_attr( $fundName ) . "' > " . esc_html( $fundName ) . "</option>";
+			}
+		}
+
+		$output .= "</select>";
+		$output .= "</p>";
+		$output .= "</div>"; /* dgx-donate-form-designated-box */
+	}
+
+	// Repeating donations
+	$output .= "<p>";
+	$output .= "<input type='checkbox' id='dgx-donate-repeating' name='_dgx_donate_repeating'/>";
+	$output .= esc_html__( "I would like this donation to automatically repeat each month", "dgx-donate" );
+	$output .= "</p>";
+		
+	$output .= "</div>"; /* dgx-donate-form-section */
 
 	$formContent .= $output;
 
@@ -484,8 +561,17 @@ function dgx_donate_get_tribute_section($formContent)
 	$honoreeEmail = '';
 	$honoreeAddress = '';
 	$honoreeCity = '';
-	$honoreeState = 'WA';
 	$honoreeZip = '';
+
+	$honoree_state = get_option('dgx_donate_default_state');
+	$honoree_province = get_option('dgx_donate_default_province');
+	$honoree_country = get_option('dgx_donate_default_country');
+
+	$checkTribute = "";
+	$honoreeEmailRecipient = "";
+	$checkHonorEmail = "";
+	$checkHonorPostal = "";
+	$honoreePostalRecipient = "";
 
 	if ($isTributeGift)
 	{
@@ -500,6 +586,7 @@ function dgx_donate_get_tribute_section($formContent)
 		$checkHonorPostal = " checked ";
 	}
 
+	$output = "";
 	$output .= "<div class=\"dgx-donate-form-section\">\n";
 	$output .= "<h2>Tribute Gift</h2>\n";
 	$output .= "<div class=\"dgx-donate-form-expander\">\n";	
@@ -512,7 +599,7 @@ function dgx_donate_get_tribute_section($formContent)
 	$output .= "<hr/>";
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_honoree_name\">Honoree's Name: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_name\" size=\"30\" value=\"$honoreeName\" />";
+	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_name\" size=\"20\" value=\"$honoreeName\" />";
 	$output .= "</p>";
 	$output .= "<p>";
 	$output .= "<input type=\"radio\" name=\"_dgx_donate_honor_by_email\" value=\"TRUE\" $checkHonorEmail /> Send acknowledgement via email to ";
@@ -520,11 +607,11 @@ function dgx_donate_get_tribute_section($formContent)
 	$output .= "<div class=\"dgx-donate-form-subsection\">";
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_honoree_address\">Name: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_email_name\" size=\"30\" value=\"$honoreeEmailRecipient\" />";
+	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_email_name\" size=\"20\" value=\"$honoreeEmailRecipient\" />";
 	$output .= "</p>";
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_honoree_email\">Email: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_email\" size=\"30\" value=\"$honoreeEmail\" />";
+	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_email\" size=\"20\" value=\"$honoreeEmail\" />";
 	$output .= "</p>";
 	$output .= "</div>";
 	$output .= "<p>";	
@@ -533,23 +620,35 @@ function dgx_donate_get_tribute_section($formContent)
 	$output .= "<div class=\"dgx-donate-form-subsection\">";
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_honoree_address\">Name: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_post_name\" size=\"30\" value=\"$honoreePostalRecipient\" />";
+	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_post_name\" size=\"20\" value=\"$honoreePostalRecipient\" />";
 	$output .= "</p>";
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_honoree_address\">Address: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_address\" size=\"30\" value=\"$honoreeAddress\" />";
+	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_address\" size=\"20\" value=\"$honoreeAddress\" />";
 	$output .= "</p>";	
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_honoree_city\">City: </label>";
 	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_city\" value=\"$honoreeCity\" />";
 	$output .= "</p>";
+
+	$output .= "<div class='dgx_donate_geography_selects'>";
 	$output .= "<p>";
-	$output .= "<label for=\"_dgx_donate_honoree_state\">State: </label>";
-	$output .= dgx_donate_get_state_selector("_dgx_donate_honoree_state", $honoreeState);
+	$output .= "<label for='_dgx_donate_honoree_state'>" . esc_html__( 'State:', 'dgx-donate' ) . "</label>";
+	$output .= dgx_donate_get_state_selector( "_dgx_donate_honoree_state", $honoree_state );
 	$output .= "</p>";
 	$output .= "<p>";
-	$output .= "<label for=\"_dgx_donate_honoree_zip\">Zip: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_honoree_zip\"  size=\"10\" value=\"$honoreeZip\" />";
+	$output .= "<label for='_dgx_donate_honoree_province'>" . esc_html__( 'Province:', 'dgx-donate' ) . "</label>";
+	$output .= dgx_donate_get_province_selector( "_dgx_donate_honoree_province", $honoree_province );
+	$output .= "</p>";
+	$output .= "<p>";
+	$output .= "<label for='_dgx_donate_honoree_country'>" . esc_html__( 'Country:', 'dgx-donate' ) ."</label>";
+	$output .= dgx_donate_get_country_selector( "_dgx_donate_honoree_country", $honoree_country );
+	$output .= "</p>";
+	$output .= "</div>";
+
+	$output .= "<p>";
+	$output .= "<label for='_dgx_donate_honoree_zip'>" . esc_html__( 'Postal Code:', 'dgx-donate' ) . "</label>";
+	$output .= "<input type='text' name='_dgx_donate_honoree_zip' size='10' value='' />";
 	$output .= "</p>";
 	$output .= "</div>"; /* dgx-donate-form-subsection */
 	$output .= "</div>"; /* dgx-donate-form-tribute-box */
@@ -571,6 +670,14 @@ function dgx_donate_get_donor_section($formContent)
 		$checkAddMailingList = " checked ";
 	}
 
+	$donorFirstName = "";
+	$donorLastName = "";
+	$donorPhone = "";
+	$donorEmail = "";
+	$checkAddMailingList = "";
+	$anonymous = "";
+
+	$output = "";
 	$output .= "<div class=\"dgx-donate-form-section\">\n";
 	$output .= "<h2>Donor Information</h2>\n";
 	$output .= "<p>";
@@ -587,7 +694,7 @@ function dgx_donate_get_donor_section($formContent)
 	$output .= "</p>";
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_donor_email\">Email: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_donor_email\"  size=\"40\" value=\"$donorEmail\" />";
+	$output .= "<input type=\"text\" name=\"_dgx_donate_donor_email\"  size=\"20\" value=\"$donorEmail\" />";
 	$output .= "</p>";
 
 	$output .= "<p><input type=\"checkbox\" name=\"_dgx_donate_add_to_mailing_list\" $checkAddMailingList /> Add me to your mailing list</p>\n";
@@ -607,30 +714,50 @@ function dgx_donate_get_donor_section($formContent)
 /******************************************************************************************************/
 function dgx_donate_get_billing_section($formContent)
 {
-	$donorState = get_option('dgx_donate_default_state');
+	$donor_state = get_option('dgx_donate_default_state');
+	$donor_province = get_option('dgx_donate_default_province');
+	$donor_country = get_option('dgx_donate_default_country');
 
+	$donorAddress = "";
+	$donorAddress2 = "";
+	$donorCity = "";
+	$donorZip = "";
+
+	$output = "";
 	$output .= "<div class=\"dgx-donate-form-section\">\n";
-	$output .= "<h2>Billing Information</h2>\n";
+	$output .= "<h2>Donor Address</h2>\n";
 	
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_donor_address\">Address: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_donor_address\"  size=\"40\" value=\"$donorAddress\" />";
+	$output .= "<input type=\"text\" name=\"_dgx_donate_donor_address\"  size=\"20\" value=\"$donorAddress\" />";
 	$output .= "</p>";	
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_donor_address2\">Address 2: <span class=\"dgx-donate-comment\">(optional)</span> </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_donor_address2\"  size=\"40\" value=\"$donorAddress2\" />";
+	$output .= "<input type=\"text\" name=\"_dgx_donate_donor_address2\"  size=\"20\" value=\"$donorAddress2\" />";
 	$output .= "</p>";
 	$output .= "<p>";
 	$output .= "<label for=\"_dgx_donate_donor_city\">City: </label>";
 	$output .= "<input type=\"text\" name=\"_dgx_donate_donor_city\" value=\"$donorCity\" /> ";
 	$output .= "</p>";
-	$output .= "<p>";	
-	$output .= "<label for=\"_dgx_donate_donor_state\">State: </label>";
-	$output .= dgx_donate_get_state_selector("_dgx_donate_donor_state", $donorState);
+
+	$output .= "<div class='dgx_donate_geography_selects'>";
+	$output .= "<p>";
+	$output .= "<label for='_dgx_donate_donor_state'>" . esc_html__( 'State:', 'dgx-donate' ) . "</label>";
+	$output .= dgx_donate_get_state_selector( "_dgx_donate_donor_state", $donor_state );
 	$output .= "</p>";
 	$output .= "<p>";
-	$output .= "<label for=\"_dgx_donate_donor_zip\">Zip: </label>";
-	$output .= "<input type=\"text\" name=\"_dgx_donate_donor_zip\"  size=\"10\" value=\"$donorZip\" />";
+	$output .= "<label for='_dgx_donate_donor_province'>" . esc_html__( 'Province:', 'dgx-donate' ) . "</label>";
+	$output .= dgx_donate_get_province_selector( "_dgx_donate_donor_province", $donor_province );
+	$output .= "</p>";
+	$output .= "<p>";
+	$output .= "<label for='_dgx_donate_donor_country'>" . esc_html__( 'Country:', 'dgx-donate' ) . "</label>";
+	$output .= dgx_donate_get_country_selector( "_dgx_donate_donor_country", $donor_country );
+	$output .= "</p>";
+	$output .= "</div>";
+
+	$output .= "<p>";
+	$output .= "<label for='_dgx_donate_donor_zip'>" . esc_html__( 'Postal Code:', 'dgx-donate' ) . "</label>";
+	$output .= "<input type='text' name='_dgx_donate_donor_zip'  size='10' value='' />";
 	$output .= "</p>";	
 	
 	$output .= "</div>\n";
@@ -645,20 +772,17 @@ add_shortcode('dgx-donate', 'dgx_donate_shortcode');
 
 function dgx_donate_shortcode($atts)
 {
-	$thanks = $_GET['thanks'];
-	
-	// Sanitize
-	$thanks = trim($thanks);
-	$thanks = strip_tags($thanks);
-	$thanks = htmlspecialchars($thanks);
+	$show_thanks = false;
+	if ( isset( $_GET['thanks'] ) ) {
+		$show_thanks = true;
+	} else if ( isset( $_GET['auth'] ) ) {
+		$show_thanks = true;
+	}
 	
 	// Switch
-	if (!empty($thanks))
-	{
+	if ( $show_thanks ) {
 		$output = dgx_donate_display_thank_you();
-	}
-	else
-	{
+	} else {
 		$output = "";
 		$output = apply_filters('dgx_donate_donation_form', $output);
 
@@ -686,8 +810,8 @@ function dgx_donate_send_thank_you_email($donationID, $testAddress="")
 		$amount = "$100.00";
 		// fundname
 		$fund = "Tesla Scholarship";
-		// recurring y/n
-		$recurring = "TRUE";
+		// repeating y/n
+		$repeating = "TRUE";
 		// designated y/n
 		$designated = "TRUE";
 		// anonymous y/n
@@ -707,11 +831,11 @@ function dgx_donate_send_thank_you_email($donationID, $testAddress="")
 		$lastName = get_post_meta($donationID, '_dgx_donate_donor_last_name', true);
 		// amount
 		$amount = get_post_meta($donationID, '_dgx_donate_amount', true);
-		$amount = "$" . number_format($amount, 2);
+		$amount = dgx_donate_get_escaped_formatted_amount( $amount );
 		// fundname
 		$fund = get_post_meta($donationID, '_dgx_donate_designated_fund', true);
 		// recurring y/n
-		$recurring = get_post_meta($donationID, '_dgx_donate_repeating', true);
+		$repeating = get_post_meta($donationID, '_dgx_donate_repeating', true);
 		// designated y/n
 		$designated = get_post_meta($donationID, '_dgx_donate_designated', true);
 		// anonymous y/n
@@ -734,24 +858,23 @@ function dgx_donate_send_thank_you_email($donationID, $testAddress="")
     $body = stripslashes($body);
     $emailBody = $body;
     $emailBody .= "\n\n";
-    
-    // if (!empty($recurring))
-    // {
-    //	$text = get_option('dgx_donate_email_recur');
-    //	$text = str_replace("[amount]", $amount, $text);
-    //	$text = stripslashes($text);
-    //	$emailBody .= $text;
-    //	$emailBody .= "\n\n";
-	// }
 
-    // if (!empty($designated))
-    // {
-    //	$text = get_option('dgx_donate_email_desig');
-    //	$text = str_replace("[fund]", $fund, $text);
-    //	$text = stripslashes($text);
-    //	$emailBody .= $text;
-    //	$emailBody .= "\n\n";
-	// }	
+	if ( ! empty( $repeating ) ) {
+		$text = get_option( 'dgx_donate_email_recur' );
+		$text = str_replace( "[amount]", $amount, $text );
+		$text = stripslashes( $text );
+		$emailBody .= $text;
+		$emailBody .= "\n\n";
+		}
+
+	if ( ! empty( $designated ) )
+	{
+		$text = get_option( 'dgx_donate_email_desig' );
+		$text = str_replace( "[fund]", $fund, $text );
+		$text = stripslashes ($text );
+		$emailBody .= $text;
+		$emailBody .= "\n\n";
+	}	
 	
     if (!empty($anonymous))
     {
@@ -827,7 +950,7 @@ function dgx_donate_send_donation_notification($donationID)
 	}
 	
 	$amount = get_post_meta($donationID, '_dgx_donate_amount', true);
-	$formattedDonationAmount = "$" . number_format($amount, 2);
+	$formattedDonationAmount = dgx_donate_get_escaped_formatted_amount( $amount );
 	$body .= "Donation:\n";
 	$body .= "Amount: $formattedDonationAmount\n";
 	
