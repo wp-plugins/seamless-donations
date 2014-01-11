@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts.
-Version: 2.7.0
+Version: 2.8.0
 Author: allendav
 Author URI: http://www.allendav.com/
 License: GPL2
@@ -846,7 +846,6 @@ function dgx_donate_send_thank_you_email($donationID, $testAddress="")
 		$tribute = get_post_meta($donationID, '_dgx_donate_tribute_gift', true);
 	}
 	
-    $replyEmail = get_option('dgx_donate_email_reply');
     $subject = get_option('dgx_donate_email_subj');
     $subject = stripslashes($subject);
     
@@ -908,11 +907,18 @@ function dgx_donate_send_thank_you_email($donationID, $testAddress="")
 	$text = get_option('dgx_donate_email_sig');
     $text = stripslashes($text);
     $emailBody .= $text;
-    $emailBody .= "\n";    
-	
-    $headers = "From: $replyEmail\r\n";
+    $emailBody .= "\n";
 
-	$mail_sent = wp_mail( $toEmail, $subject, $emailBody, $headers );
+	$header = "From: ";
+	$from_email_name = get_option( 'dgx_donate_email_name' );
+	$from_email_address = get_option( 'dgx_donate_email_reply' );
+	if ( empty( $from_email_name ) ) {
+		$header .= $from_email_address;
+	} else {
+		$header .= "\"" . $from_email_name . "\" <" . $from_email_address . ">\r\n";
+	}
+
+	$mail_sent = wp_mail( $toEmail, $subject, $emailBody, $header );
 
 	if ( ! $mail_sent ) {
 		dgx_donate_debug_log( "Error: Could NOT send mail." );

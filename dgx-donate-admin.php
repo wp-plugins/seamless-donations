@@ -29,11 +29,20 @@ add_action('dgx_donate_admin_footer', 'dgx_donate_echo_admin_footer');
 function dgx_donate_init_defaults()
 {
 	// Thank you email option defaults
-	$fromEmail = get_option('dgx_donate_email_reply');
-	if (empty($fromEmail))
-	{
-		$fromEmail = get_option('admin_email');
-		update_option('dgx_donate_email_reply', $fromEmail);
+
+	// validate name - replace with santized blog name if needed
+	$from_name = get_option( 'dgx_donate_email_name' );
+	if ( empty( $from_name ) ) {
+		$from_name = get_bloginfo( 'name' );
+		$from_name = preg_replace( "/[^a-zA-Z ]+/", "", $from_name ); // letters and spaces only please
+		update_option( 'dgx_donate_email_name', $from_name );
+	}
+
+	// validate email - replace with admin email if needed
+	$from_email = get_option( 'dgx_donate_email_reply' );
+	if ( empty( $from_email ) || ! is_email( $from_email ) ) {
+		$from_email = get_option( 'admin_email' );
+		update_option( 'dgx_donate_email_reply', $from_email );
 	}
 	
 	$thankSubj = get_option('dgx_donate_email_subj');

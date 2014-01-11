@@ -5,6 +5,7 @@
 class Dgx_Donate_Admin_Templates_View {
 	function __construct() {
 		add_action( 'dgx_donate_menu', array( $this, 'menu_item' ), 9 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 	}
 	
 	function menu_item() {
@@ -25,6 +26,13 @@ class Dgx_Donate_Admin_Templates_View {
 
 		// Data driven ftw!
 		$template_elements = array(
+			'fromname' => array(
+				'option' => 'dgx_donate_email_name',
+				'label' => __( 'From / Reply-To Name', 'dgx-donate' ),
+				'description' => __( 'The name the thank you email should appear to come from (e.g. your organization name or your name).', 'dgx-donate' ),
+				'type' => 'text',
+				'cols' => 40
+			),
 			'frommail' => array(
 				'option' => 'dgx_donate_email_reply',
 				'label' => __( 'From / Reply-To Email Address', 'dgx-donate' ),
@@ -116,6 +124,17 @@ class Dgx_Donate_Admin_Templates_View {
 			foreach ( (array) $template_elements as $key => $element ) {
 				if ( isset( $_POST[$key] ) ) {
 					$value = strip_tags( $_POST[$key] );
+
+					if ( 'fromname' == $key ) {
+						$value = preg_replace( "/[^a-zA-Z ]+/", "", $value ); // letters and spaces only please
+					}
+
+					if ( 'frommail' == $key ) {
+						if ( ! is_email( $value ) ) {
+							$value = get_option( 'admin_email' );
+						}
+					}
+
 					update_option( $element['option'], $value );
 					$message = __( 'Templates updated.', 'dgx-donate' );
 				}
@@ -168,13 +187,14 @@ class Dgx_Donate_Admin_Templates_View {
 
 		foreach ( (array) $template_elements as $key => $element ) {
 			echo "<div class='form-field'>\n";
-			echo "<label for='" . esc_attr( $key ) . "'>" . esc_html( $element['label'] ) . "</label>\n";
+			echo "<p><strong>" . esc_html( $element['label'] ) . "</strong> - ";
+			echo "<span class='description'>" . esc_html( $element['description'] ) . "</span></p>";
 			if ( 'text' == $element['type'] ) {
 				echo "<input type='text' name='" . esc_attr( $key ) . "' size='" . esc_attr( $element['cols'] ) . "' value = '" . esc_attr( $element['value'] ) . "' />\n";
 			} else {
-				echo "<textarea name='" . esc_attr( $key ) . "' rows='" . esc_attr( $element['rows'] ) . "' cols='" . esc_attr( $element['cols'] ) . "'>" . esc_textarea( $element['value'] ) . "</textarea>\n";
+				echo "<textarea style='resize: none;' name='" . esc_attr( $key ) . "' rows='" . esc_attr( $element['rows'] ) . "' cols='" . esc_attr( $element['cols'] ) . "'>" . esc_textarea( $element['value'] ) . "</textarea>\n";
 			}
-			echo "<p class='description'>" . esc_html( $element['description'] ) . "</p>\n";
+			echo "<br/><br/>";
 			echo "</div>\n";
 		}
 
@@ -212,6 +232,16 @@ class Dgx_Donate_Admin_Templates_View {
 		echo "</div>\n"; // col container
 		
 		echo "</div>\n"; // wrap 
+	}
+
+	function admin_enqueue_scripts() {
+		wp_enqueue_script( 'jquery' );
+
+		$script_url = plugins_url( '../js/jquery.autosize.js', __FILE__ ); 
+		wp_enqueue_script( 'dgx_donate_jquery_autosize', $script_url, array( 'jquery' ) );
+
+		$script_url = plugins_url( '../js/autosize-loader.js', __FILE__ ); 
+		wp_enqueue_script( 'dgx_donate_autosize_loader', $script_url, array( 'jquery', 'dgx_donate_jquery_autosize' ) );
 	}
 }
 

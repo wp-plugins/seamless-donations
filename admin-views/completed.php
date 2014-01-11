@@ -5,6 +5,7 @@
 class Dgx_Donate_Admin_Completed_View {
 	function __construct() {
 		add_action( 'dgx_donate_menu', array( $this, 'menu_item' ), 11 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 	}
 	
 	function menu_item() {
@@ -20,8 +21,8 @@ class Dgx_Donate_Admin_Completed_View {
 	
 	function menu_page() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-	      wp_die( __( 'You do not have sufficient permissions to access this page.', 'dgx-donate' ) );
-	    }
+			wp_die( __( 'You do not have sufficient permissions to access this page.', 'dgx-donate' ) );
+		}
 	
 		// Get form arguments
 		$thank_you_text = "";
@@ -49,7 +50,7 @@ class Dgx_Donate_Admin_Completed_View {
 	
 		echo "<div class='wrap'>\n";
 		echo "<div id='icon-edit-pages' class='icon32'></div>\n";
-		echo "<h2>" . esc_html__( 'Email Templates', 'dgx-donate' ) . "</h2>\n";    
+		echo "<h2>" . esc_html__( 'Thank You Page', 'dgx-donate' ) . "</h2>\n";
 	    
 		// Display any message
 		if ( ! empty( $message ) ) {
@@ -67,16 +68,17 @@ class Dgx_Donate_Admin_Completed_View {
 		echo "<div id='col-right'>\n";
 		echo "<div class='col-wrap'>\n";
 		
-		echo "<h3>" . esc_html__( 'Thank You Page', 'dgx-donate' ) . "</h3>\n";
+		echo "<h3>" . esc_html__( 'Thank You Page Details', 'dgx-donate' ) . "</h3>\n";
 		
-		echo "<form method='POST' action=''>\n";	
+		echo "<form method='POST' action=''>\n";
 		echo "<input type='hidden' name='dgx_donate_thanks_nonce' value='" . esc_attr( $nonce ) . "' />\n";	
 		
-		echo "<div class='form-field'>\n";
-		echo "<label for='thankstext'>" . esc_html__( 'Thank You Page Text', 'dgx-donate' ) . "</label><br/>\n";
-		echo "<textarea name='thankstext' rows='6' cols='40'>" . esc_textarea( $thank_you_text ) . "</textarea>\n";
-		echo "<p class='description'>" . esc_html__( 'The text to display to the donor after they complete their donation.', 'dgx-donate' ) . "</p>\n";
-		echo "</div>\n";
+		echo "<div class='form-field'>";
+		echo "<p><strong>" . esc_html__( 'Thank You Page Text', 'dgx-donate' ) . "</strong> - ";
+		echo "<span class='description'>" . esc_html__( 'The text to display to the donor after they complete their donation.', 'dgx-donate' ) . "</span></p>";
+		echo "<textarea style='resize: none;' name='thankstext' rows='3' cols='40'>" . esc_textarea( $thank_you_text ) . "</textarea>";
+		echo "<br/><br/>";
+		echo "</div>";
 		
 		echo "<p><input id='submit' class='button' type='submit' value='" . esc_attr( 'Save Changes', 'dgx=donate' ) ."' name='submit'></p>\n";
 		
@@ -105,6 +107,16 @@ class Dgx_Donate_Admin_Completed_View {
 		echo "</div>\n";
 		
 		echo "</div>\n"; 
+	}
+
+	function admin_enqueue_scripts() {
+		wp_enqueue_script( 'jquery' );
+
+		$script_url = plugins_url( '../js/jquery.autosize.js', __FILE__ ); 
+		wp_enqueue_script( 'dgx_donate_jquery_autosize', $script_url, array( 'jquery' ) );
+
+		$script_url = plugins_url( '../js/autosize-loader.js', __FILE__ ); 
+		wp_enqueue_script( 'dgx_donate_autosize_loader', $script_url, array( 'jquery', 'dgx_donate_jquery_autosize' ) );
 	}
 }
 

@@ -59,6 +59,11 @@ Yes!
 
 == Changelog ==
 
+= 2.8.0 =
+* Added: Support for specifying name for emails to donors (instead of WordPress)
+* Added: Automatic textarea height increase for email templates and thank you page
+* Fixed: Bug that would allow invalid email address to cause email to donor to not go out (defaults to admin email now)
+
 = 2.7.0 =
 * Added: Support for donors located outside the United States
 
