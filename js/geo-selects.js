@@ -1,0 +1,23 @@
+function DgxDonateOnCountryChange( event ) {
+	var countrySelectEl = jQuery( this );
+
+	var stateSelectEl = countrySelectEl.parents( '.dgx_donate_geography_selects' ).first().find( '.dgx_donate_state_select' ).parents( 'p' ).first();
+	var provinceSelectEl = countrySelectEl.parents( '.dgx_donate_geography_selects' ).first().find( '.dgx_donate_province_select' ).parents( 'p' ).first();
+
+	var country = countrySelectEl.val();
+	if ( 'US' == country ) {
+		stateSelectEl.show();
+		provinceSelectEl.hide();
+	} else if ( 'CA' == country ) {
+		stateSelectEl.hide();
+		provinceSelectEl.show();
+	} else {
+		stateSelectEl.hide();
+		provinceSelectEl.hide();
+	}
+}
+
+jQuery( document ).ready( function() {
+	jQuery( '.dgx_donate_country_select' ).change( DgxDonateOnCountryChange );
+	jQuery( '.dgx_donate_country_select' ).trigger( 'change' );
+} );
