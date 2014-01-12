@@ -46,3 +46,27 @@ function dgx_donate_get_escaped_formatted_amount( $amount, $decimal_places = 2, 
 
 	return $currency_symbol . esc_html( number_format( $amount, $decimal_places ) );
 }
+
+function dgx_donate_get_plain_formatted_amount( $amount, $decimal_places = 2, $currency_code = '', $append_currency_code = false ) {
+	if ( empty( $currency_code ) ) {
+		$currency_code = get_option( 'dgx_donate_currency' );
+	}
+
+	$formatted_amount = number_format( $amount, $decimal_places );
+	if ( $append_currency_code ) {
+		$formatted_amount .= " (" . $currency_code . ")";
+	}
+
+	return $formatted_amount;
+}
+
+function dgx_donate_get_donation_currency_code( $donation_id ) {
+	/* gets the currency code for the donation */
+	/* updates donations without one (pre version 2.8.1) as USD */
+	$currency_code = get_post_meta( $donation_id, '_dgx_donate_donation_currency', true );
+	if ( empty( $currency_code ) ) {
+		$currency_code = "USD";
+		update_post_meta( $donation_id, '_dgx_donate_donation_currency', $currency_code );
+	}
+	return $currency_code;
+}

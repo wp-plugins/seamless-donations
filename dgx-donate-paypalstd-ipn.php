@@ -106,7 +106,7 @@ class Dgx_Donate_IPN_Handler {
 	function handle_verified_ipn() {
 		$payment_status = $_POST["payment_status"];
 
-		dgx_donate_debug_log( "IPN VERIFIED for session ID {$this->session_id}, transaction ID {$this->transaction_id}" );
+		dgx_donate_debug_log( "IPN VERIFIED for session ID {$this->session_id}" );
 		dgx_donate_debug_log( "Payment status = {$payment_status}" );
 		//dgx_donate_debug_log( print_r( $this->post_data, true ) ); // @todo don't commit
 
@@ -139,7 +139,7 @@ class Dgx_Donate_IPN_Handler {
 						// some reason) - so we will have to create a donation record
 						// from the data supplied by PayPal
 
-						$donation_id = dgx_donate_create_donation_from_paypal_data( $POST );
+						$donation_id = dgx_donate_create_donation_from_paypal_data( $_POST );
 						dgx_donate_debug_log( "Created donation {$donation_id} from PayPal data (no transient data found)" );
 					}
 				} else {
@@ -163,6 +163,10 @@ class Dgx_Donate_IPN_Handler {
 				update_post_meta( $donation_id, '_dgx_donate_transaction_id', $this->transaction_id );
 				update_post_meta( $donation_id, '_dgx_donate_payment_processor', 'PAYPALSTD' );
 				update_post_meta( $donation_id, '_dgx_donate_payment_processor_data', $this->post_data );
+				// save the currency of the transaction
+				$currency_code = $_POST['mc_currency'];
+				dgx_donate_debug_log( "Payment currency = {$currency_code}" );
+				update_post_meta( $donation_id, '_dgx_donate_donation_currency', $currency_code );
 			}
 
 			// @todo - send different notification for recurring?

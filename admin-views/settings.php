@@ -176,17 +176,17 @@ class Dgx_Donate_Admin_Settings_View {
 		echo "<br/>";
 
 		// Currency
-		// echo "<h3>" . esc_html__( 'Currency', 'dgx-donate' ) . " <strong>(BETA)</strong>" . "</h3>";
-		// echo "<p>" . esc_html__( "Select the currency you'd like to receive donations in.", 'dgx-donate' ) . "</p>";
-		// echo "<form method='POST' action=''>\n";
-		// echo "<input type='hidden' name='dgx_donate_settings_nonce' value='" . esc_attr( $nonce ) . "' />\n";
-		// $currency = get_option( 'dgx_donate_currency' );
-		// echo "<p>";
-		// echo dgx_donate_get_currency_selector( 'dgx_donate_currency', $currency );
-		// echo "</p>";
-		// echo "<p><input id='submit' class='button' type='submit' value='" . esc_attr__( 'Update', 'dgx-donate' ) . "' name='submit' /></p>\n";
-		// echo "</form>";
-		// echo "<br/>";
+		echo "<h3>" . esc_html__( 'Currency', 'dgx-donate' ) . "</h3>";
+		echo "<p>" . esc_html__( "Select the currency you'd like to receive donations in.", 'dgx-donate' ) . "</p>";
+		echo "<form method='POST' action=''>\n";
+		echo "<input type='hidden' name='dgx_donate_settings_nonce' value='" . esc_attr( $nonce ) . "' />\n";
+		$currency = get_option( 'dgx_donate_currency' );
+		echo "<p>";
+		echo dgx_donate_get_currency_selector( 'dgx_donate_currency', $currency );
+		echo "</p>";
+		echo "<p><input id='submit' class='button' type='submit' value='" . esc_attr__( 'Update', 'dgx-donate' ) . "' name='submit' /></p>\n";
+		echo "</form>";
+		echo "<br/>";
 
 		// Default country/state/province for donor
 		// jQuery will take care of hiding / showing the state and province selector based on the country code

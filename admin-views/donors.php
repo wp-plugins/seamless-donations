@@ -80,7 +80,7 @@ class Dgx_Donate_Admin_Donors_View {
 				$donation_id = $my_donation->ID;
 
 				$ok_to_add = true;
-	
+
 				$year = get_post_meta( $donation_id, '_dgx_donate_year', true );
 				$month = get_post_meta( $donation_id, '_dgx_donate_month', true );
 				$day = get_post_meta( $donation_id, '_dgx_donate_day', true );
@@ -123,13 +123,16 @@ class Dgx_Donate_Admin_Donors_View {
 			
 			// Now, loop on the funds and then the donation IDs inside them
 			$grand_total = 0;
+			$all_currency_codes_found = array();
 			
 			foreach ( (array) $my_donor_emails as $my_donor_email => $donor_donation_ids ) {
 				$donor_total = 0;
 				
 				$donor_name = $my_donor_names[$my_donor_email];
 				$donor_count = count( $donor_donation_ids );
-				$donor_detail = dgx_donate_get_donor_detail_link( $donor_email );
+				$donor_detail = dgx_donate_get_donor_detail_link( $my_donor_email );
+				$donor_currency_codes_found = array();
+
 				echo "<tr>";
 				echo "<th colspan='3'><a href='" . esc_url( $donor_detail ) . "'>" . esc_html( $donor_name . " (" . $donor_count .")" ) . "</a></th>";
 				echo "</tr>\n";
@@ -145,7 +148,10 @@ class Dgx_Donate_Admin_Donors_View {
 					}
 					$amount = get_post_meta( $donation_id, '_dgx_donate_amount', true );
 					$donor_total = $donor_total + floatval( $amount );
-					$formatted_amount = dgx_donate_get_escaped_formatted_amount( $amount );
+					$currency_code = dgx_donate_get_donation_currency_code( $donation_id );
+					$donor_currency_codes_found[$currency_code] = true;
+					$all_currency_codes_found[$currency_code] = true;
+					$formatted_amount = dgx_donate_get_escaped_formatted_amount( $amount, 2, $currency_code );
 
 					$donation_detail = dgx_donate_get_donation_detail_link( $donation_id );
 					echo "<tr>";
@@ -154,7 +160,11 @@ class Dgx_Donate_Admin_Donors_View {
 					echo "<td>" . $formatted_amount . "</td>";
 					echo "</tr>\n";
 				}
-				$formatted_donor_total = dgx_donate_get_escaped_formatted_amount( $donor_total );
+				if ( count( $donor_currency_codes_found ) > 1 ) {
+					$formatted_donor_total = "-";
+				} else {
+					$formatted_donor_total = dgx_donate_get_escaped_formatted_amount( $donor_total, 2, $currency_code );
+				}
 				echo "<tr>";
 				echo "<th>&nbsp</th>";
 				echo "<th>" . esc_html__( 'Donor Subtotal', 'dgx-donate' ) . "</th>";
@@ -163,7 +173,11 @@ class Dgx_Donate_Admin_Donors_View {
 				$grand_total = $grand_total + $donor_total;
 			}
 			
-			$formatted_grand_total = dgx_donate_get_escaped_formatted_amount( $grand_total );
+			if ( count( $all_currency_codes_found ) > 1 ) {
+				$formatted_grand_total = "-";
+			} else {
+				$formatted_grand_total = dgx_donate_get_escaped_formatted_amount( $grand_total, 2, $currency_code );
+			}
 			echo "<tr>";
 			echo "<th>&nbsp</th>";
 			echo "<th>" . esc_html__( 'Grand Total', 'dgx-donate' ) . "</th>";

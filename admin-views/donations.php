@@ -123,11 +123,13 @@ class Dgx_Donate_Admin_Donations_View {
 			// Now, loop on the funds and then the donation IDs inside them
 		
 			$grand_total = 0;
+			$all_currency_codes_found = array();
 		
 			foreach ( (array) $my_funds as $my_fund => $fund_donation_ids) {
 				$fund_total = 0;
-			
 				$fund_count = count( $fund_donation_ids );
+				$fund_currency_codes_found = array();
+
 				echo "<tr>";
 				echo "<th colspan='3'>" . esc_html( $my_fund . " (" . $fund_count . ")" ) . "</th>";
 				echo "</tr>\n";
@@ -140,8 +142,10 @@ class Dgx_Donate_Admin_Donations_View {
 					$last_name = get_post_meta( $donation_id, '_dgx_donate_donor_last_name', true );
 					$amount = get_post_meta( $donation_id, '_dgx_donate_amount', true );
 					$fund_total = $fund_total + floatval( $amount );
-					$formatted_amount =dgx_donate_get_escaped_formatted_amount( $amount );
-				
+					$currency_code = dgx_donate_get_donation_currency_code( $donation_id );
+					$all_currency_codes_found[$currency_code] = true;
+					$fund_currency_codes_found[$currency_code] = true;
+					$formatted_amount = dgx_donate_get_escaped_formatted_amount( $amount, 2, $currency_code );
 					$donation_detail = dgx_donate_get_donation_detail_link( $donation_id );
 					$donor_email = get_post_meta( $donation_id, '_dgx_donate_donor_email', true );
 					$donor_detail = dgx_donate_get_donor_detail_link( $donor_email );
@@ -152,7 +156,11 @@ class Dgx_Donate_Admin_Donations_View {
 					echo "<td>" . $formatted_amount . "</td>";
 					echo "</tr>\n";
 				}
-				$formatted_fund_total = dgx_donate_get_escaped_formatted_amount( $fund_total );
+				if ( count( $fund_currency_codes_found ) > 1 ) {
+					$formatted_fund_total = "-";
+				} else {
+					$formatted_fund_total = dgx_donate_get_escaped_formatted_amount( $fund_total, 2, $currency_code );
+				}
 				echo "<tr>";
 				echo "<th>&nbsp;</th>";
 				echo "<th>" . esc_html__( 'Fund Subtotal', 'dgx-donate' ) . "</th>";
@@ -160,8 +168,12 @@ class Dgx_Donate_Admin_Donations_View {
 				echo "</tr>\n";
 				$grand_total = $grand_total + $fund_total;
 			}
-		
-			$formatted_grand_total = dgx_donate_get_escaped_formatted_amount( $grand_total );
+
+			if ( count( $all_currency_codes_found ) > 1 ) {
+				$formatted_grand_total = "-";
+			} else {
+				$formatted_grand_total = dgx_donate_get_escaped_formatted_amount( $grand_total, 2, $currency_code );
+			}
 			echo "<tr>";
 			echo "<th>&nbsp</th>";
 			echo "<th>" . esc_html__( 'Grand Total', 'dgx-donate' ) . "</th>";

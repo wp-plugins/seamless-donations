@@ -60,7 +60,8 @@ class Dgx_Donate_Admin_Donation_Detail_View {
 			echo "<td>" . esc_html( $month . "/" . $day . "/" . $year . " " . $time ) . "</td></tr>\n";
 			
 			$amount = get_post_meta( $donation_id, '_dgx_donate_amount', true );
-			$formatted_amount = dgx_donate_get_escaped_formatted_amount( $amount );
+			$currency_code = dgx_donate_get_donation_currency_code( $donation_id );
+			$formatted_amount = dgx_donate_get_escaped_formatted_amount( $amount, 2, $currency_code );
 			echo "<tr>";
 			echo "<th>" . esc_html__( 'Amount', 'dgx-donate' ) . "</th>";
 			echo "<td>" . $formatted_amount . "</td></tr>\n";

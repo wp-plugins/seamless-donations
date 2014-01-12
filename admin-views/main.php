@@ -125,8 +125,9 @@ class Dgx_Donate_Admin_Main_View {
 				$donor_detail = dgx_donate_get_donor_detail_link( $donor_email );
 			
 				$amount = get_post_meta( $donation_id, '_dgx_donate_amount', true );
-				$formatted_amount = dgx_donate_get_escaped_formatted_amount( $amount );
-			
+				$currency_code = dgx_donate_get_donation_currency_code( $donation_id );
+				$formatted_amount = dgx_donate_get_escaped_formatted_amount( $amount, 2, $currency_code );
+
 				$donation_detail = dgx_donate_get_donation_detail_link( $donation_id );
 				echo "<tr>";
 				echo "<td>";

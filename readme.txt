@@ -4,7 +4,7 @@ Donate link: http://www.allendav.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
 Tested up to: 3.8
-Stable tag: 2.7.0
+Stable tag: 2.8.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,6 +32,14 @@ Now supporting donations by US and non-US donors (all donations are in USD - oth
 
 == Frequently Asked Questions ==
 
+= Does this work with US and non-US PayPal accounts? =
+
+Yes!
+
+= Does this handle US and non-US addresses? =
+
+Yes!
+
 = Does this work with PayPal Website Payments Standard? =
 
 Yes!
@@ -58,6 +66,9 @@ Yes!
 6. Dashboard >> Thank You Email Templates
 
 == Changelog ==
+
+= 2.8.1 =
+* Added: Support for non US currencies: Australian Dollar, Canadian Dollar, Euro, Pound Sterling, and Japanese Yen
 
 = 2.8.0 =
 * Added: Support for specifying name for emails to donors (instead of WordPress)

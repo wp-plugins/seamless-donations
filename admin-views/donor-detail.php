@@ -46,6 +46,7 @@ class Dgx_Donate_Admin_Donor_Detail_View {
 			echo "</tr>\n";
 			
 			$donor_total = 0;
+			$donor_currency_codes = array();
 			
 			foreach ( (array) $my_donations as $my_donation ) {
 				$donation_id = $my_donation->ID;
@@ -61,7 +62,9 @@ class Dgx_Donate_Admin_Donor_Detail_View {
 				}
 				$amount = get_post_meta( $donation_id, '_dgx_donate_amount', true );
 				$donor_total = $donor_total + floatval( $amount );
-				$formatted_amount = dgx_donate_get_escaped_formatted_amount( $amount );
+				$currency_code = dgx_donate_get_donation_currency_code( $donation_id );
+				$donor_currency_codes[$currency_code] = true;
+				$formatted_amount = dgx_donate_get_escaped_formatted_amount( $amount, 2, $currency_code );
 
 				$donation_detail = dgx_donate_get_donation_detail_link( $donation_id );
 				echo "<tr><td><a href='" . esc_url( $donation_detail ) . "'>" . esc_html( $year . "-" . $month . "- " . $day . " " . $time ) . "</a></td>";
@@ -69,7 +72,11 @@ class Dgx_Donate_Admin_Donor_Detail_View {
 				echo "<td>" . $formatted_amount . "</td>";
 				echo "</tr>\n";
 			}
-			$formatted_donor_total = dgx_donate_get_escaped_formatted_amount( $donor_total );
+			if ( count( $donor_currency_codes ) > 1 ) {
+				$formatted_donor_total = "-";
+			} else {
+				$formatted_donor_total = dgx_donate_get_escaped_formatted_amount( $donor_total, 2, $currency_code );
+			}
 			echo "<tr>";
 			echo "<th>&nbsp</th><th>" . esc_html__( 'Donor Total', 'dgx-donate' ) . "</th>";
 			echo "<td>" . $formatted_donor_total . "</td></tr>\n";

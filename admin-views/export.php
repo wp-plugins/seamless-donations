@@ -71,7 +71,7 @@ else
 				header( "Content-type: text/csv" );
 				header( "Content-Disposition: attachment; filename=export.csv" );
 
-				echo "\"Date\",\"Time\",\"First Name\",\"Last Name\",\"Amount\",\"Repeating\",";
+				echo "\"Date\",\"Time\",\"First Name\",\"Last Name\",\"Amount\",\"Currency\",\"Repeating\",";
 				echo "\"Designated Fund\",\"Gift Item\",\"Phone\",\"Email\",\"Address\",\"Address 2\",";
 				echo "\"City\",\"State/Prov\",\"Postal Code\",\"Country\",\"OK to Add to Mailing List\"\n";
 	
@@ -82,7 +82,9 @@ else
 			$firstName = get_post_meta( $donationID, '_dgx_donate_donor_first_name', true );
 			$lastName = get_post_meta( $donationID, '_dgx_donate_donor_last_name', true );
 			$amount = get_post_meta( $donationID, '_dgx_donate_amount', true );
-			$formatted_amount = dgx_donate_get_escaped_formatted_amount( $amount );
+
+			$currency_code = dgx_donate_get_donation_currency_code( $donationID );
+			$formatted_amount = dgx_donate_get_plain_formatted_amount( $amount, 2, $currency_code, false );
 			$repeating = get_post_meta( $donationID, '_dgx_donate_repeating', true );
 			if ( empty( $repeating ) )
 			{
@@ -138,7 +140,7 @@ else
 				$addToMailingList = "No";
 			}	
 
-			echo "\"$donationDate\",\"$time\",\"$firstName\",\"$lastName\",\"$formatted_amount\",\"$repeating\",";
+			echo "\"$donationDate\",\"$time\",\"$firstName\",\"$lastName\",\"$formatted_amount\",\"$currency_code\",\"$repeating\",";
 			echo "\"$designatedFundName\",\"$gift_item_title\",\"$phone\",\"$email\",\"$address\",\"$address2\",";
 			echo "\"$city\",\"$state_or_prov\",\"$zip\",\"$country\",\"$addToMailingList\"\n";
 		}
