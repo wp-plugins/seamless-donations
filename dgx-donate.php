@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts.
-Version: 2.8.1
+Version: 2.8.2
 Author: allendav
 Author URI: http://www.allendav.com/
 License: GPL2
@@ -137,7 +137,8 @@ function dgx_donate_queue_scripts() {
 	wp_localize_script( 'dgx_donate_script', 'dgxDonateAjax',
 		array(
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),
-			'nonce' => wp_create_nonce( 'dgx-donate-nonce' )
+			'nonce' => wp_create_nonce( 'dgx-donate-nonce' ),
+			'postalCodeRequired' => dgx_donate_get_countries_requiring_postal_code()
 		)
 	);
 }
@@ -606,12 +607,12 @@ function dgx_donate_get_tribute_section($formContent)
 	$output .= "<label for='_dgx_donate_honoree_country'>" . esc_html__( 'Country:', 'dgx-donate' ) ."</label>";
 	$output .= dgx_donate_get_country_selector( "_dgx_donate_honoree_country", $honoree_country );
 	$output .= "</p>";
-	$output .= "</div>";
-
 	$output .= "<p>";
 	$output .= "<label for='_dgx_donate_honoree_zip'>" . esc_html__( 'Postal Code:', 'dgx-donate' ) . "</label>";
-	$output .= "<input type='text' name='_dgx_donate_honoree_zip' size='10' value='' />";
+	$output .= "<input class='dgx_donate_zip_input' type='text' name='_dgx_donate_honoree_zip' size='10' value='' />";
 	$output .= "</p>";
+	$output .= "</div>"; // dgx_donate_geography_selects
+
 	$output .= "</div>"; /* dgx-donate-form-subsection */
 	$output .= "</div>"; /* dgx-donate-form-tribute-box */
 	$output .= "</div>"; /* dgx-donate-form-expander */
@@ -696,12 +697,11 @@ function dgx_donate_get_billing_section( $form_content ) {
 	$output .= "<label for='_dgx_donate_donor_country'>" . esc_html__( 'Country:', 'dgx-donate' ) . "</label>";
 	$output .= dgx_donate_get_country_selector( "_dgx_donate_donor_country", $donor_country );
 	$output .= "</p>";
-	$output .= "</div>";
-
 	$output .= "<p>";
 	$output .= "<label for='_dgx_donate_donor_zip'>" . esc_html__( 'Postal Code:', 'dgx-donate' ) . "</label>";
-	$output .= "<input type='text' name='_dgx_donate_donor_zip'  size='10' value='' />";
-	$output .= "</p>";	
+	$output .= "<input class='dgx_donate_zip_input' type='text' name='_dgx_donate_donor_zip'  size='10' value='' />";
+	$output .= "</p>";
+	$output .= "</div>"; // dgx_donate_geography_selects
 	
 	$output .= "</div>\n";
 	

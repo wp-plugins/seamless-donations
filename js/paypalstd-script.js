@@ -180,7 +180,7 @@ function DgxDonateDoCheckout()
 	if (!DgxDonateIsValidAmount(amount))
 	{
 		formValidates = false;
-		DgxDonateMarkInvalid("_dgx_donate_user_amount");	
+		DgxDonateMarkInvalid("_dgx_donate_user_amount");
 	}
 
 	if (tributeGift == 'on')
@@ -222,9 +222,11 @@ function DgxDonateDoCheckout()
 			}
 			if (honoreeZip == "")
 			{
-				formValidates = false;
-				DgxDonateMarkInvalid("_dgx_donate_honoree_zip");
-			}		
+				if ( dgxDonateAjax.postalCodeRequired.indexOf( honoreeCountry ) >= 0 ) {
+					formValidates = false;
+					DgxDonateMarkInvalid("_dgx_donate_honoree_zip");
+				}
+			}
 		}
 	}
 	
@@ -266,8 +268,10 @@ function DgxDonateDoCheckout()
 
 	if (zip == "")
 	{
-		formValidates = false;
-		DgxDonateMarkInvalid("_dgx_donate_donor_zip");
+		if ( dgxDonateAjax.postalCodeRequired.indexOf( country ) >= 0 ) {
+			formValidates = false;
+			DgxDonateMarkInvalid("_dgx_donate_donor_zip");
+		}
 	}
 	
 	if (!formValidates)

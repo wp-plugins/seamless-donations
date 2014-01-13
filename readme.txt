@@ -67,6 +67,10 @@ Yes!
 
 == Changelog ==
 
+= 2.8.2 =
+* Fixed: Don't require postal code for countries that don't require postal codes
+* Fixed: International tribute gift addresses were not displaying country information in donation details
+
 = 2.8.1 =
 * Added: Support for non US currencies: Australian Dollar, Canadian Dollar, Euro, Pound Sterling, and Japanese Yen
 

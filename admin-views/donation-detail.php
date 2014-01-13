@@ -105,8 +105,11 @@ class Dgx_Donate_Admin_Donation_Detail_View {
 				$honoree_address = get_post_meta( $donation_id, '_dgx_donate_honoree_address', true );
 				$honoree_city = get_post_meta( $donation_id, '_dgx_donate_honoree_city', true );
 				$honoree_state = get_post_meta( $donation_id, '_dgx_donate_honoree_state', true );
+				$honoree_province = get_post_meta( $donation_id, '_dgx_donate_honoree_province', true );
 				$honoree_zip = get_post_meta( $donation_id, '_dgx_donate_honoree_zip', true );
+				$honoree_country = get_post_meta( $donation_id, '_dgx_donate_honoree_country', true );
 				$memorial_gift = get_post_meta( $donation_id, '_dgx_donate_memorial_gift', true );
+
 				if ( empty( $memorial_gift ) ) {
 					$tribute_gift_message .= __( 'in honor of', 'dgx-donate' ) . ' ';
 				} else {
@@ -122,7 +125,25 @@ class Dgx_Donate_Admin_Donation_Detail_View {
 					$tribute_gift_message .= __( 'Send acknowledgement via postal mail to', 'dgx-donate' ) . '<br/>';
 					$tribute_gift_message .= esc_html( $honoree_post_name ) . "<br/>";
 					$tribute_gift_message .= esc_html( $honoree_address ) . "<br/>";
-					$tribute_gift_message .= esc_html( $honoree_city ) . " " . esc_html( $honoree_state ) . " " . esc_html( $honoree_zip );
+
+
+					if ( ! empty( $honoree_city ) ) {
+						$tribute_gift_message .= esc_html( $honoree_city . " " );
+					}
+					if ( 'US' == $honoree_country ) {
+						$tribute_gift_message .= esc_html( $honoree_state . " " );
+					} else if ( 'CA' == $honoree_country ) {
+						$tribute_gift_message .= esc_html( $honoree_province . " " );
+					}
+
+					if ( dgx_donate_country_requires_postal_code( $honoree_country ) ) {
+							$tribute_gift_message .= esc_html( " " . $honoree_zip );
+					}
+					$tribute_gift_message .= "<br/>";
+
+					$countries = dgx_donate_get_countries();
+					$honoree_country_name = $countries[$honoree_country];
+					$tribute_gift_message .= esc_html( $honoree_country_name ) . "<br/><br/>";
 				}
 			}
 			echo "<tr>";

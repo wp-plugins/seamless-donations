@@ -260,6 +260,38 @@ function dgx_donate_get_countries() {
 	return $countries;
 }
 
+/*
+ * From http://about.usps.com/publications/pub141/section-2-references.htm
+ */ 
+function dgx_donate_get_countries_requiring_postal_code() {
+	$countries = array(
+		'AU', 'AT',
+		'BE', 'BR',
+		'CA', 'CN', 'CZ',
+		'DK',
+		'FO', 'FI', 'FR',
+		'DE', 'GR', 'GL',
+		'HU',
+		'IN', 'ID', 'IT',
+		'JP',
+		'KR',
+		'LI', 'LU',
+		'MY', 'MX', 'MC',
+		'NL', 'NO',
+		'PH', 'PL', 'PT',
+		'RU',
+		'SZ', 'ZA', 'ES', 'SE', 'CH',
+		'TH', 'TR',
+		'GB', 'US'
+	);
+
+	return $countries;
+}
+
+function dgx_donate_country_requires_postal_code( $country_code ) {
+	return in_array( $country_code, dgx_donate_get_countries_requiring_postal_code() );
+}
+
 /**
  * Abbreviations for U.S. States
  * Based on list at https://developer.paypal.com/docs/classic/api/StateandProvinceCodes/

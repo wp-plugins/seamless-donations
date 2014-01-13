@@ -138,16 +138,23 @@ class Dgx_Donate_Admin_Donor_Detail_View {
 			echo esc_html( $address2 ) . "<br/>";;
 		}
 		if ( ! empty( $city ) ) {
-			if ( 'US' == $country ) {
-				echo esc_html( $city . " " . $state . " " . $zip ) . "<br/>";
-			} else if ( 'CA' == $country ) {
-				echo esc_html( $city . " " . $province . " " . $zip ) . "<br/>";
-			} else {
-				echo esc_html( $city . " " . $zip ) . "<br/>";
-			}
-			$countries = dgx_donate_get_countries();
-			echo esc_html( $countries[$country] ) . "<br/><br/>";
+			echo esc_html( $city . " " );
 		}
+		if ( 'US' == $country ) {
+			echo esc_html( $state . " " );
+		} else if ( 'CA' == $country ) {
+			echo esc_html( $province . " " );
+		}
+
+		if ( dgx_donate_country_requires_postal_code( $country ) ) {
+				echo esc_html( " " . $zip );
+		}
+		echo "<br/>";
+
+		$countries = dgx_donate_get_countries();
+		$country_name = $countries[$country];
+		echo esc_html( $country_name ) . "<br/><br/>";
+
 		if ( ! empty( $phone ) ) {
 			echo esc_html( $phone ) . "<br/>";
 		}
