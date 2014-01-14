@@ -140,7 +140,12 @@ function dgx_donate_show_paypalstd_donation_form($content)
 		if ( "true" == $show_tribute_section ) {
 			$content = dgx_donate_get_tribute_section($content);
 		}
-		
+
+		$show_employer_section = get_option( 'dgx_donate_show_employer_section' );
+		if ( "true" == $show_employer_section ) {
+			$content = dgx_donate_get_employer_section( $content );
+		}
+
 		$content = dgx_donate_get_donor_section($content);
 		$content = dgx_donate_get_billing_section($content);
 		$content = dgx_donate_paypalstd_payment_section($content);
@@ -362,7 +367,9 @@ function dgx_donate_paypalstd_ajax_checkout()
 	$zip = $_POST['zip'];
 	$increaseToCover = $_POST['increaseToCover'];
 	$anonymous = $_POST['anonymous'];
-		
+	$employerMatch = $_POST['employerMatch'];
+	$employerName = $_POST['employerName'];
+
 	// Resolve the donation amount
 	if (strcasecmp($donationAmount, "OTHER") == 0)
 	{
@@ -413,6 +420,8 @@ function dgx_donate_paypalstd_ajax_checkout()
 	$postData['INCREASETOCOVER'] = $increaseToCover;
 	$postData['ANONYMOUS'] = $anonymous;
 	$postData['PAYMENTMETHOD'] = "PayPal";
+	$postData['EMPLOYERMATCH'] = $employerMatch;
+	$postData['EMPLOYERNAME'] = $employerName;
 	
 	// Sanitize the data (remove leading, trailing spaces quotes, brackets)
 	foreach ($postData as $key => $value)

@@ -17,10 +17,12 @@ function DgxDonateOnCountryChange( event ) {
 		provinceSelectEl.hide();
 	}
 
-	if ( -1 == dgxDonateAjax.postalCodeRequired.indexOf( country ) ) {
-		postalCodeEl.hide();
-	} else {
-		postalCodeEl.show();
+	if ( 'undefined' != typeof dgxDonateAjax ) {
+		if ( -1 == dgxDonateAjax.postalCodeRequired.indexOf( country ) ) {
+			postalCodeEl.hide();
+		} else {
+			postalCodeEl.show();
+		}
 	}
 }
 

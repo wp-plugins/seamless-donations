@@ -57,6 +57,17 @@ class Dgx_Donate_Admin_Settings_View {
 			$message = __( 'Settings updated.', 'dgx-donate' );
 		}
 
+		// Whether to show the employer section or not
+		$show_employer_section = ( isset( $_POST['show_employer_section'] ) ) ? $_POST['show_employer_section'] : '';
+		if ( ! empty( $show_employer_section ) ) {
+			if ( "true" == $show_employer_section ) {
+				update_option( 'dgx_donate_show_employer_section', 'true' );
+			} else {
+				update_option( 'dgx_donate_show_employer_section', 'false' );
+			}
+			$message = "Settings updated.";
+		}
+
 		// Where to load the scripts
 		$scripts_in_footer = ( isset( $_POST['scripts_in_footer'] ) ) ? $_POST['scripts_in_footer'] : '';
 		if ( ! empty( $scripts_in_footer ) ) {
@@ -229,6 +240,23 @@ class Dgx_Donate_Admin_Settings_View {
 
 		echo "<p><input type='radio' name='show_tribute_section' value='true' $true_checked />" . esc_html__( 'Show the Tribute Gift form section', 'dgx-donate' ) . "</p>";
 		echo "<p><input type='radio' name='show_tribute_section' value='false' $false_checked />" . esc_html__( 'Do not show the Tribute Gift form section', 'dgx-donate' ) . "</p>";
+
+		echo "<p><input id='submit' class='button' type='submit' value='" . esc_attr__( 'Update', 'dgx-donate' ) . "' name='submit'/></p>\n";
+		echo "</form>";
+		echo "<br/>";
+
+		// Show Employer Section?
+		echo "<h3>" . esc_html__( 'Employer Match Section', 'dgx-donate' ) . "</h3>";
+		echo "<p>" . esc_html__( 'Show or hide the Employer Match section of the donation form.', 'dgx-donate' ) . "</p>";
+		echo "<form method='POST' action=''>\n";
+		echo "<input type='hidden' name='dgx_donate_settings_nonce' value='" . esc_attr( $nonce ) . "' />\n";
+
+		$show_employer_section = get_option( 'dgx_donate_show_employer_section' );
+		$true_checked = ( 'true' == $show_employer_section ) ? "checked" : '';
+		$false_checked = ( 'false' == $show_employer_section) ? "checked" : '';
+
+		echo "<p><input type='radio' name='show_employer_section' value='true' $true_checked />" . esc_html__( 'Show the Employer Match form section', 'dgx-donate' ) . "</p>";
+		echo "<p><input type='radio' name='show_employer_section' value='false' $false_checked />" . esc_html__( 'Do not show the Employer Match form section', 'dgx-donate' ) . "</p>";
 
 		echo "<p><input id='submit' class='button' type='submit' value='" . esc_attr__( 'Update', 'dgx-donate' ) . "' name='submit'/></p>\n";
 		echo "</form>";

@@ -67,6 +67,10 @@ Yes!
 
 == Changelog ==
 
+= 2.9.0 =
+* Added: Optional employer match section to donation form - props Jamie Summerlin
+* Fixed: Javascript error in admin on settings page
+
 = 2.8.2 =
 * Fixed: Don't require postal code for countries that don't require postal codes
 * Fixed: International tribute gift addresses were not displaying country information in donation details

@@ -87,6 +87,14 @@ class Dgx_Donate_Admin_Templates_View {
 				'cols' => 40,
 				'rows' => 3
 			),
+			'employertext' => array(
+				'option' => 'dgx_donate_email_empl',
+				'label' => __( 'Employer Match', 'dgx-donate' ),
+				'description' => __( 'This message will be included when the donor selects the employer match.', 'dgx-donate' ),
+				'type' => 'textarea',
+				'cols' => 40,
+				'rows' => 3
+			),
 			'tributetext' => array(
 				'option' => 'dgx_donate_email_trib',
 				'label' => __( 'Tribute Gift', 'dgx-donate' ),

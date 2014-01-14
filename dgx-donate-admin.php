@@ -98,6 +98,12 @@ function dgx_donate_init_defaults()
 		update_option('dgx_donate_email_trib', $tributeText);
 	}
 
+	$employer_text = get_option( 'dgx_donate_email_empl' );
+	if ( empty( $employer_text ) ) {
+		$employer_text = "You have specified that your employer matches some or all of your donation. ";
+		update_option( 'dgx_donate_email_empl', $employer_text );
+	}
+
 	$closingText = get_option('dgx_donate_email_close');
 	if (empty($closingText))
 	{
@@ -190,7 +196,12 @@ function dgx_donate_init_defaults()
 		update_option( 'dgx_donate_default_province', 'AB' );
 	}
 
-
+	// Show Employer match section default
+	$show_employer_section = get_option( 'dgx_donate_show_employer_section' );
+	if ( empty( $show_employer_section ) ) {
+		update_option( 'dgx_donate_show_employer_section', 'true' );
+	}
+	
 	// Show Tribute Gift section default
 	$show_tribute_section = get_option( 'dgx_donate_show_tribute_section' );
 	if ( empty( $show_tribute_section ) ) {

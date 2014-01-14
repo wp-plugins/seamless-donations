@@ -92,6 +92,16 @@ class Dgx_Donate_Admin_Donation_Detail_View {
 			echo "<tr><th>" . esc_html__( 'Designated Fund', 'dgx-donate' ) . "</th>";
 			echo "<td>" . esc_html( $fund_name ) . "</td></tr>\n";
 
+			$employer_match = get_post_meta( $donation_id, '_dgx_donate_employer_match', true );
+			$employer_name = get_post_meta( $donation_id, '_dgx_donate_employer_name', true );
+			if ( empty( $employer_match ) ) {
+				$employer_match_message = __( 'No', 'dgx-donate' );
+			} else {
+				$employer_match_message = __( 'Yes', 'dgx-donate' ) . " - " . $employer_name;
+			}
+			echo "<tr><th>" . esc_html__( 'Employer Match', 'dgx-donate' ) . "</th>";
+			echo "<td>" . esc_html( $employer_match_message ) . "</td></tr>\n";
+
 			$tribute_gift_message = __( 'No', 'dgx-donate' );
 			$tribute_gift = get_post_meta( $donation_id, '_dgx_donate_tribute_gift', true );
 			if ( ! empty( $tribute_gift ) ) {

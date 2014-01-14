@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts.
-Version: 2.8.2
+Version: 2.9.0
 Author: allendav
 Author URI: http://www.allendav.com/
 License: GPL2
@@ -223,7 +223,9 @@ function dgx_donate_get_meta_map() {
 		'ZIP' => '_dgx_donate_donor_zip',
 		'INCREASETOCOVER' => '_dgx_donate_increase_to_cover',
 		'ANONYMOUS' => '_dgx_donate_anonymous',
-		'PAYMENTMETHOD' => '_dgx_donate_payment_method'
+		'PAYMENTMETHOD' => '_dgx_donate_payment_method',
+		'EMPLOYERMATCH' => '_dgx_donate_employer_match',
+		'EMPLOYERNAME' => '_dgx_donate_employer_name'
 	);
 }
 
@@ -624,6 +626,30 @@ function dgx_donate_get_tribute_section($formContent)
 }
 
 /******************************************************************************************************/
+function dgx_donate_get_employer_section( $form_content ) {
+	$output = "";
+	$output .= "<div class='dgx-donate-form-section'>";
+	$output .= "<h2>" . esc_html__( 'Employer Match', 'dgx-donate' ) . "</h2>";
+	$output .= "<div class='dgx-donate-form-expander'>";
+	$output .= "<p class='dgx-donate-form-expander-header'>";
+	$output .= "<input type='checkbox' id='dgx-donate-employer' name='_dgx_donate_employer_match' /> ";
+	$output .= esc_html__( 'Check here if your employer matches donations', 'dgx-donate' ) . "</p>";
+	$output .= "<div class='dgx-donate-form-employer-box'>";
+	$output .= "<hr/>";
+	$output .= "<p>";
+	$output .= "<label for='_dgx_donate_employer_name'>" . esc_html__( 'Employer Name:', 'dgx-donate' ) . "</label>";
+	$output .= "<input type='text' name='_dgx_donate_employer_name' size='30' value='' />";
+	$output .= "</p>";
+	$output .= "</div>"; /* dgx-donate-form-employer-box */
+	$output .= "</div>"; /* dgx-donate-form-expander */
+	$output .= "</div>\n"; /* dgx-donate-form-section */
+
+	$form_content .= $output;
+
+	return $form_content;
+}
+
+/******************************************************************************************************/
 function dgx_donate_get_donor_section( $form_content ) {
 
 	$output = "";
@@ -763,6 +789,8 @@ function dgx_donate_send_thank_you_email($donationID, $testAddress="")
 		$mailingListJoin = "TRUE";
 		// tribute y/n
 		$tribute = "TRUE";
+		// employer match
+		$employer_name = "Global Corporation";
 	}
 	else
 	{
@@ -788,6 +816,8 @@ function dgx_donate_send_thank_you_email($donationID, $testAddress="")
 		$mailingListJoin = get_post_meta($donationID, '_dgx_donate_add_to_mailing_list', true);
 		// tribute y/n
 		$tribute = get_post_meta($donationID, '_dgx_donate_tribute_gift', true);
+		// employer match
+		$employer_name = get_post_meta($donationID, '_dgx_doname_employer_name', true);
 	}
 	
     $subject = get_option('dgx_donate_email_subj');
@@ -835,14 +865,20 @@ function dgx_donate_send_thank_you_email($donationID, $testAddress="")
     	$emailBody .= "\n\n";
 	}	
 
-    if (!empty($tribute))
-    {
-    	$text = get_option('dgx_donate_email_trib');
-    	$text = stripslashes($text);
-    	$emailBody .= $text;
-    	$emailBody .= "\n\n";
+	if ( ! empty( $tribute ) ) {
+		$text = get_option( 'dgx_donate_email_trib' );
+		$text = stripslashes( $text );
+		$emailBody .= $text;
+		$emailBody .= "\n\n";
 	}
-	
+
+	if ( ! empty( $employer_name ) ) {
+		$text = get_option( 'dgx_donate_email_empl' );
+		$text = stripslashes( $text );
+		$emailBody .= $text;
+		$emailBody .= "\n\n";
+	}
+
 	$text = get_option('dgx_donate_email_close');
     $text = stripslashes($text);
     $emailBody .= $text;
@@ -894,11 +930,18 @@ function dgx_donate_send_donation_notification($donationID)
 	$tributeGift = get_post_meta($donationID, '_dgx_donate_tribute_gift', true);
 	if (!empty($tributeGift))
 	{
-		$body .= __( 'NOTE:  The donor is making this donation in honor of / in memory of someone.', 'dgx-donate' );
+		$body .= __( 'NOTE:  The donor is making this donation in honor of / in memory of someone.', 'dgx-donate' ) . " ";
 		$body .= __( 'Please see the donation details (using the link below) for more information.', 'dgx-donate' ) . "\n";
 		$body .= "\n";
 	}
-	
+
+	$employer_name = get_post_meta( $donationID, '_dgx_donate_employer_name', true );
+	if ( ! empty( $employer_name ) ) {
+		$body .= __( 'NOTE:  The donor is making this donation with an employer match.', 'dgx-donate' ) . " ";
+		$body .= __( 'Please see the donation details (using the link below) for more information.', 'dgx-donate' ) . "\n";
+		$body .= "\n";
+	}
+
 	$amount = get_post_meta($donationID, '_dgx_donate_amount', true);
 	$currency_code = dgx_donate_get_donation_currency_code( $donationID );
 	$formattedDonationAmount = dgx_donate_get_plain_formatted_amount( $amount, 2, $currency_code, true );
