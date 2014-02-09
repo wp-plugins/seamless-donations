@@ -4,6 +4,7 @@ function DgxDonateOnCountryChange( event ) {
 	var stateSelectEl = countrySelectEl.parents( '.dgx_donate_geography_selects' ).first().find( '.dgx_donate_state_select' ).parents( 'p' ).first();
 	var provinceSelectEl = countrySelectEl.parents( '.dgx_donate_geography_selects' ).first().find( '.dgx_donate_province_select' ).parents( 'p' ).first();
 	var postalCodeEl = countrySelectEl.parents( '.dgx_donate_geography_selects' ).first().find( '.dgx_donate_zip_input' ).parents( 'p' ).first();
+	var ukGiftAidEl = countrySelectEl.parents( '.dgx_donate_geography_selects' ).first().find( '.dgx_donate_uk_gift_aid' ).parents( 'p' ).first();
 
 	var country = countrySelectEl.val();
 	if ( 'US' == country ) {
@@ -15,6 +16,12 @@ function DgxDonateOnCountryChange( event ) {
 	} else {
 		stateSelectEl.hide();
 		provinceSelectEl.hide();
+	}
+
+	if ( 'GB' == country ) {
+		ukGiftAidEl.show();
+	} else {
+		ukGiftAidEl.hide();
 	}
 
 	if ( 'undefined' != typeof dgxDonateAjax ) {

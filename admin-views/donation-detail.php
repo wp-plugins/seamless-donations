@@ -102,6 +102,18 @@ class Dgx_Donate_Admin_Donation_Detail_View {
 			echo "<tr><th>" . esc_html__( 'Employer Match', 'dgx-donate' ) . "</th>";
 			echo "<td>" . esc_html( $employer_match_message ) . "</td></tr>\n";
 
+			$donor_country = get_post_meta( $donation_id, '_dgx_donate_donor_country', true );
+			if ( 'GB' == $donor_country ) {
+				$uk_gift_aid = get_post_meta( $donation_id, '_dgx_donate_uk_gift_aid', true );
+				if ( empty( $uk_gift_aid ) ) {
+					$uk_gift_aid_message = __( 'No', 'dgx-donate' );
+				} else {
+					$uk_gift_aid_message = __( 'Yes', 'dgx-donate' );
+				}
+				echo "<tr><th>" . esc_html__( 'UK Gift Aid', 'dgx-donate' ) . "</th>";
+				echo "<td>" . esc_html( $uk_gift_aid_message ) . "</td></tr>\n";
+			}
+
 			$tribute_gift_message = __( 'No', 'dgx-donate' );
 			$tribute_gift = get_post_meta( $donation_id, '_dgx_donate_tribute_gift', true );
 			if ( ! empty( $tribute_gift ) ) {

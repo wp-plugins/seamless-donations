@@ -166,6 +166,7 @@ function DgxDonateDoCheckout()
 	var zip = DgxDonateTrim(values['_dgx_donate_donor_zip']);
 	var increaseToCover = DgxDonateTrim(values['_dgx_donate_increase_to_cover']);
 	var paymentMethod = DgxDonateTrim(values['_dgx_donate_payment_method']);
+	var ukGiftAid = DgxDonateTrim(values['_dgx_donate_uk_gift_aid']);
 	var referringUrl = location.href;
 
 	var amount = "";
@@ -312,7 +313,7 @@ function DgxDonateDoCheckout()
 		hiddenForm.find( 'input[name="state"]' ).remove();
 	}
 
-	// jQuery('#dgx-donate-hidden-form').find('input[name="country"]').val("xxx");
+	hiddenForm.find('input[name="country"]').val(country);
 	hiddenForm.find('input[name="email"]').val(email);
 	hiddenForm.find('input[name="custom"]').val(sessionID);
 	hiddenForm.find('input[name="amount"]').val(amount);
@@ -343,7 +344,7 @@ function DgxDonateDoCheckout()
 		honoreeCountry: honoreeCountry, honoreeZip: honoreeZip,
 		firstName: firstName, lastName: lastName, phone: phone, email: email, addToMailingList: addToMailingList,
 		address: address, address2: address2, city: city, state: state, province: province, country: country,
-		zip: zip, increaseToCover: increaseToCover, paymentMethod: paymentMethod };
+		zip: zip, increaseToCover: increaseToCover, paymentMethod: paymentMethod, ukGiftAid: ukGiftAid };
 
 	jQuery.post( dgxDonateAjax.ajaxurl, data, DgxDonateCallback );
 

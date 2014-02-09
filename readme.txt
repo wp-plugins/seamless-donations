@@ -67,6 +67,10 @@ Yes!
 
 == Changelog ==
 
+= 3.0.0 =
+* Added: Gift Aid checkbox for UK donors
+* Fixed: Bug that would cause IPN notifications to not be received
+
 = 2.9.0 =
 * Added: Optional employer match section to donation form - props Jamie Summerlin
 * Fixed: Javascript error in admin on settings page

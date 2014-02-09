@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts.
-Version: 2.9.0
+Version: 3.0.0
 Author: allendav
 Author URI: http://www.allendav.com/
 License: GPL2
@@ -25,10 +25,10 @@ License: GPL2
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
  
-include 'dgx-donate-admin.php';
-include 'dgx-donate-paypalstd.php';
-include 'inc/geography.php';
-include 'inc/currency.php';
+require_once 'dgx-donate-admin.php';
+require_once 'dgx-donate-paypalstd.php';
+require_once 'inc/geography.php';
+require_once 'inc/currency.php';
 
 /******************************************************************************************************/
 function dgx_donate_get_giving_levels()
@@ -225,7 +225,8 @@ function dgx_donate_get_meta_map() {
 		'ANONYMOUS' => '_dgx_donate_anonymous',
 		'PAYMENTMETHOD' => '_dgx_donate_payment_method',
 		'EMPLOYERMATCH' => '_dgx_donate_employer_match',
-		'EMPLOYERNAME' => '_dgx_donate_employer_name'
+		'EMPLOYERNAME' => '_dgx_donate_employer_name',
+		'UKGIFTAID' => '_dgx_donate_uk_gift_aid'
 	);
 }
 
@@ -726,6 +727,10 @@ function dgx_donate_get_billing_section( $form_content ) {
 	$output .= "<p>";
 	$output .= "<label for='_dgx_donate_donor_zip'>" . esc_html__( 'Postal Code:', 'dgx-donate' ) . "</label>";
 	$output .= "<input class='dgx_donate_zip_input' type='text' name='_dgx_donate_donor_zip'  size='10' value='' />";
+	$output .= "</p>";
+	$output .= "<p>";
+	$output .= "<input class='dgx_donate_uk_gift_aid' type='checkbox' name='_dgx_donate_uk_gift_aid' />";
+	$output .= esc_html( 'I am a UK taxpayer and my gift qualifies for Gift Aid.', 'dgx-donate' );
 	$output .= "</p>";
 	$output .= "</div>"; // dgx_donate_geography_selects
 	

@@ -2,18 +2,18 @@
 
 /* Copyright 2013 Allen Snook (email: allendav@allendav.com) */
 
-require 'admin-views/main.php';
-require 'admin-views/donor-detail.php';
-require 'admin-views/donation-detail.php';
+require_once 'admin-views/main.php';
+require_once 'admin-views/donor-detail.php';
+require_once 'admin-views/donation-detail.php';
 
-require 'admin-views/donations.php';
-require 'admin-views/donors.php';
-require 'admin-views/funds.php';
-require 'admin-views/templates.php';
-require 'admin-views/completed.php';
-require 'admin-views/settings.php';
-require 'admin-views/log.php';
-require 'admin-views/help.php';
+require_once 'admin-views/donations.php';
+require_once 'admin-views/donors.php';
+require_once 'admin-views/funds.php';
+require_once 'admin-views/templates.php';
+require_once 'admin-views/completed.php';
+require_once 'admin-views/settings.php';
+require_once 'admin-views/log.php';
+require_once 'admin-views/help.php';
 
 /******************************************************************************************************/
 function dgx_donate_echo_admin_footer()
