@@ -67,6 +67,9 @@ Yes!
 
 == Changelog ==
 
+= 3.0.1 =
+* Fixed: Bug: Was using admin_print_styles to enqueue admin CSS.  Switched to correct hook - admin_enqueue_scripts
+
 = 3.0.0 =
 * Added: Gift Aid checkbox for UK donors
 * Fixed: Bug that would cause IPN notifications to not be received

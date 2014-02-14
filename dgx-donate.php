@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts.
-Version: 3.0.0
+Version: 3.0.1
 Author: allendav
 Author URI: http://www.allendav.com/
 License: GPL2
@@ -116,12 +116,12 @@ add_action('wp_enqueue_scripts', 'dgx_donate_queue_stylesheet');
 
 /**********************************************************************************************************/
 function dgx_donate_queue_admin_stylesheet() {
-        $styleurl = plugins_url('/css/adminstyles.css', __FILE__);
+	$style_url = plugins_url( '/css/adminstyles.css', __FILE__ );
 
-        wp_register_style('dgx_donate_admin_css', $styleurl);
-        wp_enqueue_style('dgx_donate_admin_css');
+	wp_register_style( 'dgx_donate_admin_css', $style_url );
+	wp_enqueue_style( 'dgx_donate_admin_css' );
 }
-add_action('admin_print_styles', 'dgx_donate_queue_admin_stylesheet');
+add_action( 'admin_enqueue_scripts', 'dgx_donate_queue_admin_stylesheet' );
 
 /******************************************************************************************************/
 function dgx_donate_queue_scripts() {
