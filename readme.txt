@@ -4,7 +4,7 @@ Donate link: http://www.allendav.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
 Tested up to: 3.8
-Stable tag: 3.0.1
+Stable tag: 3.0.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,6 +66,9 @@ Yes!
 6. Dashboard >> Thank You Email Templates
 
 == Changelog ==
+
+= 3.0.2 =
+* Fixed: Bug: Removed unused variable that was causing PHP warning
 
 = 3.0.1 =
 * Fixed: Bug: Was using admin_print_styles to enqueue admin CSS.  Switched to correct hook - admin_enqueue_scripts
