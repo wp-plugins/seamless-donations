@@ -66,7 +66,6 @@ class Dgx_Donate_IPN_Handler {
 		$get_magic_quotes_exists = function_exists( 'get_magic_quotes_gpc' );
 
 		foreach ($_POST as $key => $value) {
-			$paypalData .= "$key : $value\n";
 			if( $get_magic_quotes_exists && get_magic_quotes_gpc() == 1 ) {
 				$value = urlencode( stripslashes( $value ) );
 			} else {
