@@ -139,7 +139,7 @@ class Dgx_Donate_Admin_Settings_View {
 		echo "<div class='form-field'>\n";
 		echo "<label for='notifyemails'>" . esc_html__( 'Notification Email Address(es)', 'dgx-donate' ) . "</label><br/>\n";
 		echo "<input type='text' name='notifyemails' value='" . esc_attr( $notify_emails ) ."' />\n";
-		echo "<p class='description'>" . esc_html( 'Email address(es) that should be notified (e.g. administrators) of new donations.', 'dgx-donate' ) . "</p>\n";
+		echo "<p class='description'>" . esc_html__( 'Email address(es) that should be notified (e.g. administrators) of new donations.', 'dgx-donate' ) . "</p>\n";
 		echo "</div>\n";
 		
 		echo "<p><input id='submit' class='button' type='submit' value='" . esc_attr__( 'Update', 'dgx-donate' ) . "' name='submit'></p>\n";

@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts.
-Version: 3.0.2
+Version: 3.0.3
 Author: allendav
 Author URI: http://www.allendav.com/
 License: GPL2
@@ -29,6 +29,12 @@ require_once 'dgx-donate-admin.php';
 require_once 'dgx-donate-paypalstd.php';
 require_once 'inc/geography.php';
 require_once 'inc/currency.php';
+
+/******************************************************************************************************/
+function dgx_donate_plugins_loaded() {
+	load_plugin_textdomain( 'dgx-donate', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+}
+add_action( 'plugins_loaded', 'dgx_donate_plugins_loaded' );
 
 /******************************************************************************************************/
 function dgx_donate_get_giving_levels()
@@ -488,7 +494,8 @@ function dgx_donate_get_donation_section($formContent)
 	}
 	$output .= "</p>";
 
-	$output .= "<p><input type=\"radio\" name=\"_dgx_donate_amount\" value=\"OTHER\" id=\"dgx-donate-other-radio\" /> Other: ";
+	$output .= "<p><input type='radio' name='_dgx_donate_amount' value='OTHER' id='dgx-donate-other-radio' />";
+	$output .= esc_html__( 'Other: ', 'dgx-donate' );
 	$output .= "<input type=\"text\" class=\"aftertext\" id=\"dgx-donate-other-input\" name=\"_dgx_donate_user_amount\" />";
 	$output .= "</p>\n";
 	
@@ -677,7 +684,7 @@ function dgx_donate_get_donor_section( $form_content ) {
 	
 	$output .= "<p>";
 	$output .= "<input type='checkbox' name='_dgx_donate_anonymous' />";
-	$output .= esc_html( 'Please do not publish my name.  I would like to remain anonymous.', 'dgx-donate' );
+	$output .= esc_html__( 'Please do not publish my name.  I would like to remain anonymous.', 'dgx-donate' );
 	$output .= "</p>\n";
 	
 	$output .= "</div>\n";

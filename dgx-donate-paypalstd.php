@@ -61,15 +61,14 @@ function dgx_donate_show_paypalstd_settings_form()
 	$payPalEmail = get_option('dgx_donate_paypal_email');
 
 	echo "<div class=\"form-field\">\n";
-	echo "<label for=\"paypalemail\">PayPal Email Address</label><br/>\n";
+	echo "<label for='paypalemail'>" . esc_html__( 'PayPal Email Address', 'dgx-donate' ) . "</label><br/>\n";
 	echo "<input type=\"text\" name=\"paypalemail\" value=\"$payPalEmail\" />\n";
-	echo "<p class=\"description\">The email address at which to receive payments.</p>\n";
+	echo "<p class='description'>" . esc_html__( 'The email address at which to receive payments.', 'dgx-donate' ) . "</p>\n";
 	echo "</div> <!-- form-field --> \n";
 
-	echo "<p>Mode: \n";
-	echo "<input type=\"radio\" name=\"paypalserver\" value=\"SANDBOX\" $checkSandbox /> Sandbox (Test Server) ";
-	echo "<input type=\"radio\" name=\"paypalserver\" value=\"LIVE\" $checkLive /> Live (Production Server)</p>";
-
+	echo "<p>" . esc_html__( 'Mode:', 'dgx-donate' ) . " \n";
+	echo "<input type='radio' name='paypalserver' value='SANDBOX' $checkSandbox /> ". esc_html__( 'Sandbox (Test Server)', 'dgx-donate' ) . " ";
+	echo "<input type='radio' name='paypalserver' value='LIVE' $checkLive /> " . esc_html__( 'Live (Production Server)', 'dgx-donate' ) . "</p>";
 	echo "<p>" . __( 'IPN URL', 'dgx-donate' ) . "<p>";
 	$notify_url = plugins_url( '/dgx-donate-paypalstd-ipn.php', __FILE__ );
 	echo "<pre>$notify_url</pre>";
@@ -260,15 +259,15 @@ function dgx_donate_paypalstd_warning_section($formContent)
 	{
 		$formContent .= "<div class=\"dgx-donate-form-section\">";
 		$formContent .= "<p>";
-		$formContent .= "Warning:  Seamless Donations is currently configured to use the PayPal Sandbox (Test Server).";
+		$formContent .= esc_html__( "Warning - Seamless Donations is currently configured to use the Sandbox (Test Server).", "dgx-donate" );
 		$formContent .= "</p>";
-		$formContent .= "</div>";			
+		$formContent .= "</div>";
 	}
 
 	// Echo a NOSCRIPT warning
 	$formContent .= "<noscript>";
 	$formContent .= "<div class=\"dgx-donate-form-section\">";
-	$formContent .= "<p>Warning:  To make a donation, you must first enable JavaScript.</p>";
+	$formContent .= "<p>" . esc_html__( "Warning:  To make a donation, you must first enable JavaScript.", "dgx-donate" ) . "</p>";
 	$formContent .= "</div>";
 	$formContent .= "</noscript>";
 

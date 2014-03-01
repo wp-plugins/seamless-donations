@@ -230,7 +230,7 @@ class Dgx_Donate_Admin_Templates_View {
 		echo "<p class='description'>" . esc_html__( 'The email address to receive the test message.', 'dgx-donate' ) . "</p>\n";
 		echo "</div>\n";
 		
-		echo "<p><input id='submit' class='button' type='submit' value='" . esc_attr( 'Send Test Email', 'dgx-donate' ) ."' name='submit'></p>\n";
+		echo "<p><input id='submit' class='button' type='submit' value='" . esc_attr__( 'Send Test Email', 'dgx-donate' ) ."' name='submit'></p>\n";
 		echo "</form>";
 
 		do_action('dgx_donate_email_template_page_left');

@@ -184,7 +184,7 @@ class Dgx_Donate_Admin_Funds_View {
 		echo "<div class='form-field'>";
 		echo "<label for='addfund'>" . esc_html__( 'Name', 'dgx-donate' ) . "</label>";
 		echo "<input type='text' name='addfund' size='40' />";
-		echo "<p class='description'>" . esc_html( 'The name of the desginated fund, as you want it to appear to visitors.', 'dgx-donate' ) . "</p>";
+		echo "<p class='description'>" . esc_html__( 'The name of the desginated fund, as you want it to appear to visitors.', 'dgx-donate' ) . "</p>";
 		echo "</div> <!-- form-field -->";
 		
 		echo "<p><input id='submit' class='button' type='submit' value='" . esc_attr__( 'Add New Designated Fund', 'dgx-donate' ) . "' name='submit'></p>";

@@ -67,6 +67,9 @@ Yes!
 
 == Changelog ==
 
+= 3.0.3 =
+* Fixed: A few strings were not properly marked for translation.
+
 = 3.0.2 =
 * Fixed: Bug: Removed unused variable that was causing PHP warning
 

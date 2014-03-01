@@ -95,7 +95,7 @@ class Dgx_Donate_Admin_Completed_View {
 		echo "<div class='col-wrap'>\n";
 	
 		echo "<h3>" . esc_html__( 'Thank You Page', 'dgx-donate' ) . "</h3>\n";
-		echo "<p>" . esc_html( 'On this page you can configure a special thank you message which will appear to your donors after they complete their donation.  This is separate from the thank you email that gets emailed to your donor.', 'dgx-donate' );
+		echo "<p>" . esc_html__( 'On this page you can configure a special thank you message which will appear to your donors after they complete their donation.  This is separate from the thank you email that gets emailed to your donor.', 'dgx-donate' );
 		echo "</p>\n";
 	
 		echo "</form>";
