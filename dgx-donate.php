@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts.
-Version: 3.0.3
+Version: 3.1.0
 Author: allendav
 Author URI: http://www.allendav.com/
 License: GPL2
@@ -471,7 +471,7 @@ function dgx_donate_get_month_year_selector($monthSelectName, $yearSelectName)
 function dgx_donate_get_donation_section($formContent)
 {
 	$output = "";
-	$output .= "<div class=\"dgx-donate-form-section\">\n";
+	$output .= "<div class='dgx-donate-form-section' id='dgx-donate-form-donation-section'>\n";
 	$output .= "<h2>" . esc_html__( 'Donation Information', 'dgx-donate' ) . "</h2>\n";
 	
 	$output .= "<p>" . esc_html__( 'I would like to make a donation in the amount of:', 'dgx-donate' ) . "</p>";
@@ -556,7 +556,7 @@ function dgx_donate_get_tribute_section($formContent)
 	$honoree_country = get_option('dgx_donate_default_country');
 
 	$output = "";
-	$output .= "<div class='dgx-donate-form-section'>\n";
+	$output .= "<div class='dgx-donate-form-section' id='dgx-donate-form-tribute-section'>\n";
 	$output .= "<h2>" . esc_html__( 'Tribute Gift', 'dgx-donate' ) . "</h2>\n";
 	$output .= "<div class='dgx-donate-form-expander'>\n";
 	$output .= "<p class='dgx-donate-form-expander-header'>";
@@ -636,7 +636,7 @@ function dgx_donate_get_tribute_section($formContent)
 /******************************************************************************************************/
 function dgx_donate_get_employer_section( $form_content ) {
 	$output = "";
-	$output .= "<div class='dgx-donate-form-section'>";
+	$output .= "<div class='dgx-donate-form-section' id='dgx-donate-form-employer-section'>";
 	$output .= "<h2>" . esc_html__( 'Employer Match', 'dgx-donate' ) . "</h2>";
 	$output .= "<div class='dgx-donate-form-expander'>";
 	$output .= "<p class='dgx-donate-form-expander-header'>";
@@ -661,7 +661,7 @@ function dgx_donate_get_employer_section( $form_content ) {
 function dgx_donate_get_donor_section( $form_content ) {
 
 	$output = "";
-	$output .= "<div class='dgx-donate-form-section'>";
+	$output .= "<div class='dgx-donate-form-section' id='dgx-donate-form-donor-section'>";
 	$output .= "<h2>" . esc_html__( 'Donor Information', 'dgx-donate' ) . "</h2>";
 	$output .= "<p>";
 	$output .= "<label for='_dgx_donate_donor_first_name'>" . esc_html__( 'First Name:', 'dgx-donate' ) . " </label>";
@@ -701,7 +701,7 @@ function dgx_donate_get_billing_section( $form_content ) {
 	$donor_country = get_option('dgx_donate_default_country');
 
 	$output = "";
-	$output .= "<div class='dgx-donate-form-section'>\n";
+	$output .= "<div class='dgx-donate-form-section' id='dgx-donate-form-address-section'>\n";
 	$output .= "<h2>" . esc_html__( 'Donor Address', 'dgx_donate' ) . "</h2>\n";
 	
 	$output .= "<p>";

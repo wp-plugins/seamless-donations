@@ -212,6 +212,8 @@ function dgx_donate_paypalstd_get_hidden_form()
 
 	$currency_code = get_option( 'dgx_donate_currency' );
 
+	$item_name = apply_filters( 'dgx_donate_item_name', __( 'Donation', 'dgx-donate' ) );
+
 	$output = "";
 	$output .= "<form id='dgx-donate-hidden-form' action='" . esc_attr( $formAction ) . "' method='post' target='_top' >";
 	$output .= "<input type='hidden' name='cmd' value='_donations' />";
@@ -232,7 +234,7 @@ function dgx_donate_paypalstd_get_hidden_form()
 	$output .= "<input type='hidden' name='custom' value='' />";
 	$output .= "<input type='hidden' name='notify_url' value='" . esc_attr( $notifyUrl ) . "' />";
 
-	$output .= "<input type='hidden' name='item_name' value='" . esc_attr__( 'Donation', 'dgx-donate' ) . "' />";
+	$output .= "<input type='hidden' name='item_name' value='" . esc_attr( $item_name ) . "' />";
 	$output .= "<input type='hidden' name='amount' value='1.00' />";
 	$output .= "<input type='hidden' name='quantity' value='1' />";
 
@@ -257,7 +259,7 @@ function dgx_donate_paypalstd_warning_section($formContent)
 	$payPalServer = get_option('dgx_donate_paypal_server');
 	if ($payPalServer == "SANDBOX")
 	{
-		$formContent .= "<div class=\"dgx-donate-form-section\">";
+		$formContent .= "<div class='dgx-donate-form-section' id='dgx-donate-form-sandbox-warning'>";
 		$formContent .= "<p>";
 		$formContent .= esc_html__( "Warning - Seamless Donations is currently configured to use the Sandbox (Test Server).", "dgx-donate" );
 		$formContent .= "</p>";
@@ -266,7 +268,7 @@ function dgx_donate_paypalstd_warning_section($formContent)
 
 	// Echo a NOSCRIPT warning
 	$formContent .= "<noscript>";
-	$formContent .= "<div class=\"dgx-donate-form-section\">";
+	$formContent .= "<div class='dgx-donate-form-section' id='dgx-donate-form-noscript-warning'>";
 	$formContent .= "<p>" . esc_html__( "Warning:  To make a donation, you must first enable JavaScript.", "dgx-donate" ) . "</p>";
 	$formContent .= "</div>";
 	$formContent .= "</noscript>";
@@ -282,7 +284,7 @@ function dgx_donate_paypalstd_payment_section( $form_content ) {
 	$button_image_url = plugins_url( '/images/paypal_btn_donate_lg.gif', __FILE__ );
 	$disabled_button_image_url = plugins_url( '/images/paypal_btn_donate_lg_disabled.gif', __FILE__ );
 
-	$section = "<div class='dgx-donate-form-section'>"
+	$section = "<div class='dgx-donate-form-section' id='dgx-donate-form-payment-section'>"
 		. "<p>"
 		. "<input class='dgx-donate-pay-enabled' type='image' src='" . esc_url( $button_image_url ) . "' value='" . esc_attr__( 'Donate Now', 'dgx-donate' ) . "'/>"
 		. "<img class='dgx-donate-pay-disabled' src='" . esc_url( $disabled_button_image_url ) . "' />"

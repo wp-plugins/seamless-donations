@@ -67,6 +67,10 @@ Yes!
 
 == Changelog ==
 
+= 3.1.0 =
+* Added: Filter for donation item name
+* Added IDs for form sections to allow for more styling of the donation form
+
 = 3.0.3 =
 * Fixed: A few strings were not properly marked for translation.
 
