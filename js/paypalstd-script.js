@@ -233,13 +233,6 @@ function DgxDonateDoCheckout()
 		}
 	}
 
-	if ( employerMatch == 'on' ) {
-		if ( employerName == "" ) {
-			formValidates = false;
-			DgxDonateMarkInvalid( "_dgx_donate_employer_name" );
-		}
-	}
-
 	if (firstName == "")
 	{
 		formValidates = false;
@@ -252,38 +245,56 @@ function DgxDonateDoCheckout()
 		DgxDonateMarkInvalid("_dgx_donate_donor_last_name");
 	}
 	
-	if (phone == "")
+	var phoneRequired = jQuery( '#dgx-donate-form' ).find( "input[name='_dgx_donate_donor_phone']" ).hasClass( 'required' );
+	if ( phoneRequired && phone == "" )
 	{
 		formValidates = false;
 		DgxDonateMarkInvalid("_dgx_donate_donor_phone");
-	}	
+	}
 
 	if (email == "")
 	{
 		formValidates = false;
 		DgxDonateMarkInvalid("_dgx_donate_donor_email");
 	}
-	
-	if (address == "")
-	{
-		formValidates = false;
-		DgxDonateMarkInvalid("_dgx_donate_donor_address");
-	}
-	
-	if (city == "")
-	{
-		formValidates = false;
-		DgxDonateMarkInvalid("_dgx_donate_donor_city");
-	}	
 
-	if (zip == "")
+	var employerRequired = jQuery( '#dgx-donate-form' ).find( "input[name='_dgx_donate_employer_name']" ).hasClass( 'required' );
+	if ( employerRequired && employerName == "" )
 	{
-		if ( dgxDonateAjax.postalCodeRequired.indexOf( country ) >= 0 ) {
+		formValidates = false;
+		DgxDonateMarkInvalid("_dgx_donate_employer_name");
+	}
+
+	if ( employerMatch == 'on' ) {
+		if ( employerName == "" ) {
 			formValidates = false;
-			DgxDonateMarkInvalid("_dgx_donate_donor_zip");
+			DgxDonateMarkInvalid( "_dgx_donate_employer_name" );
 		}
 	}
-	
+
+	var addressRequired = jQuery( '#dgx-donate-form' ).find( "input[name='_dgx_donate_donor_address']" ).hasClass( 'required' );
+	if ( addressRequired ) {
+		if (address == "")
+		{
+			formValidates = false;
+			DgxDonateMarkInvalid("_dgx_donate_donor_address");
+		}
+		
+		if (city == "")
+		{
+			formValidates = false;
+			DgxDonateMarkInvalid("_dgx_donate_donor_city");
+		}	
+
+		if (zip == "")
+		{
+			if ( dgxDonateAjax.postalCodeRequired.indexOf( country ) >= 0 ) {
+				formValidates = false;
+				DgxDonateMarkInvalid("_dgx_donate_donor_zip");
+			}
+		}
+	}
+
 	if (!formValidates)
 	{
 		alert('Some required information is missing or invalid.  Please complete the fields highlighted in red');

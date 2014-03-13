@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts.
-Version: 3.1.0
+Version: 3.2.0
 Author: allendav
 Author URI: http://www.allendav.com/
 License: GPL2
@@ -500,47 +500,52 @@ function dgx_donate_get_donation_section($formContent)
 	$output .= "</p>\n";
 	
 	// Designated Funds
-	$showFundCount = 0;
-	$fundArray = get_option( 'dgx_donate_designated_funds' );
 
-	if ( ! empty( $fundArray ) ) {
-		ksort( $fundArray );
+	if ( 'true' == get_option( 'dgx_donate_show_designated_funds_section' ) ) {
+		$showFundCount = 0;
+		$fundArray = get_option( 'dgx_donate_designated_funds' );
 
-		foreach ( (array) $fundArray as $key => $value ) {
-			if ( strcasecmp( $fundArray[$key], "SHOW" ) == 0 ) {
-				$showFundCount = $showFundCount + 1;
-			}
-		}
-	}
+		if ( ! empty( $fundArray ) ) {
+			ksort( $fundArray );
 
-	if ( $showFundCount > 0 ) {
-		$output .= "<p>";
-		$output .= "<input type='checkbox' id='dgx-donate-designated' name='_dgx_donate_designated'/>";
-		$output .= esc_html__( "I would like to designate this donation to a specific fund", "dgx-donate" );
-		$output .= "</p>";
-		
-		$output .= "<div class='dgx-donate-form-designated-box'>";
-		$output .= "<p>" . esc_html__( 'Designated Fund: ', 'dgx-donate' ) . " ";
-		$output .= "<select class='aftertext' name='_dgx_donate_designated_fund'>";
-		
-		foreach ( (array) $fundArray as $key => $value ) {
-			if ( strcasecmp( $fundArray[$key], "SHOW" ) == 0 ) {
-				$fundName = stripslashes( $key );
-				$output .= "<option value='" . esc_attr( $fundName ) . "' > " . esc_html( $fundName ) . "</option>";
+			foreach ( (array) $fundArray as $key => $value ) {
+				if ( strcasecmp( $fundArray[$key], "SHOW" ) == 0 ) {
+					$showFundCount = $showFundCount + 1;
+				}
 			}
 		}
 
-		$output .= "</select>";
-		$output .= "</p>";
-		$output .= "</div>"; /* dgx-donate-form-designated-box */
+		if ( $showFundCount > 0 ) {
+			$output .= "<p>";
+			$output .= "<input type='checkbox' id='dgx-donate-designated' name='_dgx_donate_designated'/>";
+			$output .= esc_html__( "I would like to designate this donation to a specific fund", "dgx-donate" );
+			$output .= "</p>";
+			
+			$output .= "<div class='dgx-donate-form-designated-box'>";
+			$output .= "<p>" . esc_html__( 'Designated Fund: ', 'dgx-donate' ) . " ";
+			$output .= "<select class='aftertext' name='_dgx_donate_designated_fund'>";
+			
+			foreach ( (array) $fundArray as $key => $value ) {
+				if ( strcasecmp( $fundArray[$key], "SHOW" ) == 0 ) {
+					$fundName = stripslashes( $key );
+					$output .= "<option value='" . esc_attr( $fundName ) . "' > " . esc_html( $fundName ) . "</option>";
+				}
+			}
+
+			$output .= "</select>";
+			$output .= "</p>";
+			$output .= "</div>"; /* dgx-donate-form-designated-box */
+		}
 	}
 
 	// Repeating donations
-	$output .= "<p>";
-	$output .= "<input type='checkbox' id='dgx-donate-repeating' name='_dgx_donate_repeating'/>";
-	$output .= esc_html__( "I would like this donation to automatically repeat each month", "dgx-donate" );
-	$output .= "</p>";
-		
+	if ( 'true' == get_option( 'dgx_donate_show_repeating_option' ) ) {
+		$output .= "<p>";
+		$output .= "<input type='checkbox' id='dgx-donate-repeating' name='_dgx_donate_repeating'/>";
+		$output .= esc_html__( "I would like this donation to automatically repeat each month", "dgx-donate" );
+		$output .= "</p>";
+	}
+
 	$output .= "</div>"; /* dgx-donate-form-section */
 
 	$formContent .= $output;
@@ -551,108 +556,104 @@ function dgx_donate_get_donation_section($formContent)
 /******************************************************************************************************/
 function dgx_donate_get_tribute_section($formContent)
 {
-	$honoree_state = get_option('dgx_donate_default_state');
-	$honoree_province = get_option('dgx_donate_default_province');
-	$honoree_country = get_option('dgx_donate_default_country');
+	if ( 'true' == get_option( 'dgx_donate_show_tribute_section' ) ) {
+		$honoree_state = get_option('dgx_donate_default_state');
+		$honoree_province = get_option('dgx_donate_default_province');
+		$honoree_country = get_option('dgx_donate_default_country');
 
-	$output = "";
-	$output .= "<div class='dgx-donate-form-section' id='dgx-donate-form-tribute-section'>\n";
-	$output .= "<h2>" . esc_html__( 'Tribute Gift', 'dgx-donate' ) . "</h2>\n";
-	$output .= "<div class='dgx-donate-form-expander'>\n";
-	$output .= "<p class='dgx-donate-form-expander-header'>";
-	$output .= "<input type='checkbox' id='dgx-donate-tribute' name='_dgx_donate_tribute_gift' /> ";
-	$output .= esc_html__( 'Check here to donate in honor or memory of someone', 'dgx-donate' ) . " </p>\n";
-	$output .= "<div class='dgx-donate-form-tribute-box'>\n";
-	$output .= "<p>";
-	$output .= "<input type='checkbox' name='_dgx_donate_memorial_gift' />";
-	$output .= esc_html__( 'Check here if this is a memorial gift', 'dgx-donate' ) . " ";
-	$output .= "</p>\n";
-	$output .= "<hr/>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_honoree_name'>" . esc_html__( "Honoree's Name:", 'dgx-donate' ) . " </label>";
-	$output .= "<input type='text' name='_dgx_donate_honoree_name' size='20' value='' />";
-	$output .= "</p>";
-	$output .= "<p>";
-	$output .= "<input type='radio' name='_dgx_donate_honor_by_email' value='TRUE' /> ";
-	$output .= esc_html__( 'Send acknowledgement via email to ', 'dgx-donate' ) . " ";
-	$output .= "</p>";
-	$output .= "<div class='dgx-donate-form-subsection'>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_honoree_address'>" . esc_html__( 'Name:', 'dgx-donate' ) . " </label>";
-	$output .= "<input type='text' name='_dgx_donate_honoree_email_name' size='20' value='' />";
-	$output .= "</p>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_honoree_email'>" . esc_html__( 'Email:', 'dgx-donate' ). " </label>";
-	$output .= "<input type='text' name='_dgx_donate_honoree_email' size='20' value='' />";
-	$output .= "</p>";
-	$output .= "</div>";
-	$output .= "<p>";
-	$output .= "<input type='radio' name='_dgx_donate_honor_by_email' value='FALSE' /> ";
-	$output .= esc_html__( 'Send acknowledgement via postal mail to ', 'dgx-donate' ) . " ";
-	$output .= "</p>";
-	$output .= "<div class='dgx-donate-form-subsection'>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_honoree_address'>" . esc_html__( 'Name:', 'dgx-donate' ) . " </label>";
-	$output .= "<input type='text' name='_dgx_donate_honoree_post_name' size='20' value='' />";
-	$output .= "</p>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_honoree_address'>" . esc_html__( 'Address:', 'dgx-donate' ) . " </label>";
-	$output .= "<input type='text' name='_dgx_donate_honoree_address' size='20' value='' />";
-	$output .= "</p>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_honoree_city'>" . esc_html__( 'City:', 'dgx-donate' ) . " </label>";
-	$output .= "<input type='text' name='_dgx_donate_honoree_city' value='' />";
-	$output .= "</p>";
+		$output = "";
+		$output .= "<div class='dgx-donate-form-section' id='dgx-donate-form-tribute-section'>\n";
+		$output .= "<h2>" . esc_html__( 'Tribute Gift', 'dgx-donate' ) . "</h2>\n";
+		$output .= "<div class='dgx-donate-form-expander'>\n";
+		$output .= "<p class='dgx-donate-form-expander-header'>";
+		$output .= "<input type='checkbox' id='dgx-donate-tribute' name='_dgx_donate_tribute_gift' /> ";
+		$output .= esc_html__( 'Check here to donate in honor or memory of someone', 'dgx-donate' ) . " </p>\n";
+		$output .= "<div class='dgx-donate-form-tribute-box'>\n";
+		$output .= "<p>";
+		$output .= "<input type='checkbox' name='_dgx_donate_memorial_gift' />";
+		$output .= esc_html__( 'Check here if this is a memorial gift', 'dgx-donate' ) . " ";
+		$output .= "</p>\n";
+		$output .= "<hr/>";
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_honoree_name'>" . esc_html__( "Honoree's Name:", 'dgx-donate' ) . " </label>";
+		$output .= "<input type='text' name='_dgx_donate_honoree_name' size='20' value='' />";
+		$output .= "</p>";
+		$output .= "<p>";
+		$output .= "<input type='radio' name='_dgx_donate_honor_by_email' value='TRUE' /> ";
+		$output .= esc_html__( 'Send acknowledgement via email to ', 'dgx-donate' ) . " ";
+		$output .= "</p>";
+		$output .= "<div class='dgx-donate-form-subsection'>";
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_honoree_address'>" . esc_html__( 'Name:', 'dgx-donate' ) . " </label>";
+		$output .= "<input type='text' name='_dgx_donate_honoree_email_name' size='20' value='' />";
+		$output .= "</p>";
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_honoree_email'>" . esc_html__( 'Email:', 'dgx-donate' ). " </label>";
+		$output .= "<input type='text' name='_dgx_donate_honoree_email' size='20' value='' />";
+		$output .= "</p>";
+		$output .= "</div>";
+		$output .= "<p>";
+		$output .= "<input type='radio' name='_dgx_donate_honor_by_email' value='FALSE' /> ";
+		$output .= esc_html__( 'Send acknowledgement via postal mail to ', 'dgx-donate' ) . " ";
+		$output .= "</p>";
+		$output .= "<div class='dgx-donate-form-subsection'>";
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_honoree_address'>" . esc_html__( 'Name:', 'dgx-donate' ) . " </label>";
+		$output .= "<input type='text' name='_dgx_donate_honoree_post_name' size='20' value='' />";
+		$output .= "</p>";
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_honoree_address'>" . esc_html__( 'Address:', 'dgx-donate' ) . " </label>";
+		$output .= "<input type='text' name='_dgx_donate_honoree_address' size='20' value='' />";
+		$output .= "</p>";
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_honoree_city'>" . esc_html__( 'City:', 'dgx-donate' ) . " </label>";
+		$output .= "<input type='text' name='_dgx_donate_honoree_city' value='' />";
+		$output .= "</p>";
 
-	$output .= "<div class='dgx_donate_geography_selects'>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_honoree_state'>" . esc_html__( 'State:', 'dgx-donate' ) . "</label>";
-	$output .= dgx_donate_get_state_selector( "_dgx_donate_honoree_state", $honoree_state );
-	$output .= "</p>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_honoree_province'>" . esc_html__( 'Province:', 'dgx-donate' ) . "</label>";
-	$output .= dgx_donate_get_province_selector( "_dgx_donate_honoree_province", $honoree_province );
-	$output .= "</p>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_honoree_country'>" . esc_html__( 'Country:', 'dgx-donate' ) ."</label>";
-	$output .= dgx_donate_get_country_selector( "_dgx_donate_honoree_country", $honoree_country );
-	$output .= "</p>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_honoree_zip'>" . esc_html__( 'Postal Code:', 'dgx-donate' ) . "</label>";
-	$output .= "<input class='dgx_donate_zip_input' type='text' name='_dgx_donate_honoree_zip' size='10' value='' />";
-	$output .= "</p>";
-	$output .= "</div>"; // dgx_donate_geography_selects
+		$output .= "<div class='dgx_donate_geography_selects'>";
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_honoree_state'>" . esc_html__( 'State:', 'dgx-donate' ) . "</label>";
+		$output .= dgx_donate_get_state_selector( "_dgx_donate_honoree_state", $honoree_state );
+		$output .= "</p>";
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_honoree_province'>" . esc_html__( 'Province:', 'dgx-donate' ) . "</label>";
+		$output .= dgx_donate_get_province_selector( "_dgx_donate_honoree_province", $honoree_province );
+		$output .= "</p>";
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_honoree_country'>" . esc_html__( 'Country:', 'dgx-donate' ) ."</label>";
+		$output .= dgx_donate_get_country_selector( "_dgx_donate_honoree_country", $honoree_country );
+		$output .= "</p>";
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_honoree_zip'>" . esc_html__( 'Postal Code:', 'dgx-donate' ) . "</label>";
+		$output .= "<input class='dgx_donate_zip_input' type='text' name='_dgx_donate_honoree_zip' size='10' value='' />";
+		$output .= "</p>";
+		$output .= "</div>"; // dgx_donate_geography_selects
 
-	$output .= "</div>"; /* dgx-donate-form-subsection */
-	$output .= "</div>"; /* dgx-donate-form-tribute-box */
-	$output .= "</div>"; /* dgx-donate-form-expander */
-	$output .= "</div>\n"; /* dgx-donate-form-section */
-	
-	$formContent .= $output;
+		$output .= "</div>"; /* dgx-donate-form-subsection */
+		$output .= "</div>"; /* dgx-donate-form-tribute-box */
+		$output .= "</div>"; /* dgx-donate-form-expander */
+		$output .= "</div>\n"; /* dgx-donate-form-section */
+		
+		$formContent .= $output;
+	}
 
 	return $formContent;
 }
 
 /******************************************************************************************************/
 function dgx_donate_get_employer_section( $form_content ) {
-	$output = "";
-	$output .= "<div class='dgx-donate-form-section' id='dgx-donate-form-employer-section'>";
-	$output .= "<h2>" . esc_html__( 'Employer Match', 'dgx-donate' ) . "</h2>";
-	$output .= "<div class='dgx-donate-form-expander'>";
-	$output .= "<p class='dgx-donate-form-expander-header'>";
-	$output .= "<input type='checkbox' id='dgx-donate-employer' name='_dgx_donate_employer_match' /> ";
-	$output .= esc_html__( 'Check here if your employer matches donations', 'dgx-donate' ) . "</p>";
-	$output .= "<div class='dgx-donate-form-employer-box'>";
-	$output .= "<hr/>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_employer_name'>" . esc_html__( 'Employer Name:', 'dgx-donate' ) . "</label>";
-	$output .= "<input type='text' name='_dgx_donate_employer_name' size='30' value='' />";
-	$output .= "</p>";
-	$output .= "</div>"; /* dgx-donate-form-employer-box */
-	$output .= "</div>"; /* dgx-donate-form-expander */
-	$output .= "</div>\n"; /* dgx-donate-form-section */
 
-	$form_content .= $output;
+	if ( 'true' == get_option( 'dgx_donate_show_employer_section' ) ) {
+		$output = "";
+		$output .= "<div class='dgx-donate-form-section' id='dgx-donate-form-employer-section'>";
+		$output .= "<h2>" . esc_html__( 'Employer Match', 'dgx-donate' ) . "</h2>";
+		$output .= "<p>";
+		$output .= "<input type='checkbox' id='dgx-donate-employer' name='_dgx_donate_employer_match' /> ";
+		$output .= esc_html__( 'Check here if your employer matches donations', 'dgx-donate' ) . "</p>";
+		$output .= "</div>"; /* dgx-donate-form-section */
+
+		$form_content .= $output;
+	}
 
 	return $form_content;
 }
@@ -665,27 +666,49 @@ function dgx_donate_get_donor_section( $form_content ) {
 	$output .= "<h2>" . esc_html__( 'Donor Information', 'dgx-donate' ) . "</h2>";
 	$output .= "<p>";
 	$output .= "<label for='_dgx_donate_donor_first_name'>" . esc_html__( 'First Name:', 'dgx-donate' ) . " </label>";
-	$output .= "<input type='text' name='_dgx_donate_donor_first_name' value='' />";
+	$output .= "<input type='text' class='required' name='_dgx_donate_donor_first_name' value='' />";
 	$output .= "</p>";
 	$output .= "<p>";
 	$output .= "<label for='_dgx_donate_donor_last_name'>" . esc_html__( 'Last Name:', 'dgx-donate' ) . " </label>";
-	$output .= "<input type='text' name='_dgx_donate_donor_last_name' value='' />";
-	$output .= "</p>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_donor_phone'>" . esc_html__( 'Phone:', 'dgx-donate' ) . " </label>";
-	$output .= "<input type='text' name='_dgx_donate_donor_phone' value='' />";
-	$output .= "</p>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_donor_email'>" . esc_html__( 'Email:', 'dgx-donate' ) . " </label>";
-	$output .= "<input type='text' name='_dgx_donate_donor_email' size='20' value='' />";
+	$output .= "<input type='text' class='required' name='_dgx_donate_donor_last_name' value='' />";
 	$output .= "</p>";
 
-	$output .= "<p><input type='checkbox' name='_dgx_donate_add_to_mailing_list' /> " . esc_html__( 'Add me to your mailing list', 'dgx-donate' ) . "</p>\n";
-	
+	$show_donor_telephone_field = get_option( 'dgx_donate_show_donor_telephone_field' );
+	if ( 'false' !== $show_donor_telephone_field ) {
+		$required = ( 'required' == $show_donor_telephone_field ) ? "class='required'" : '';
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_donor_phone'>" . esc_html__( 'Phone:', 'dgx-donate' ) . " </label>";
+		$output .= "<input type='text' {$required} name='_dgx_donate_donor_phone' value='' />";
+		$output .= "</p>";
+	}
+
+	$show_donor_employer_field = get_option( 'dgx_donate_show_donor_employer_field' );
+	$show_employer_match_checkbox = get_option( 'dgx_donate_show_employer_section' ); // i.e. they are showing the matching checkbox section
+	if ( ( 'false' !== $show_donor_employer_field ) || ( 'false' !== $show_employer_match_checkbox ) ) {
+		$required = ( 'required' == $show_donor_employer_field ) ? "class='required'" : '';
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_employer_name'>" . esc_html__( 'Employer:', 'dgx-donate' ) . "</label>";
+		$output .= "<input type='text' {$required} name='_dgx_donate_employer_name' value='' />";
+		$output .= "</p>";
+	}
+
 	$output .= "<p>";
-	$output .= "<input type='checkbox' name='_dgx_donate_anonymous' />";
-	$output .= esc_html__( 'Please do not publish my name.  I would like to remain anonymous.', 'dgx-donate' );
-	$output .= "</p>\n";
+	$output .= "<label for='_dgx_donate_donor_email'>" . esc_html__( 'Email:', 'dgx-donate' ) . " </label>";
+	$output .= "<input type='text' class='required' name='_dgx_donate_donor_email' size='20' value='' />";
+	$output .= "</p>";
+
+	if ( 'true' == get_option( 'dgx_donate_show_mailing_list_option' ) ) {
+		$output .= "<p>";
+		$output .= "<input type='checkbox' name='_dgx_donate_add_to_mailing_list' /> " . esc_html__( 'Add me to your mailing list', 'dgx-donate' );
+		$output .= "</p>";
+	}
+
+	if ( 'true' == get_option( 'dgx_donate_show_anonymous_option' ) ) {
+		$output .= "<p>";
+		$output .= "<input type='checkbox' name='_dgx_donate_anonymous' />";
+		$output .= esc_html__( 'Please do not publish my name.  I would like to remain anonymous.', 'dgx-donate' );
+		$output .= "</p>";
+	}
 	
 	$output .= "</div>\n";
 	
@@ -696,55 +719,58 @@ function dgx_donate_get_donor_section( $form_content ) {
 
 /******************************************************************************************************/
 function dgx_donate_get_billing_section( $form_content ) {
-	$donor_state = get_option('dgx_donate_default_state');
-	$donor_province = get_option('dgx_donate_default_province');
-	$donor_country = get_option('dgx_donate_default_country');
 
-	$output = "";
-	$output .= "<div class='dgx-donate-form-section' id='dgx-donate-form-address-section'>\n";
-	$output .= "<h2>" . esc_html__( 'Donor Address', 'dgx_donate' ) . "</h2>\n";
-	
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_donor_address'>" . esc_html__( 'Address:', 'dgx-donate' ) . " </label>";
-	$output .= "<input type='text' name='_dgx_donate_donor_address'  size='20' value='' />";
-	$output .= "</p>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_donor_address2'>" . esc_html__( 'Address 2:', 'dgx-donate' );
-	$output .= " <span class='dgx-donate-comment'>" . esc_html__( '(optional)', 'dgx-donate' ) . "</span> </label>";
-	$output .= "<input type='text' name='_dgx_donate_donor_address2'  size='20' value='' />";
-	$output .= "</p>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_donor_city'>" . esc_html__( 'City:', 'dgx-donate' ) . " </label>";
-	$output .= "<input type='text' name='_dgx_donate_donor_city' value='' /> ";
-	$output .= "</p>";
+	if ( 'true' == get_option( 'dgx_donate_show_donor_address_fields' ) ) {
+		$donor_state = get_option('dgx_donate_default_state');
+		$donor_province = get_option('dgx_donate_default_province');
+		$donor_country = get_option('dgx_donate_default_country');
 
-	$output .= "<div class='dgx_donate_geography_selects'>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_donor_state'>" . esc_html__( 'State:', 'dgx-donate' ) . "</label>";
-	$output .= dgx_donate_get_state_selector( "_dgx_donate_donor_state", $donor_state );
-	$output .= "</p>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_donor_province'>" . esc_html__( 'Province:', 'dgx-donate' ) . "</label>";
-	$output .= dgx_donate_get_province_selector( "_dgx_donate_donor_province", $donor_province );
-	$output .= "</p>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_donor_country'>" . esc_html__( 'Country:', 'dgx-donate' ) . "</label>";
-	$output .= dgx_donate_get_country_selector( "_dgx_donate_donor_country", $donor_country );
-	$output .= "</p>";
-	$output .= "<p>";
-	$output .= "<label for='_dgx_donate_donor_zip'>" . esc_html__( 'Postal Code:', 'dgx-donate' ) . "</label>";
-	$output .= "<input class='dgx_donate_zip_input' type='text' name='_dgx_donate_donor_zip'  size='10' value='' />";
-	$output .= "</p>";
-	$output .= "<p>";
-	$output .= "<input class='dgx_donate_uk_gift_aid' type='checkbox' name='_dgx_donate_uk_gift_aid' />";
-	$output .= esc_html( 'I am a UK taxpayer and my gift qualifies for Gift Aid.', 'dgx-donate' );
-	$output .= "</p>";
-	$output .= "</div>"; // dgx_donate_geography_selects
-	
-	$output .= "</div>\n";
-	
-	$form_content .= $output;
+		$output = "";
+		$output .= "<div class='dgx-donate-form-section' id='dgx-donate-form-address-section'>\n";
+		$output .= "<h2>" . esc_html__( 'Donor Address', 'dgx_donate' ) . "</h2>\n";
+		
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_donor_address'>" . esc_html__( 'Address:', 'dgx-donate' ) . " </label>";
+		$output .= "<input type='text' class='required' name='_dgx_donate_donor_address'  size='20' value='' />";
+		$output .= "</p>";
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_donor_address2'>" . esc_html__( 'Address 2:', 'dgx-donate' );
+		$output .= " <span class='dgx-donate-comment'>" . esc_html__( '(optional)', 'dgx-donate' ) . "</span> </label>";
+		$output .= "<input type='text' name='_dgx_donate_donor_address2'  size='20' value='' />";
+		$output .= "</p>";
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_donor_city'>" . esc_html__( 'City:', 'dgx-donate' ) . " </label>";
+		$output .= "<input type='text' class='required' name='_dgx_donate_donor_city' value='' /> ";
+		$output .= "</p>";
 
+		$output .= "<div class='dgx_donate_geography_selects'>";
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_donor_state'>" . esc_html__( 'State:', 'dgx-donate' ) . "</label>";
+		$output .= dgx_donate_get_state_selector( "_dgx_donate_donor_state", $donor_state );
+		$output .= "</p>";
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_donor_province'>" . esc_html__( 'Province:', 'dgx-donate' ) . "</label>";
+		$output .= dgx_donate_get_province_selector( "_dgx_donate_donor_province", $donor_province );
+		$output .= "</p>";
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_donor_country'>" . esc_html__( 'Country:', 'dgx-donate' ) . "</label>";
+		$output .= dgx_donate_get_country_selector( "_dgx_donate_donor_country", $donor_country );
+		$output .= "</p>";
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_donor_zip'>" . esc_html__( 'Postal Code:', 'dgx-donate' ) . "</label>";
+		$output .= "<input class='dgx_donate_zip_input' type='text' name='_dgx_donate_donor_zip'  size='10' value='' />";
+		$output .= "</p>";
+		$output .= "<p>";
+		$output .= "<input class='dgx_donate_uk_gift_aid' type='checkbox' name='_dgx_donate_uk_gift_aid' />";
+		$output .= esc_html( 'I am a UK taxpayer and my gift qualifies for Gift Aid.', 'dgx-donate' );
+		$output .= "</p>";
+		$output .= "</div>"; // dgx_donate_geography_selects
+		
+		$output .= "</div>\n";
+		
+		$form_content .= $output;
+	}
+	
 	return $form_content;
 }
 
@@ -947,8 +973,8 @@ function dgx_donate_send_donation_notification($donationID)
 		$body .= "\n";
 	}
 
-	$employer_name = get_post_meta( $donationID, '_dgx_donate_employer_name', true );
-	if ( ! empty( $employer_name ) ) {
+	$employer_match = get_post_meta( $donationID, '_dgx_donate_employer_match', true );
+	if ( ! empty( $employer_match ) ) {
 		$body .= __( 'NOTE:  The donor is making this donation with an employer match.', 'dgx-donate' ) . " ";
 		$body .= __( 'Please see the donation details (using the link below) for more information.', 'dgx-donate' ) . "\n";
 		$body .= "\n";

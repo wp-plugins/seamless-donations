@@ -11,6 +11,7 @@ require_once 'admin-views/donors.php';
 require_once 'admin-views/funds.php';
 require_once 'admin-views/templates.php';
 require_once 'admin-views/completed.php';
+require_once 'admin-views/form-options.php';
 require_once 'admin-views/settings.php';
 require_once 'admin-views/log.php';
 require_once 'admin-views/help.php';
