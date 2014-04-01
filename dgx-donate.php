@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts.
-Version: 3.2.2
+Version: 3.2.3
 Author: allendav
 Author URI: http://www.allendav.com/
 License: GPL2
@@ -709,7 +709,7 @@ function dgx_donate_get_donor_section( $form_content ) {
 
 	if ( 'true' == get_option( 'dgx_donate_show_mailing_list_option' ) ) {
 		$output .= "<p>";
-		$output .= "<input type='checkbox' name='_dgx_donate_add_to_mailing_list' /> " . esc_html__( 'Add me to your mailing list', 'dgx-donate' );
+		$output .= "<input type='checkbox' name='_dgx_donate_add_to_mailing_list' />" . esc_html__( 'Add me to your mailing list', 'dgx-donate' );
 		$output .= "</p>";
 	}
 
