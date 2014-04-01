@@ -67,6 +67,14 @@ Yes!
 
 == Changelog ==
 
+= 3.2.1 =
+* Added: Occupation field to donation form and to donation detail in admin
+* Added: Employer name to donation detail in admin
+* Added: Employer and occupation fields to report
+
+= 3.2.0 =
+* Added: More control over which parts of the donation form appear
+
 = 3.1.0 =
 * Added: Filter for donation item name
 * Added IDs for form sections to allow for more styling of the donation form

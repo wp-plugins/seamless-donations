@@ -73,7 +73,8 @@ else
 
 				echo "\"Date\",\"Time\",\"First Name\",\"Last Name\",\"Amount\",\"Currency\",\"Repeating\",";
 				echo "\"Designated Fund\",\"Gift Item\",\"Phone\",\"Email\",\"Address\",\"Address 2\",";
-				echo "\"City\",\"State/Prov\",\"Postal Code\",\"Country\",\"OK to Add to Mailing List\"\n";
+				echo "\"City\",\"State/Prov\",\"Postal Code\",\"Country\",\"Employer\",\"Occupation\",";
+				echo "\"OK to Add to Mailing List\"\n";
 	
 				$firstOne = false;
 			}
@@ -138,11 +139,15 @@ else
 			else
 			{
 				$addToMailingList = "No";
-			}	
+			}
+
+			$employer = get_post_meta( $donationID, '_dgx_donate_employer_name', true );
+			$occupation = get_post_meta( $donationID, '_dgx_donate_occupation', true );
 
 			echo "\"$donationDate\",\"$time\",\"$firstName\",\"$lastName\",\"$formatted_amount\",\"$currency_code\",\"$repeating\",";
 			echo "\"$designatedFundName\",\"$gift_item_title\",\"$phone\",\"$email\",\"$address\",\"$address2\",";
-			echo "\"$city\",\"$state_or_prov\",\"$zip\",\"$country\",\"$addToMailingList\"\n";
+			echo "\"$city\",\"$state_or_prov\",\"$zip\",\"$country\",\"$employer\",\"$occupation\",";
+			echo "\"$addToMailingList\"\n";
 		}
 	}
 

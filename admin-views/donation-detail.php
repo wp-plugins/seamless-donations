@@ -93,14 +93,31 @@ class Dgx_Donate_Admin_Donation_Detail_View {
 			echo "<td>" . esc_html( $fund_name ) . "</td></tr>\n";
 
 			$employer_match = get_post_meta( $donation_id, '_dgx_donate_employer_match', true );
-			$employer_name = get_post_meta( $donation_id, '_dgx_donate_employer_name', true );
 			if ( empty( $employer_match ) ) {
 				$employer_match_message = __( 'No', 'dgx-donate' );
 			} else {
-				$employer_match_message = __( 'Yes', 'dgx-donate' ) . " - " . $employer_name;
+				$employer_match_message = __( 'Yes', 'dgx-donate' );
 			}
 			echo "<tr><th>" . esc_html__( 'Employer Match', 'dgx-donate' ) . "</th>";
 			echo "<td>" . esc_html( $employer_match_message ) . "</td></tr>\n";
+
+			$employer_name = get_post_meta( $donation_id, '_dgx_donate_employer_name', true );
+			if ( empty( $employer_name ) ) {
+				$employer_name_message = '-';
+			} else {
+				$employer_name_message = $employer_name;
+			}
+			echo "<tr><th>" . esc_html__( 'Employer', 'dgx-donate' ) . "</th>";
+			echo "<td>" . esc_html( $employer_name_message ) . "</td></tr>\n";
+
+			$occupation = get_post_meta( $donation_id, '_dgx_donate_occupation', true );
+			if ( empty( $occupation ) ) {
+				$occupation_message = '-';
+			} else {
+				$occupation_message = $occupation;
+			}
+			echo "<tr><th>" . esc_html__( 'Occupation', 'dgx-donate' ) . "</th>";
+			echo "<td>" . esc_html( $occupation_message ) . "</td></tr>\n";
 
 			$donor_country = get_post_meta( $donation_id, '_dgx_donate_donor_country', true );
 			if ( 'GB' == $donor_country ) {

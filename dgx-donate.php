@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts.
-Version: 3.2.0
+Version: 3.2.1
 Author: allendav
 Author URI: http://www.allendav.com/
 License: GPL2
@@ -232,6 +232,7 @@ function dgx_donate_get_meta_map() {
 		'PAYMENTMETHOD' => '_dgx_donate_payment_method',
 		'EMPLOYERMATCH' => '_dgx_donate_employer_match',
 		'EMPLOYERNAME' => '_dgx_donate_employer_name',
+		'OCCUPATION' => '_dgx_donate_occupation',
 		'UKGIFTAID' => '_dgx_donate_uk_gift_aid'
 	);
 }
@@ -689,6 +690,15 @@ function dgx_donate_get_donor_section( $form_content ) {
 		$output .= "<p>";
 		$output .= "<label for='_dgx_donate_employer_name'>" . esc_html__( 'Employer:', 'dgx-donate' ) . "</label>";
 		$output .= "<input type='text' {$required} name='_dgx_donate_employer_name' value='' />";
+		$output .= "</p>";
+	}
+
+	$show_donor_occupation_field = get_option( 'dgx_donate_show_donor_occupation_field' );
+	if ( ( 'false' !== $show_donor_employer_field ) ) {
+		$required = ( 'required' == $show_donor_occupation_field ) ? "class='required'" : '';
+		$output .= "<p>";
+		$output .= "<label for='_dgx_donate_occupation'>" . esc_html__( 'Occupation:', 'dgx-donate' ) . "</label>";
+		$output .= "<input type='text' {$required} name='_dgx_donate_occupation' value='' />";
 		$output .= "</p>";
 	}
 

@@ -361,6 +361,7 @@ function dgx_donate_paypalstd_ajax_checkout()
 	$anonymous = $_POST['anonymous'];
 	$employerMatch = $_POST['employerMatch'];
 	$employerName = $_POST['employerName'];
+	$occupation = $_POST['occupation'];
 	$ukGiftAid = $_POST['ukGiftAid'];
 
 	// Resolve the donation amount
@@ -415,6 +416,7 @@ function dgx_donate_paypalstd_ajax_checkout()
 	$postData['PAYMENTMETHOD'] = "PayPal";
 	$postData['EMPLOYERMATCH'] = $employerMatch;
 	$postData['EMPLOYERNAME'] = $employerName;
+	$postData['OCCUPATION'] = $occupation;
 	$postData['UKGIFTAID'] = $ukGiftAid;
 	
 	// Sanitize the data (remove leading, trailing spaces quotes, brackets)

@@ -48,6 +48,12 @@ class Dgx_Donate_Admin_Form_Options_View {
 				'show_require_option' => true
 			),
 			array(
+				'prompt' => __( 'Donor Occupation Field', 'dgx-donate' ),
+				'key' => 'dgx_donate_show_donor_occupation_field',
+				'default' => 'false',
+				'show_require_option' => true
+			),
+			array(
 				'prompt' => __( 'Mailing List Checkbox', 'dgx-donate' ),
 				'key' => 'dgx_donate_show_mailing_list_option',
 				'default' => 'true',

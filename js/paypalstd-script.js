@@ -140,6 +140,7 @@ function DgxDonateDoCheckout()
 	var tributeGift = DgxDonateTrim(values['_dgx_donate_tribute_gift']);
 	var employerMatch = DgxDonateTrim( values['_dgx_donate_employer_match'] );
 	var employerName = DgxDonateTrim( values['_dgx_donate_employer_name'] );
+	var occupation = DgxDonateTrim( values['_dgx_donate_occupation'] );
 	var memorialGift = DgxDonateTrim(values['_dgx_donate_memorial_gift']);
 	var honoreeName = DgxDonateTrim(values['_dgx_donate_honoree_name']);
 	var honorByEmail = DgxDonateTrim(values['_dgx_donate_honor_by_email']);
@@ -265,6 +266,13 @@ function DgxDonateDoCheckout()
 		DgxDonateMarkInvalid("_dgx_donate_employer_name");
 	}
 
+	var occupationRequired = jQuery( '#dgx-donate-form' ).find( "input[name='_dgx_donate_occupation']" ).hasClass( 'required' );
+	if ( occupationRequired && occupation == "" )
+	{
+		formValidates = false;
+		DgxDonateMarkInvalid("_dgx_donate_occupation");
+	}
+
 	if ( employerMatch == 'on' ) {
 		if ( employerName == "" ) {
 			formValidates = false;
@@ -348,7 +356,7 @@ function DgxDonateDoCheckout()
 	var data = { action: 'dgx_donate_paypalstd_ajax_checkout', referringUrl: referringUrl, nonce: nonce, sessionID: sessionID,
 		donationAmount: donationAmount, userAmount: userAmount, repeating: repeating, designated: designated,
 		designatedFund: designatedFund, increaseToCover: increaseToCover, anonymous: anonymous,
-		employerMatch: employerMatch, employerName: employerName,
+		employerMatch: employerMatch, employerName: employerName, occupation: occupation,
 		tributeGift: tributeGift, honoreeName: honoreeName, honorByEmail: honorByEmail, honoreeEmail: honoreeEmail,
 		memorialGift: memorialGift, honoreeEmailName: honoreeEmailName, honoreePostName: honoreePostName,
 		honoreeAddress: honoreeAddress, honoreeCity: honoreeCity, honoreeState: honoreeState, honoreeProvince: honoreeProvince,
