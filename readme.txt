@@ -67,6 +67,11 @@ Yes!
 
 == Changelog ==
 
+= 3.2.2 =
+* Added Currency Support: Brazilian Real, Czech Krona, Danish Krone, Hong Kong Dollar, Hungarian Forint, Israeli New Sheqel
+* Added Currency Support: Malaysian Ringit, Mexican Peso, Norwegian Krone, New Zealand Dollar, Philippine Peso, Polish Zloty
+* Added Currency Support: Russian Ruble, Singapore Dollar, Swedish Krona, Swiss Franc, Taiwan New Dollar, Thai Bhat, Turkish Lira
+
 = 3.2.1 =
 * Added: Occupation field to donation form and to donation detail in admin
 * Added: Employer name to donation detail in admin

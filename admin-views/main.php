@@ -63,6 +63,10 @@ class Dgx_Donate_Admin_Main_View {
 				'url' => get_admin_url() . "admin.php?page=dgx_donate_thank_you_page"
 			),
 			array(
+				'title' => __( 'Form Options', 'dgx-donate' ),
+				'url' => get_admin_url() . "admin.php?page=dgx_donate_form_options_page"
+			),
+			array(
 				'title' => __( 'Settings', 'dgx-donate' ),
 				'url' => get_admin_url() . "admin.php?page=dgx_donate_settings_page"
 			),
