@@ -10,6 +10,10 @@ function DgxDonateSubscribeFormEvents()
 	jQuery('#dgx-donate-tribute').click(function() {
 		DgxDonateUpdateTributeDiv();
 	});
+
+	jQuery( '#dgx-donate-employer' ).click( function() {
+		DgxDonateUpdateEmployerDiv();
+	} );
 }
 
 function DgxDonateUpdateDesignatedDiv()
@@ -36,6 +40,14 @@ function DgxDonateUpdateTributeDiv()
    	}
 }
 
+function DgxDonateUpdateEmployerDiv() {
+	if ( jQuery( '#dgx-donate-employer:checked' ).length > 0 ) {
+		jQuery( ".dgx-donate-form-employer-box" ).show( 'fast' );
+	} else {
+		jQuery( ".dgx-donate-form-employer-box" ).hide( 'fast' );
+	}
+}
+
 function DgxDonateAddOnClickOther()
 {
 	jQuery('#dgx-donate-other-input').focus(function() {
@@ -51,6 +63,7 @@ jQuery(document).ready(function() {
 	// Make sure form divs like tribute box match their checkbox state
 	DgxDonateUpdateDesignatedDiv();
 	DgxDonateUpdateTributeDiv();
+	DgxDonateUpdateEmployerDiv();
 	
 	// Hook up special handling for the OTHER donation amount box
 	DgxDonateAddOnClickOther();
