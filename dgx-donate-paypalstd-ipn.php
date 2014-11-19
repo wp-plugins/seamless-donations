@@ -13,7 +13,7 @@ include_once "./dgx-donate.php";
 
 class Dgx_Donate_IPN_Handler {
 
-	var $chat_back_url  = "ssl://www.paypal.com";
+	var $chat_back_url  = "tls://www.paypal.com";
 	var $host_header    = "Host: www.paypal.com\r\n";
 	var $post_data      = array();
 	var $session_id     = '';
@@ -24,7 +24,9 @@ class Dgx_Donate_IPN_Handler {
 		dgx_donate_debug_log( 'IPN processing start' );
 
 		// Grab all the post data
-		$this->post_data = $_POST;
+		$post = file_get_contents( 'php://input' );
+		parse_str( $post, $data );
+		$this->post_data = $data;
 
 		// Set up for production or test
 		$this->configure_for_production_or_test();
@@ -51,39 +53,31 @@ class Dgx_Donate_IPN_Handler {
 
 	function configure_for_production_or_test() {
 		if ( "SANDBOX" == get_option( 'dgx_donate_paypal_server' ) ) {
-			$this->chat_back_url = "ssl://www.sandbox.paypal.com";
+			$this->chat_back_url = "tls://www.sandbox.paypal.com";
 			$this->host_header   = "Host: www.sandbox.paypal.com\r\n";
 		}
 	}
 
 	function get_ids_from_post() {
-		$this->session_id = isset( $_POST[ "custom" ] ) ? $_POST[ "custom" ] : '';
-		$this->transaction_id = isset( $_POST[ "txn_id" ] ) ? $_POST[ "txn_id" ] : '';
+		$this->session_id = isset( $this->post_data[ "custom" ] ) ? $this->post_data[ "custom" ] : '';
+		$this->transaction_id = isset( $this->post_data[ "txn_id" ] ) ? $this->post_data[ "txn_id" ] : '';
 	}
 
 	function reply_to_paypal() {
-		$req = 'cmd=_notify-validate';
-		$get_magic_quotes_exists = function_exists( 'get_magic_quotes_gpc' );
-
-		foreach ($_POST as $key => $value) {
-			if( $get_magic_quotes_exists && get_magic_quotes_gpc() == 1 ) {
-				$value = urlencode( stripslashes( $value ) );
-			} else {
-				$value = urlencode( $value );
-			}
-			$req .= "&$key=$value";
-		}
+		$request_data = $this->post_data;
+		$request_data['cmd'] = '_notify-validate';
+		$request = http_build_query( $request_data );
 
 		$header = "POST /cgi-bin/webscr HTTP/1.0\r\n";
 		$header .= $this->host_header;
 		$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
-		$header .= "Content-Length: " . strlen( $req ) . "\r\n\r\n";
+		$header .= "Content-Length: " . strlen( $request ) . "\r\n\r\n";
 
 		$response = '';
 
 		$fp = fsockopen( $this->chat_back_url, 443, $errno, $errstr, 30 );
 		if ( $fp ) {
-			fputs( $fp, $header . $req );
+			fputs( $fp, $header . $request );
 
 			$done = false;
 			do {
@@ -103,11 +97,10 @@ class Dgx_Donate_IPN_Handler {
 	}
 
 	function handle_verified_ipn() {
-		$payment_status = $_POST["payment_status"];
+		$payment_status = $this->post_data["payment_status"];
 
 		dgx_donate_debug_log( "IPN VERIFIED for session ID {$this->session_id}" );
 		dgx_donate_debug_log( "Payment status = {$payment_status}" );
-		//dgx_donate_debug_log( print_r( $this->post_data, true ) ); // @todo don't commit
 
 		if ( "Completed" == $payment_status ) {
 			// Check if we've already logged a transaction with this same transaction id 
@@ -138,7 +131,7 @@ class Dgx_Donate_IPN_Handler {
 						// some reason) - so we will have to create a donation record
 						// from the data supplied by PayPal
 
-						$donation_id = dgx_donate_create_donation_from_paypal_data( $_POST );
+						$donation_id = dgx_donate_create_donation_from_paypal_data( $this->post_data );
 						dgx_donate_debug_log( "Created donation {$donation_id} from PayPal data (no transient data found)" );
 					}
 				} else {
@@ -163,7 +156,7 @@ class Dgx_Donate_IPN_Handler {
 				update_post_meta( $donation_id, '_dgx_donate_payment_processor', 'PAYPALSTD' );
 				update_post_meta( $donation_id, '_dgx_donate_payment_processor_data', $this->post_data );
 				// save the currency of the transaction
-				$currency_code = $_POST['mc_currency'];
+				$currency_code = $this->post_data['mc_currency'];
 				dgx_donate_debug_log( "Payment currency = {$currency_code}" );
 				update_post_meta( $donation_id, '_dgx_donate_donation_currency', $currency_code );
 			}
