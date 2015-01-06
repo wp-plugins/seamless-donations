@@ -3,12 +3,12 @@ Contributors: allendav, designgeneers
 Donate link: http://www.allendav.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
-Tested up to: 3.8.1
-Stable tag: 3.2.3
+Tested up to: 4.1
+Stable tag: 3.3.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts.
+Receive and manage PayPal donations (including repeating donations), track donors and send customized thank you messages.
 
 == Description ==
 
@@ -66,6 +66,16 @@ Yes!
 6. Dashboard >> Thank You Email Templates
 
 == Changelog ==
+
+= 3.3.1 =
+* Tested with WordPress 4.1
+
+= 3.3.0 =
+* Changed PayPal IPN reply to use TLS instead of SSL because of the POODLE vulnerability
+* Changed PayPal IPN reply to better handle unexpected characters and avoid IPN verification failure - props smarques
+
+= 3.2.4 =
+* Fixed: Don't start a PHP session if one has already been started - props nikdow and gingrichdk
 
 = 3.2.3 =
 * Fixed: Unwanted extra space in front of Add me to your mailing list prompt
