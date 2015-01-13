@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://allendav.com/wordpress-plugins/seamless-donations-for-wordpress/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts.
-Version: 3.3.0
+Version: 3.3.2
 Author: allendav
 Author URI: http://www.allendav.com/
 License: GPL2
@@ -342,7 +342,7 @@ function dgx_donate_create_donation_from_paypal_data( $post_data )
 	update_post_meta( $new_donation_id, '_dgx_donate_amount', $amount );
 
 
-	dgx_donate_debug_log( "done with dgx_donate_create_donation_from_paypal_data, returning new id $new_donation" );
+	dgx_donate_debug_log( "done with dgx_donate_create_donation_from_paypal_data, returning new id $new_donation_id" );
 	return $new_donation_id;
 }
 
@@ -818,7 +818,7 @@ function dgx_donate_send_thank_you_email($donationID, $testAddress="")
 		// lastname
 		$lastName = "Doe";
 		// amount
-		$amount = "$100.00";
+		$formatted_amount = "$100.00";
 		// fundname
 		$fund = "Tesla Scholarship";
 		// repeating y/n
