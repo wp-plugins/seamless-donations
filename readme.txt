@@ -4,7 +4,7 @@ Donate link: http://www.allendav.com/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
 Tested up to: 4.1
-Stable tag: 3.3.1
+Stable tag: 3.3.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,6 +66,11 @@ Yes!
 6. Dashboard >> Thank You Email Templates
 
 == Changelog ==
+
+= 3.3.2 =
+* Updated: Seamless Donation news feed updated to point to designgeneers.com
+* Fixed: Corrected variable name to resolve PHP Warning for formatted amount that would be displayed on sending a test email
+* Fixed: Corrected variable name to resolve PHP error for new donation created from PayPal data
 
 = 3.3.1 =
 * Tested with WordPress 4.1
