@@ -1,5 +1,5 @@
 === Seamless Donations ===
-Contributors: allendav, designgeneers
+Contributors: allendav, dgewirtz
 Donate link: http://www.allendav.com/
 Tags: adopt-me, donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
