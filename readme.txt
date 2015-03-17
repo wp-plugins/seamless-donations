@@ -1,10 +1,10 @@
 === Seamless Donations ===
-Contributors: allendav, dgewirtz
-Donate link: http://www.allendav.com/
-Tags: adopt-me, donation, donations, paypal, donate, non-profit, charity, gifts
+Contributors: dgewirtz
+Donate link: http://zatzlabs.com/seamless-donations/
+Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
 Tested up to: 4.1
-Stable tag: 3.3.3
+Stable tag: 3.3.4
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,9 +12,7 @@ Receive and manage PayPal donations (including repeating donations), track donor
 
 == Description ==
 
-__Note: This plugin is no longer actively developed nor maintained!__
-
-__Note: This plugin is available for adoption.__
+__Note: This plugin has been adopted by David Gewirtz and is once again being actively supported! Special thanks to Allen Snook for creating the plugin and making adoption possible.__
 
 Need more than just a PayPal donation button?  Would you like to allow your visitors to donate in honor of
 someone?  Invite them to subscribe to your mailing list?  Choose from desginated funds?  Do donations that
@@ -70,6 +68,9 @@ Yes!
 6. Dashboard >> Thank You Email Templates
 
 == Changelog ==
+
+= 3.3.4 =
+* Officially adopting the plugin and beginning support by David Gewirtz as new developer
 
 = 3.3.3 =
 * Officially marking this plugin as unsupported and putting it up for adoption

@@ -163,7 +163,7 @@ class Dgx_Donate_Admin_Main_View {
 		echo "<h3>" . esc_html__( "Latest News", 'dgx-donate' ) . "</h3>";
 		echo "<div class='rss-widget'>";
 		wp_widget_rss_output( array(
-			'url' => 'http://www.designgeneers.com/tag/seamless-donations/feed/',
+			'url' => 'http://zatzlabs.com/feed/',
 			'title' => __( "What's up with Seamless Donations", 'dgx-donate' ),
 			'items' => 3,
 			'show_summary' => 1,
