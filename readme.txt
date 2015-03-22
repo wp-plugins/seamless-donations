@@ -23,7 +23,7 @@ Now supporting donations by US and non-US donors (all donations are in USD - oth
 
 = Support Note =
 
-Many support questions can be answered by the [growing support FAQ on the plugin's home page](http://zatzlabs.com/better-recent-posts-widget/). If you can't find an answer there, you are invited to post questions [here on the Support boards](https://wordpress.org/support/plugin/seamless-donations).
+Many support questions can be answered by the [growing support FAQ on the plugin's home page](http://zatzlabs.com/seamless-donations/). If you can't find an answer there, you are invited to post questions [here on the Support boards](https://wordpress.org/support/plugin/seamless-donations).
 
 = Mailing List =
 If you'd like to keep up with the latest updates to this plugin, please visit [David's Lab Notes](http://zatzlabs.com/lab-notes/) and add yourself to the mailing list.
@@ -67,7 +67,7 @@ Yes!
 
 = In-depth technical FAQ =
 
-An in-depth technical FAQ is available on [the plugin's home page](http://zatzlabs.com/better-recent-posts-widget/). If you can't find an answer there, you are invited to post questions [here on the Support boards](https://wordpress.org/support/plugin/seamless-donations).
+An in-depth technical FAQ is available on [the plugin's home page](http://zatzlabs.com/seamless-donations/). If you can't find an answer there, you are invited to post questions [here on the Support boards](https://wordpress.org/support/plugin/seamless-donations).
 
 = Mailing List =
 If you'd like to keep up with the latest updates to this plugin, please visit [David's Lab Notes](http://zatzlabs.com/lab-notes/) and add yourself to the mailing list.
