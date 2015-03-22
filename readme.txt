@@ -14,14 +14,23 @@ Receive and manage PayPal donations (including repeating donations), track donor
 
 __Note: This plugin has been adopted by David Gewirtz and is once again being actively supported! Special thanks to Allen Snook for creating the plugin and making adoption possible.__
 
-Need more than just a PayPal donation button?  Would you like to allow your visitors to donate in honor of
-someone?  Invite them to subscribe to your mailing list?  Choose from desginated funds?  Do donations that
-automatically repeat each month?  Allow them to mark their donation anonymous?  Track donors and donations?
+Need more than just a PayPal donation button?  Would you like to allow your visitors to donate in honor of someone?  Invite them to subscribe to your mailing list?  Choose from desginated funds?  Do donations that automatically repeat each month?  Allow them to mark their donation anonymous?  Track donors and donations?
 
-Seamless Donations by Designgeneers does all this and more - and all you need to do is embed a simple shortcode
-and supply your PayPal Website Payments Standard email address to start receiving donations today.
+Seamless Donations does all this and more - and all you need to do is embed a simple shortcode and supply your PayPal Website Payments Standard email address to start receiving donations today.
+
+> <strong>Adoption Notice</strong><br>
+> This plugin was recently adopted by David Gewirtz and ongoing support and updates will continue. Feel free to visit [David's Lab Notes](http://zatzlabs.com/just-adopted-seamless-donations-wordpress-plugin/) for a development roadmap and additional details.
 
 Now supporting donations by US and non-US donors (all donations are in USD - other currencies will be supported soon)
+
+= Support Note =
+
+Many support questions can be answered by the [growing support FAQ on the plugin's home page](http://zatzlabs.com/better-recent-posts-widget/). If you can't find an answer there, you are invited to post questions [here on the Support boards](https://wordpress.org/support/plugin/seamless-donations).
+
+= Mailing List =
+If you'd like to keep up with the latest updates to this plugin, please visit [David's Lab Notes](http://zatzlabs.com/lab-notes/) and add yourself to the mailing list.
+
+Special thanks to Allen Snook for creating the plugin and making adoption possible.
 
 == Installation ==
 
@@ -57,6 +66,13 @@ Yes!
 = Can I have multiple emails addresses receive notification when a donation is made? =
 
 Yes!
+
+= In-depth technical FAQ =
+
+An in-depth technical FAAQ is available on [the plugin's home page](http://zatzlabs.com/better-recent-posts-widget/). If you can't find an answer there, you are invited to post questions [here on the Support boards](https://wordpress.org/support/plugin/seamless-donations).
+
+= Mailing List =
+If you'd like to keep up with the latest updates to this plugin, please visit [David's Lab Notes](http://zatzlabs.com/lab-notes/) and add yourself to the mailing list.
 
 == Screenshots ==
 
