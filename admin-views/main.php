@@ -1,12 +1,13 @@
 <?php
 
 /* Copyright 2013 Allen Snook (email: allendav@allendav.com) */
+/* Copyright 2015 David Gewirtz, based on code by Allen Snook */
 
 class Dgx_Donate_Admin_Main_View {
 	function __construct() {
 		add_action( 'admin_menu', array( $this, 'menu_item' ), 9 );
 	}
-	
+
 	function menu_item() {
 		add_menu_page(
 			__( 'Seamless Donations', 'dgx-donate' ),
@@ -17,7 +18,7 @@ class Dgx_Donate_Admin_Main_View {
 		);
 		do_action( 'dgx_donate_menu' );
 	}
-	
+
 	function menu_page() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( __( 'You do not have sufficient permissions to access this page.', 'dgx-donate' ) );
@@ -34,7 +35,7 @@ class Dgx_Donate_Admin_Main_View {
 			self::show();
 		}
 	}
-	
+
 	static function show() {
 		echo "<div class='wrap'>\n";
 		echo "<div id='icon-edit-pages' class='icon32'></div>\n";
@@ -92,6 +93,52 @@ class Dgx_Donate_Admin_Main_View {
 		}
 		echo "</p>";
 
+		// Seamless Donations 4.0 warning code
+
+		if(isset($_GET['update_notify'])) {
+			if ($_GET['update_notify'] == "dismiss") {
+				update_option("dgx_donate_initial_40_update_warning", "40A1UPDATEWARNED"); // initial warning showed
+			}
+		}
+		echo '<div style="padding:5px; background-color:red; color:white; line-height:2em">';
+		echo '<H1>**** Alert ****</h1><h1>Seamless Donations is getting a major upgrade soon (May/June 2015).</H1>';
+		echo '<h2 style="color:white">The upgrade, for version 4.0, will provide substantial new capabilities ';
+		echo 'for the plugin, but the architectural ';
+		echo 'changes <b>may impact customizations you have made to the plugin</b>. ';
+		echo 'Please visit ';
+		echo '<A HREF="http://zatzlabs.com/lab-notes/" style="color:white">David\'s Lab Notes</A> ';
+		echo 'for ongoing development news or subscribe below.</h2>';
+
+		?>
+<!-- Begin MailChimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/classic-081711.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+	#mc_embed_signup{background-color: red; color: white; clear:left; font:14px Helvetica,Arial,sans-serif; }
+	/* Add your own MailChimp form style overrides in your site stylesheet or in this style block.
+	   We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+	<form action="//zatzlabs.us10.list-manage.com/subscribe/post?u=81b10c30eeed8b4ec79c86d53&amp;id=f56ca4c04e" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+		<div id="mc_embed_signup_scroll">
+			<h2 style="color:white">Subscribe to David's Lab Notes now</h2>
+			<div class="mc-field-group">
+				<label for="mce-EMAIL">Email Address </label>
+				<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL">
+			</div>
+			<div id="mce-responses" class="clear">
+				<div class="response" id="mce-error-response" style="display:none"></div>
+				<div class="response" id="mce-success-response" style="display:none"></div>
+			</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+			<div style="position: absolute; left: -5000px;"><input type="text" name="b_81b10c30eeed8b4ec79c86d53_f56ca4c04e" tabindex="-1" value=""></div>
+			<div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+		</div>
+	</form>
+</div>
+<script type='text/javascript' src='//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js'></script><script type='text/javascript'>(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+<!--End mc_embed_signup-->
+<?php
+		echo "</div>";
+
 		// Recent Donations
 		echo "<div id='col-container'>\n";
 		echo "<div id='col-right'>\n";
@@ -102,7 +149,7 @@ class Dgx_Donate_Admin_Main_View {
 		$args = array(
 			'numberposts'     => '10',
 			'post_type'       => 'dgx-donation'
-		); 
+		);
 
 		$my_donations = get_posts( $args );
 
@@ -122,12 +169,12 @@ class Dgx_Donate_Admin_Main_View {
 				$day = get_post_meta( $donation_id, '_dgx_donate_day', true );
 				$time = get_post_meta( $donation_id, '_dgx_donate_time', true );
 				$donation_date = $month . "/" . $day . "/" . $year;
-			
+
 				$first_name = get_post_meta( $donation_id, '_dgx_donate_donor_first_name', true );
 				$last_name = get_post_meta( $donation_id, '_dgx_donate_donor_last_name', true );
 				$donor_email = get_post_meta( $donation_id, '_dgx_donate_donor_email', true );
 				$donor_detail = dgx_donate_get_donor_detail_link( $donor_email );
-			
+
 				$amount = get_post_meta( $donation_id, '_dgx_donate_amount', true );
 				$currency_code = dgx_donate_get_donation_currency_code( $donation_id );
 				$formatted_amount = dgx_donate_get_escaped_formatted_amount( $amount, 2, $currency_code );
@@ -157,10 +204,14 @@ class Dgx_Donate_Admin_Main_View {
 		echo "</div> <!-- col-wrap -->\n";
 		echo "</div> <!-- col-right -->\n";
 
+
 		echo "<div id='col-left'>\n";
 		echo "<div class='col-wrap'>\n";
-	
+
 		echo "<h3>" . esc_html__( "Latest News", 'dgx-donate' ) . "</h3>";
+
+
+		// regular news feed
 		echo "<div class='rss-widget'>";
 		wp_widget_rss_output( array(
 			'url' => 'http://zatzlabs.com/feed/',
@@ -168,7 +219,7 @@ class Dgx_Donate_Admin_Main_View {
 			'items' => 3,
 			'show_summary' => 1,
 			'show_author' => 0,
-			'show_date' => 1 
+			'show_date' => 1
 		) );
 		echo "</div>";
 

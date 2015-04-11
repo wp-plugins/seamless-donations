@@ -4,7 +4,7 @@ Donate link: http://zatzlabs.com/seamless-donations/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts
 Requires at least: 3.4
 Tested up to: 4.1
-Stable tag: 3.3.4
+Stable tag: 3.3.5
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -82,6 +82,9 @@ If you'd like to keep up with the latest updates to this plugin, please visit [D
 6. Dashboard >> Thank You Email Templates
 
 == Changelog ==
+
+= 3.3.5 =
+* Added update notice warning and splash so current site operators can have some warning before the new 4.0 version lands. Also added MailChimp subscribe form to main plugin page.
 
 = 3.3.4 =
 * Officially adopting the plugin and beginning support by David Gewirtz as new developer

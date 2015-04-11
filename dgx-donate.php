@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://zatzlabs.com/seamless-donations/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts. Adopted from Allen Snook.
-Version: 3.3.4
+Version: 3.3.5
 Author: David Gewirtz
 Author URI: http://zatzlabs.com/lab-notes/
 License: GPL2
@@ -383,8 +383,8 @@ function dgx_donate_init () {
 		session_start();
 	}
 
-	// Register CPT
-	register_post_type('dgx-donation',
+	// Register CPT -- this is now done in admin-new/donations
+	/*	register_post_type('dgx-donation',
 		array(
 			'labels' => array(
 				'name' => __( 'Donations' ),
@@ -406,7 +406,7 @@ function dgx_donate_init () {
 			'show_in_nav_menus' => false,
 			'has_archive' => false
 		)
-	);
+	);*/
 
 	// Initialize options to defaults as needed
 	dgx_donate_init_defaults();
@@ -418,8 +418,26 @@ function dgx_donate_init () {
 	{
 		add_action('admin_notices', 'dgx_donate_admin_sandbox_msg');
 	}
+	$initial40updateWarning = get_option('dgx_donate_initial_40_update_warning');
+	if (strcasecmp($initial40updateWarning, "40A1UPDATEWARNED") != 0)
+	{
+		add_action('admin_notices', 'dgx_donate_admin_update_alert_msg1');
+	}
 }
 add_action('init', 'dgx_donate_init');
+
+/******************************************************************************************************/
+function dgx_donate_admin_update_alert_msg1()
+{
+	$url = get_admin_url() . "admin.php?page=dgx_donate_menu_page";
+	echo "<div class=\"error\">";
+	echo "<p>";
+	echo esc_html__( 'Alert - Seamless Donations is getting a major upgrade that may impact your site. ', 'dgx-donate' );
+	echo '<A HREF="'. $url . '">Learn more</A>. ';
+	echo '<A HREF="'. $url . '&update_notify=dismiss">Turn off this notification</A>. ';
+	echo "</p>";
+	echo "</div>";
+}
 
 /******************************************************************************************************/
 function dgx_donate_admin_sandbox_msg()
