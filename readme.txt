@@ -17,7 +17,7 @@ Need more than just a PayPal donation button?  Would you like to allow your visi
 Seamless Donations does all this and more - and all you need to do is embed a simple shortcode and supply your PayPal Website Payments Standard email address to start receiving donations today.
 
 > <strong>Adoption Notice</strong><br>
-> This plugin was recently adopted by David Gewirtz and ongoing support and updates will continue. Feel free to visit [David's Lab Notes](http://zatzlabs.com/just-adopted-seamless-donations-wordpress-plugin/) for a development roadmap and additional details.
+> This plugin was recently adopted by David Gewirtz and ongoing support and updates will continue. Feel free to visit [David's Lab Notes](http://zatzlabs.com/category/seamless-donations/) for a development roadmap and additional details.
 
 Now supporting donations by US and non-US donors (all donations are in USD - other currencies will be supported soon)
 
