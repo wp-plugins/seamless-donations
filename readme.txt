@@ -16,10 +16,33 @@ Need more than just a PayPal donation button?  Would you like to allow your visi
 
 Seamless Donations does all this and more - and all you need to do is embed a simple shortcode and supply your PayPal Website Payments Standard email address to start receiving donations today.
 
-> <strong>Adoption Notice</strong><br>
-> This plugin was recently adopted by David Gewirtz and ongoing support and updates will continue. Feel free to visit [David's Lab Notes](http://zatzlabs.com/category/seamless-donations/) for a development roadmap and additional details.
+= Seamless Donations 4.0 Beta 1 is here! =
 
-Now supporting donations by US and non-US donors (all donations are in USD - other currencies will be supported soon)
+Seamless Donations 4.0 is now ready for testing. The final changes to the PayPal payment gateway are done (there’s now only one form on the form page, not a mix of two forms competing with each other), and it seems to be working quite well. To that end, it’s time to test, test, test and your help is incredibly important. Because there are so many active nonprofits running Seamless Donations, we want to make sure the migration goes smoothly. There’s a video below that will take you through that whole process.
+
+You can download the beta and report your findings [on the plugin's project page page](http://zatzlabs.com/seamless-donations/).
+
+Here are some of the new features you’ll find in 4.0:
+
+* **Updated, modern admin UI:** The admin interface has been updated to a modern tabbed-look.
+* **Custom post types:** Funds and donors have now been implemented as custom post types. This gives you the ability to use all of WordPress’ post management and display tools with donors and funds. The donation data has always been a custom post type, but it is now also available to manipulate using
+plugins and themes outside of Seamless Donations.
+* **Designed for extensibility:** The primary design goal of 4.0 was to add hooks in the form of filters and actions that web designers can use to modify the behavior of Seamless Donations to fit individual needs. The plugin was re-architected to allow for loads of extensibility.
+* **Forms engine designed for extensibility:** Rather than just basic form code, Seamless Donations 4.0 now has a brand-new array-driven forms engine, which will give web site builders the ability to modify and access every part of the form before it is displayed to donors.
+* **Admin UI designed for extensibility:** Yep, like everything else, the admin interface has been designed to allow for extensibility.
+* **Translation-ready:** Seamless Donations 4.0 has had numerous tweaks to allow it to be translated into other languages.
+
+= Be sure to test for the following changes in the new version =
+* **Change the form shortcode:** The [dgx-donate] shortcode is deprecated and will issue an update warning once you update. The new shortcode is [seamless-donations].
+* **Check your CSS:** Most of the CSS should remain the same, but because the form interaction has been updated, your CSS may change.
+* **Check your data:** Great pains have been taken to be sure the data migrates correctly, but please, please, PLEASE double-check it.
+
+= Seamless Donations 4.0 overview video and testing guidelines =
+
+https://www.youtube.com/watch?v=cGeia-lCJME
+
+> <strong>Adoption Notice</strong><br>
+> This plugin was adopted in March 2015 by David Gewirtz and ongoing support and updates will continue. Feel free to visit [David's Lab Notes](http://zatzlabs.com/category/seamless-donations/) for a development roadmap and additional details.
 
 = Support Note =
 
