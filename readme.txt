@@ -22,7 +22,7 @@ Seamless Donations 4.0 is now ready for testing. The final changes to the PayPal
 
 You can download the beta and report your findings [on the plugin's project page page](http://zatzlabs.com/seamless-donations/).
 
-Here are some of the new features you’ll find in 4.0:
+= Here are some of the new features you’ll find in 4.0 =
 
 * **Updated, modern admin UI:** The admin interface has been updated to a modern tabbed-look.
 * **Custom post types:** Funds and donors have now been implemented as custom post types. This gives you the ability to use all of WordPress’ post management and display tools with donors and funds. The donation data has always been a custom post type, but it is now also available to manipulate using
