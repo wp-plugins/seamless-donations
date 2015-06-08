@@ -41,8 +41,7 @@ plugins and themes outside of Seamless Donations.
 
 https://www.youtube.com/watch?v=cGeia-lCJME
 
-> <strong>Adoption Notice</strong><br>
-> This plugin was adopted in March 2015 by David Gewirtz and ongoing support and updates will continue. Feel free to visit [David's Lab Notes](http://zatzlabs.com/category/seamless-donations/) for a development roadmap and additional details.
+
 
 = Support Note =
 
@@ -51,7 +50,9 @@ Many support questions can be answered by the [growing support FAQ on the plugin
 = Mailing List =
 If you'd like to keep up with the latest updates to this plugin, please visit [David's Lab Notes](http://zatzlabs.com/lab-notes/) and add yourself to the mailing list.
 
-Special thanks to Allen Snook for creating the plugin and making adoption possible.
+= Adoption Notice =
+
+This plugin was adopted in March 2015 by David Gewirtz. Ongoing support and updates have continued, as evidenced by the major 4.0 upgrade. Feel free to visit [David's Lab Notes](http://zatzlabs.com/category/seamless-donations/) for a development roadmap and additional details. Special thanks to Allen Snook for originally creating the plugin and making adoption possible.
 
 == Installation ==
 
