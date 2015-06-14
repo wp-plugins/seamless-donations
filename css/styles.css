@@ -1,3 +1,42 @@
+
+/* 4.0+ styles */
+
+input[type="text"].seamless-donations-invalid-input {
+    background-color: #ff8486;
+}
+
+.seamless-donations-error-message-field {
+    color: red;
+    background-color: yellow;
+}
+
+.seamless-donations-forms-error-message {
+    color: yellow;
+    background-color: red;
+}
+
+.dgx-donate-form-section span.horiz {
+    margin-left: 25px;
+}
+
+.dgx-donate-form-section #designate_fund {
+    margin-top: 1em;
+}
+.dgx-donate-form-section #repeating_checkbox {
+    margin-top: 1em;
+}
+
+div#designated_fund_selector select {
+    max-width: 100%;
+}
+
+.dgx-donate-form-section
+{
+    border: 1px solid darkred !important;
+}
+
+/* Legacy styles pre-4.0 */
+
 #dgx-donate-container
 {
 	border: none;
