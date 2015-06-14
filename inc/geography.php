@@ -1,4 +1,13 @@
 <?php
+/*
+Seamless Donations by David Gewirtz, adopted from Allen Snook
+
+Lab Notes: http://zatzlabs.com/lab-notes/
+Plugin Page: http://zatzlabs.com/seamless-donations/
+Contact: http://zatzlabs.com/contact-us/
+
+Copyright (c) 2015 by David Gewirtz
+*/
 
 /* Abbreviations for Countries
  * lists country codes defined by ISO 3166-1
@@ -219,7 +228,7 @@ function dgx_donate_get_countries() {
 		'SE' => 'Sweden',
 		'CH' => 'Switzerland',
 
-		'TW' => 'Taiwan, Province of China',
+		'TW' => 'Taiwan',
 		'TJ' => 'Tajikistan',
 		'TZ' => 'Tanzania, United Republic of',
 		'TH' => 'Thailand',
@@ -257,12 +266,15 @@ function dgx_donate_get_countries() {
 		'ZM' => 'Zambia'
 	);
 
+	$countries = apply_filters (
+		'seamless_donations_geography_country_list', $countries );
+
 	return $countries;
 }
 
 /*
  * From http://about.usps.com/publications/pub141/section-2-references.htm
- */ 
+ */
 function dgx_donate_get_countries_requiring_postal_code() {
 	$countries = array(
 		'AU', 'AT',
@@ -362,6 +374,9 @@ function dgx_donate_get_states() {
 		'AP' => 'Armed Forces Pacific'
 	);
 
+	$states = apply_filters (
+		'seamless_donations_geography_state_list', $states );
+
 	return $states;
 }
 
@@ -386,6 +401,9 @@ function dgx_donate_get_provinces() {
 		'YT' => 'Yukon'
 	);
 
+	$provinces = apply_filters (
+		'seamless_donations_geography_province_list', $provinces );
+
 	return $provinces;
 }
 
@@ -402,7 +420,7 @@ function dgx_donate_get_country_selector( $select_name, $select_initial_value)
 		}
 		$output .= "<option value='" . esc_attr( $country_code ) . "'" . esc_attr( $selected ) . ">" . esc_html( $country_name ) ."</option>";
 	}
-	
+
 	$output .= "</select>";
 
 	return $output;
@@ -411,7 +429,7 @@ function dgx_donate_get_country_selector( $select_name, $select_initial_value)
 function dgx_donate_get_state_selector( $select_name, $select_initial_value)
 {
 	$output = "<select class='dgx_donate_state_select' id='" . esc_attr( $select_name ) . "' name='" . esc_attr( $select_name ) . "'>";
-	
+
 	$states = dgx_donate_get_states();
 
 	foreach ( $states as $state_abbr => $state_name ) {
@@ -421,7 +439,7 @@ function dgx_donate_get_state_selector( $select_name, $select_initial_value)
 		}
 		$output .= "<option value='" . esc_attr( $state_abbr ) . "'" . esc_attr( $selected ) . ">" . esc_html( $state_name ) ."</option>";
 	}
-	
+
 	$output .= "</select>";
 
 	return $output;
@@ -430,7 +448,7 @@ function dgx_donate_get_state_selector( $select_name, $select_initial_value)
 function dgx_donate_get_province_selector( $select_name, $select_initial_value)
 {
 	$output = "<select class='dgx_donate_province_select' id='" . esc_attr( $select_name ) . "' name='" . esc_attr( $select_name ) . "'>";
-	
+
 	$provinces = dgx_donate_get_provinces();
 
 	foreach ( $provinces as $province_abbr => $province_name ) {
@@ -440,7 +458,7 @@ function dgx_donate_get_province_selector( $select_name, $select_initial_value)
 		}
 		$output .= "<option value='" . esc_attr( $province_abbr ) . "'" . esc_attr( $selected ) . ">" . esc_html( $province_name ) ."</option>";
 	}
-	
+
 	$output .= "</select>";
 
 	return $output;
