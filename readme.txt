@@ -22,7 +22,7 @@ Learn more on the [Seamless Donations home page](http://zatzlabs.com/project/sea
 
 = Seamless Donations 4.0 is here! =
 
-https://youtu.be/75IjGyHp52o
+https://www.youtube.com/watch?v=75IjGyHp52o
 
 = Here are some of the new features you’ll find in 4.0 =
 
@@ -96,7 +96,7 @@ This plugin was adopted in March 2015 by David Gewirtz. Ongoing support and upda
 
 For those updating from 3.3 to 4.0, this video will provide more details:
 
-https://youtu.be/SWm6GivlJi0
+https://www.youtube.com/watch?v=SWm6GivlJi0
 
 = Be sure to test for the following changes in the new version =
 * **Change the form shortcode:** The [dgx-donate] shortcode is deprecated and will issue an update warning once you update. The new shortcode is [seamless-donations].
