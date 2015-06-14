@@ -1,12 +1,21 @@
-// Copyright 2012 Designgeneers! Web Design (email: info@designgeneers.com)
-// 
+// Based on code copyright 2012 Designgeneers! Web Design (email: info@designgeneers.com)
+//
+/*
+ Seamless Donations by David Gewirtz, adopted from Allen Snook
+
+ Lab Notes: http://zatzlabs.com/lab-notes/
+ Plugin Page: http://zatzlabs.com/seamless-donations/
+ Contact: http://zatzlabs.com/contact-us/
+
+ Copyright (c) 2015 by David Gewirtz
+ */
 
 function DgxDonateSubscribeFormEvents()
 {
 	jQuery('#dgx-donate-designated').click(function() {
 		DgxDonateUpdateDesignatedDiv();
 	});
-	
+
 	jQuery('#dgx-donate-tribute').click(function() {
 		DgxDonateUpdateTributeDiv();
 	});
@@ -55,16 +64,16 @@ function DgxDonateAddOnClickOther()
 	});
 }
 
-jQuery(document).ready(function() {	
+jQuery(document).ready(function() {
 
 	// Hook up listener for checkboxes on expanders
 	DgxDonateSubscribeFormEvents();
-	
+
 	// Make sure form divs like tribute box match their checkbox state
 	DgxDonateUpdateDesignatedDiv();
 	DgxDonateUpdateTributeDiv();
 	DgxDonateUpdateEmployerDiv();
-	
+
 	// Hook up special handling for the OTHER donation amount box
 	DgxDonateAddOnClickOther();
 
