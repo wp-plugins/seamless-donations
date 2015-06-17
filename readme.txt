@@ -12,6 +12,8 @@ Receive and manage donations (including repeating donations), track donors and s
 
 == Description ==
 
+**IMPORTANT: Before upgrading from 3.3 or if you are experiencing problems upgrading from v3 to v4, [read this](http://zatzlabs.com/fixing-seamless-donations-4-0-updateactivation-problems/).**
+
 Need more than just a PayPal donation button? Would you like to allow your visitors to donate in honor of someone? Invite them to subscribe to your mailing list? Choose from designated funds? Do donations that automatically repeat each month? Allow them to mark their donation anonymous? Track donors and donations?
 
 Seamless Donations does all this and more. All you need to do is embed a simple shortcode and supply your PayPal Website Payments Standard email address to start receiving donations today.
@@ -94,7 +96,9 @@ This plugin was adopted in March 2015 by David Gewirtz. Ongoing support and upda
 5. Add the following shortcode to the page : [seamless-donations]
 6. That's it - you're now receiving donations!
 
-For those updating from 3.3 to 4.0, this video will provide more details:
+For those updating from 3.3 to 4.0, go to your Plugins page and deactivate Seamless Donations. Then delete the plugin. Refresh your plugins page (this is very important, make sure to refresh). Now you can Add New and bring Seamless Donations 4.0 onto your site. **If you are experiencing problems upgrading from v3 to v4, [read this](http://zatzlabs.com/fixing-seamless-donations-4-0-updateactivation-problems/).**
+
+This video will provide more details:
 
 https://www.youtube.com/watch?v=SWm6GivlJi0
 
@@ -148,6 +152,7 @@ If you'd like to keep up with the latest updates to this plugin, please visit [D
 
 = 4.0.0 =
 * Major update
+* **IMPORTANT:** Before upgrading from 3.3 or if you are experiencing problems upgrading from v3 to v4, [read this](http://zatzlabs.com/fixing-seamless-donations-4-0-updateactivation-problems/).
 * Added updated, modern UI
 * Funds and donors have now been implemented as custom post types.
 * Designed for extensibility with support for wide range of hooks
