@@ -160,7 +160,7 @@ If you'd like to keep up with the latest updates to this plugin, please visit [D
 * **IMPORTANT:** Before upgrading from 3.3 or if you are experiencing problems upgrading from v3 to v4, [read this](http://zatzlabs.com/fixing-seamless-donations-4-0-updateactivation-problems/).
 * Added German translation
 * Fixed problem with Windows servers and long path names
-* Fixed multiple currency-related bugs
+* Fixed multiple currency-related bugs: be sure to re-save your settings for this fix to take effect
 * Fixed the giving level filter
 * Fixed "undefined index" error
 * Fixed bug where default fields didn't default properly
