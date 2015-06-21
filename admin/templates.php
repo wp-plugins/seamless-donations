@@ -85,7 +85,7 @@ function validate_page_slug_seamless_donations_admin_templates_callback (
 			for( $i = 0; $i < count ( $_submitted_array[ $section ] ); ++ $i ) {
 				$key   = seamless_donations_name_of ( $_submitted_array[ $section ], $i );
 				$value = trim ( $_submitted_array[ $section ][ $key ] );
-				$value = sanitize_text_field ( $value );
+				$value = wp_kses_post ( $value );
 				if( $key == 'submit' ) {
 					continue; // not a text field
 				}
@@ -109,7 +109,7 @@ function validate_page_slug_seamless_donations_admin_templates_callback (
 				if( $key == 'dgx_donate_email_reply' ) {
 					$value = sanitize_email ( $value );
 				} else {
-					$value = sanitize_text_field ( $value );
+					$value = wp_kses_post ( $value );
 				}
 
 				if( $key == 'submit' ) {

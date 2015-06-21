@@ -108,7 +108,7 @@ function seamless_donations_get_donation_section () {
 
 	// assemble the radio buttons for the giving levels
 	$index         = 0;
-	$giving_levels = seamless_donations_get_giving_levels ();
+	$giving_levels = dgx_donate_get_giving_levels ();
 	foreach( $giving_levels as $giving_level ) {
 
 		$giving_level_key    = "dgx_donate_giving_level_" . $giving_level;

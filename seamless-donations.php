@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://zatzlabs.com/seamless-donations/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts. Adopted from Allen Snook.
-Version: 4.0
+Version: 4.0.1
 Author: David Gewirtz
 Author URI: http://zatzlabs.com/lab-notes/
 Text Domain: seamless-donations
@@ -136,23 +136,6 @@ function seamless_donations_queue_admin_stylesheet () {
 add_action ( 'admin_enqueue_scripts', 'seamless_donations_queue_admin_stylesheet' );
 
 //// donation-specific code
-
-function seamless_donations_get_giving_levels () {
-
-	// very similar to code in legacy dgx-donate.php
-
-	$builtinGivingLevels = array( 1000, 500, 200, 100, 50, 20, 10, 5 );
-
-	// The more modern version of dgx_donate_giving_levels, functionally identical for now
-	$givingLevels = apply_filters ( 'seamless_donations_giving_levels', $builtinGivingLevels );
-
-	// check if filter results are unusable
-	if( count ( $givingLevels ) == 0 ) {
-		$givingLevels = array( 1000 ); // default = just $1000
-	}
-
-	return $givingLevels;
-}
 
 function seamless_donations_get_escaped_formatted_amount ( $amount, $decimal_places = 2, $currency_code = '' ) {
 
@@ -424,7 +407,19 @@ function seamless_donations_init_defaults () {
 	// Show Employer match section default
 	$show_employer_section = get_option ( 'dgx_donate_show_employer_section' );
 	if( empty( $show_employer_section ) ) {
-		update_option ( 'dgx_donate_show_employer_section', 'true' );
+		update_option ( 'dgx_donate_show_employer_section', 'false' );
+	}
+
+	// Show occupation field default
+	$show_occupation_section = get_option ( 'dgx_donate_show_donor_occupation_field' );
+	if( empty( $show_occupation_section ) ) {
+		update_option ( 'dgx_donate_show_donor_occupation_field', 'false' );
+	}
+
+	// Show donor employer default
+	$show_occupation_section = get_option ( 'dgx_donate_show_donor_employer_field' );
+	if( empty( $show_occupation_section ) ) {
+		update_option ( 'dgx_donate_show_donor_employer_field', 'false' );
 	}
 
 	// Show Tribute Gift section default

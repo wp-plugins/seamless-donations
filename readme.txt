@@ -4,7 +4,7 @@ Donate link: http://zatzlabs.com/project-donations/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts, church, worship, churches, crowdfunding, donation plugin, fundraiser, fundraising, giving, nonprofit, paypal, PayPal Donate, paypal donations, recurring, recurring donations, wordpress donation plugin, wordpress donations, wp donation
 Requires at least: 3.4
 Tested up to: 4.2.2
-Stable tag: 4.0.0
+Stable tag: 4.0.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -83,6 +83,12 @@ Support for the following currencies is built into Seamless Donations 4.0:
 * Turkish Lira
 * U.S. Dollar
 
+= Translations =
+
+* German translation complete in 4.0.1
+* French, Spanish, Portuguese
+* HUGE thank you to users doing these translations!
+
 = Adoption Notice =
 
 This plugin was adopted in March 2015 by David Gewirtz. Ongoing support and updates have continued, as evidenced by the major 4.0 upgrade. Feel free to visit [David's Lab Notes](http://zatzlabs.com/category/seamless-donations/) for a development roadmap and additional details. Special thanks to Allen Snook for originally creating the plugin and making adoption possible.
@@ -150,9 +156,19 @@ If you'd like to keep up with the latest updates to this plugin, please visit [D
 
 == Changelog ==
 
+= 4.0.1 =
+* **IMPORTANT:** Before upgrading from 3.3 or if you are experiencing problems upgrading from v3 to v4, [read this](http://zatzlabs.com/fixing-seamless-donations-4-0-updateactivation-problems/).
+* Added German translation
+* Fixed problem with Windows servers and long path names
+* Fixed multiple currency-related bugs
+* Fixed the giving level filter
+* Fixed "undefined index" error
+* Fixed bug where default fields didn't default properly
+* Fixed overly oppressive field sanitization
+* Full blog post on update fixes [here](http://zatzlabs.com/seamless-donations-4-0-1-includes-german-translation-and-bug-fixes/)
+
 = 4.0.0 =
 * Major update
-* **IMPORTANT:** Before upgrading from 3.3 or if you are experiencing problems upgrading from v3 to v4, [read this](http://zatzlabs.com/fixing-seamless-donations-4-0-updateactivation-problems/).
 * Added updated, modern UI
 * Funds and donors have now been implemented as custom post types.
 * Designed for extensibility with support for wide range of hooks

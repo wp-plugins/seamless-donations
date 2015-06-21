@@ -34,7 +34,14 @@ class SeamlessDonationsFundsPostType extends SeamlessDonationsAdminPageFramework
 		                           'supports'  => array( 'title' ),
 		                           'public'    => true,
 		                           'menu_icon' => 'dashicons-palmtree',
+
 		);
+
+		// check to see if compact menus has been enabled, which tucks menu item under donations
+		// add the following elements to the array
+		// not adding yet because not yet able to do this AND add tab in main form, so this is temp code for now
+		// 'show_ui'               => true,
+		// 'show_in_menu'          => 'SeamlessDonationsAdmin',
 
 		$funds_setup      = apply_filters ( 'seamless_donations_funds_setup', $funds_setup );
 		$funds_type_setup = apply_filters ( 'seamless_donations_funds_type_setup', $funds_type_setup );

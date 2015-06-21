@@ -12,7 +12,7 @@
 
 
 if( ! class_exists ( 'SeamlessDonationsAdminPageFramework' ) ) {
-	include_once ( 'library/seamless-donations-admin-page-framework/admin-page-framework.php' );
+	include_once ( 'library/apf/admin-page-framework.php' );
 }
 
 // Extend the class

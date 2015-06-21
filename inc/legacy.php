@@ -14,19 +14,21 @@ Copyright (c) 2015 by David Gewirtz
 // tell users that there is a new version and that they need to update
 function seamless_donations_sd40_update_alert_message () {
 
-	if( $_REQUEST['page'] != 'dgx_donate_menu_page' ) {
-		$url = get_admin_url () . "admin.php?page=dgx_donate_menu_page";
-		echo "<div class=\"error\">";
-		echo "<p>";
-		echo esc_html__ (
-			'Alert - Seamless Donations has had a major update. ', 'seamless-donations' );
-		echo '<A HREF="' . $url . '">Click here</A> ';
-		echo esc_html__ (
-			'to learn about enabling your new features ', 'seamless-donations' );
-		echo esc_html__ (
-			'(they will remain off until you manually enable them).', 'seamless-donations' );
-		echo "</p>";
-		echo "</div>";
+	if(isset ($_REQUEST['page'])) {
+		if( $_REQUEST['page'] != 'dgx_donate_menu_page' ) {
+			$url = get_admin_url () . "admin.php?page=dgx_donate_menu_page";
+			echo "<div class=\"error\">";
+			echo "<p>";
+			echo esc_html__ (
+				'Alert - Seamless Donations has had a major update. ', 'seamless-donations' );
+			echo '<A HREF="' . $url . '">Click here</A> ';
+			echo esc_html__ (
+				'to learn about enabling your new features ', 'seamless-donations' );
+			echo esc_html__ (
+				'(they will remain off until you manually enable them).', 'seamless-donations' );
+			echo "</p>";
+			echo "</div>";
+		}
 	}
 }
 

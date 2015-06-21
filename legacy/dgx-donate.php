@@ -108,9 +108,13 @@ function dgx_donate_get_version () {
 
 	$pluginFolder   = get_plugins ();
 	$pluginBasename = plugin_basename ( __FILE__ );
-	$pluginVersion  = $pluginFolder[ $pluginBasename ]['Version'];
+	if( isset( $pluginFolder[ $pluginBasename ]['Version'] ) ) {
+		$pluginVersion = $pluginFolder[ $pluginBasename ]['Version'];
 
-	return $pluginVersion;
+		return $pluginVersion;
+	} else {
+		return "";
+	}
 }
 
 /******************************************************************************************************/
@@ -194,14 +198,14 @@ function dgx_donate_get_meta_map () {
 /******************************************************************************************************/
 function dgx_donate_create_empty_donation_record () {
 
-	dgx_donate_debug_log("Creating donation record...");
+	dgx_donate_debug_log ( "Creating donation record..." );
 	$sd4_mode = get_option ( 'dgx_donate_start_in_sd4_mode' );
 	if( $sd4_mode == false ) {
 		$post_type = 'dgx-donation';
 	} else {
 		$post_type = 'donation';
 	}
-	dgx_donate_debug_log("...of type $post_type");
+	dgx_donate_debug_log ( "...of type $post_type" );
 
 	// Get all the dates - timezone fix thanks to pkwooster
 	$gmt_offset    = - get_option ( 'gmt_offset' );
@@ -400,7 +404,7 @@ function dgx_donate_get_month_year_selector ( $monthSelectName, $yearSelectName 
 /******************************************************************************************************/
 function dgx_donate_get_donation_section ( $formContent ) {
 
-	$output   = "";
+	$output = "";
 	$output .= "<div class='dgx-donate-form-section' id='dgx-donate-form-donation-section'>\n";
 	$output .= "<h2>" . esc_html__ ( 'Donation Information', 'seamless-donations' ) . "</h2>\n";
 
@@ -754,7 +758,7 @@ function dgx_donate_shortcode ( $atts ) {
 	if( $show_thanks ) {
 		$output = dgx_donate_display_thank_you ();
 	} else {
-		$output = "";
+		$output   = "";
 		$sd4_mode = get_option ( 'dgx_donate_start_in_sd4_mode' );
 		if( $sd4_mode != false ) {
 			$output .= "<div style='background-color:red; color:white'>";
@@ -972,8 +976,7 @@ function dgx_donate_send_donation_notification ( $donationID ) {
 		$secureDonateLink = seamless_donations_get_donation_detail_link ( $donationID );
 	}
 
-
-	$donateLink       = str_replace ( "https:", "http:", $secureDonateLink );
+	$donateLink = str_replace ( "https:", "http:", $secureDonateLink );
 	$body .= $donateLink;
 	$body .= "\n";
 

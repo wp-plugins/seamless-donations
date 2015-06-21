@@ -78,7 +78,7 @@ function validate_page_slug_seamless_donations_admin_forms_callback (
 			break;
 		case 'seamless_donations_admin_forms_section_defaults': // SAVE DEFAULTS //
 			update_option (
-				'dgx_donate_default_currency', $_submitted_array[ $section ]['dgx_donate_default_currency'] );
+				'dgx_donate_currency', $_submitted_array[ $section ]['dgx_donate_currency'] );
 			update_option ( 'dgx_donate_default_country', $_submitted_array[ $section ]['dgx_donate_default_country'] );
 			$_setup_object->setSettingNotice ( 'Form updated successfully.', 'updated' );
 			break;
@@ -189,7 +189,7 @@ function seamless_donations_admin_forms_section_defaults ( $_setup_object ) {
 
 	$defaults_options = array(
 		array(
-			'field_id' => 'dgx_donate_default_currency',
+			'field_id' => 'dgx_donate_currency',
 			'title'    => __ ( 'Default Currency', 'seamless-donations' ),
 			'type'     => 'select',
 			'default'  => 'USD', // the index key of the label array below
@@ -246,14 +246,14 @@ function seamless_donations_admin_forms_section_fields ( $_setup_object ) {
 			'field_id' => 'dgx_donate_show_designated_funds_section',
 			'title'    => __ ( 'Designated Funds Checkbox and Section', 'seamless-donations' ),
 			'type'     => 'select',
-			'default'  => 'true', // the index key of the label array below
+			'default'  => 'false', // the index key of the label array below
 			'label'    => $form_display_options
 		),
 		array(
 			'field_id' => 'dgx_donate_show_repeating_option',
 			'title'    => __ ( 'Repeating Donation Checkbox', 'seamless-donations' ),
 			'type'     => 'select',
-			'default'  => 'true', // the index key of the label array below
+			'default'  => 'false', // the index key of the label array below
 			'label'    => $form_display_options
 		),
 		array(
@@ -267,7 +267,7 @@ function seamless_donations_admin_forms_section_fields ( $_setup_object ) {
 			'field_id' => 'dgx_donate_show_employer_section',
 			'title'    => __ ( 'Employer Match Section', 'seamless-donations' ),
 			'type'     => 'select',
-			'default'  => 'true', // the index key of the label array below
+			'default'  => 'false', // the index key of the label array below
 			'label'    => $form_display_options
 		),
 		array(
@@ -281,35 +281,35 @@ function seamless_donations_admin_forms_section_fields ( $_setup_object ) {
 			'field_id' => 'dgx_donate_show_donor_employer_field',
 			'title'    => __ ( 'Donor Employer Field', 'seamless-donations' ),
 			'type'     => 'select',
-			'default'  => 'true', // the index key of the label array below
+			'default'  => 'false', // the index key of the label array below
 			'label'    => $form_display_options_with_require
 		),
 		array(
 			'field_id' => 'dgx_donate_show_donor_occupation_field',
 			'title'    => __ ( 'Donor Occupation Field', 'seamless-donations' ),
 			'type'     => 'select',
-			'default'  => 'true', // the index key of the label array below
+			'default'  => 'false', // the index key of the label array below
 			'label'    => $form_display_options_with_require
 		),
 		array(
 			'field_id' => 'dgx_donate_show_mailing_list_option',
 			'title'    => __ ( 'Mailing List Checkbox', 'seamless-donations' ),
 			'type'     => 'select',
-			'default'  => 'true', // the index key of the label array below
+			'default'  => 'false', // the index key of the label array below
 			'label'    => $form_display_options
 		),
 		array(
 			'field_id' => 'dgx_donate_show_anonymous_option',
 			'title'    => __ ( 'Anonymous Donation Checkbox', 'seamless-donations' ),
 			'type'     => 'select',
-			'default'  => 'true', // the index key of the label array below
+			'default'  => 'false', // the index key of the label array below
 			'label'    => $form_display_options
 		),
 		array(
 			'field_id' => 'dgx_donate_show_donor_address_fields',
 			'title'    => __ ( 'Donor Address Section', 'seamless-donations' ),
 			'type'     => 'select',
-			'default'  => 'true', // the index key of the label array below
+			'default'  => 'false', // the index key of the label array below
 			'label'    => $form_display_options
 		),
 		array(
