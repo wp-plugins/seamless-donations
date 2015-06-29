@@ -18,6 +18,7 @@ function seamless_donations_admin_forms ( $setup_object ) {
 	seamless_donations_admin_forms_section_levels ( $setup_object );
 	seamless_donations_admin_forms_section_defaults ( $setup_object );
 	seamless_donations_admin_forms_section_fields ( $setup_object );
+	seamless_donations_admin_forms_section_tweaks ( $setup_object );
 
 	do_action ( 'seamless_donations_admin_forms_after', $setup_object );
 
@@ -114,6 +115,11 @@ function validate_page_slug_seamless_donations_admin_forms_callback (
 				'dgx_donate_show_donor_address_fields',
 				$_submitted_array[ $section ]['dgx_donate_show_donor_address_fields'] );
 
+			$_setup_object->setSettingNotice ( 'Form updated successfully.', 'updated' );
+			break;
+		case 'seamless_donations_admin_forms_section_tweaks': // SAVE TWEAKS //
+			update_option (
+				'dgx_donate_labels_for_input', $_submitted_array[ $section ]['dgx_donate_labels_for_input'] );
 			$_setup_object->setSettingNotice ( 'Form updated successfully.', 'updated' );
 			break;
 		default:
@@ -324,4 +330,41 @@ function seamless_donations_admin_forms_section_fields ( $_setup_object ) {
 
 	seamless_donations_process_add_settings_fields_with_options (
 		$giving_levels_options, $_setup_object, $giving_levels_section );
+}
+
+//// FORMS - SECTION - TWEAKS ////
+function seamless_donations_admin_forms_section_tweaks ( $_setup_object ) {
+
+	$section_desc = 'Options that can tweak your form. Starting with one, undoubtedly more to come.';
+
+	$tweaks_section = array(
+		'section_id'  => 'seamless_donations_admin_forms_section_tweaks',    // the section ID
+		'page_slug'   => 'seamless_donations_admin_forms',    // the page slug that the section belongs to
+		'title'       => __ ( 'Form Tweaks', 'seamless-donations' ),   // the section title
+		'description' => __ ( $section_desc, 'seamless-donations' ),
+	);
+
+	$tweaks_section = apply_filters ( 'seamless_donations_admin_forms_section_tweaks', $tweaks_section );
+
+	$tweaks_options = array(
+		array(
+		       'field_id'    => 'dgx_donate_labels_for_input',
+		       'title'       => __ ( 'Label Tag', 'seamless-donations' ),
+		       'type'        => 'checkbox',
+		       'label'       => __ ( 'Add label tag to input form (may improve form layout for some themes)', 'seamless-donations'),
+		       'default'     => false,
+		       'after_label' => '<br />',
+		),
+		array(
+			'field_id' => 'submit',
+			'type'     => 'submit',
+			'label'    => __ ( 'Save Tweaks', 'seamless-donations' ),
+		)
+	);
+
+	$tweaks_options = apply_filters (
+		'seamless_donations_admin_forms_section_tweaks_options', $tweaks_options );
+
+	seamless_donations_process_add_settings_fields_with_options (
+		$tweaks_options, $_setup_object, $tweaks_section );
 }

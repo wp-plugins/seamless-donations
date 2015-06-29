@@ -4,8 +4,6 @@
 
 include( '../../../../wp-config.php' );
 
-$sd4_mode = get_option ( 'dgx_donate_start_in_sd4_mode' );
-
 if ( ! current_user_can( 'manage_options' ) ) {
 
 	header( "Content-Type: text/html" );
@@ -29,12 +27,7 @@ else
 	$countries = dgx_donate_get_countries();
 
 	$firstOne = true;
-
-	if( $sd4_mode == false ) {
-		$post_type = 'dgx-donation';
-	} else {
-		$post_type = 'donation';
-	}
+	$post_type = 'dgx-donation';
 
 	$args = array(
 		'numberposts'     => '-1',

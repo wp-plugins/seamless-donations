@@ -749,7 +749,7 @@ function seamless_donations_get_paypal_section () {
 	);
 
 	$paypal_hidden_section = apply_filters (
-		'seamless_donations_form_submit_section', $paypal_hidden_section );
+		'seamless_donations_form_paypal_section', $paypal_hidden_section );
 
 	return $paypal_hidden_section;
 }

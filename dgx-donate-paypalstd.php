@@ -126,6 +126,7 @@ function dgx_donate_show_paypalstd_donation_form ( $content ) {
 	$paymentGateway = get_option ( 'dgx_donate_payment_gateway' );
 	if( $paymentGateway == DGXDONATEPAYPALSTD ) {
 		// Open the form
+		$content .= "<!-- SD " . dgx_donate_get_version() . " legacy mode -->";
 		$content .= "<form id=\"dgx-donate-form\" method=\"post\" onsubmit=\"return DgxDonateDoCheckout();\" >";
 
 		// Save the session ID as a hidden input
@@ -196,10 +197,6 @@ function dgx_donate_paypalstd_get_hidden_form () {
 
 	$successUrl .= "thanks=1&sessionid=";
 	$successUrl .= "$sessionID";
-
-	seamless_donations_debug_log ( "Inside dgx_donate_paypalstd_get_hidden_form formAction: $formAction" );
-	seamless_donations_debug_log ( "Inside dgx_donate_paypalstd_get_hidden_form notifyUrl: $notifyUrl" );
-	seamless_donations_debug_log ( "Inside dgx_donate_paypalstd_get_hidden_form sessionID: $sessionID" );
 
 	$currency_code = get_option ( 'dgx_donate_currency' );
 

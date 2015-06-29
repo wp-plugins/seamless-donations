@@ -11,7 +11,8 @@ Copyright (c) 2015 by David Gewirtz
 
 function seamless_donations_forms_engine ( $form_array ) {
 
-	$form_html      = '';
+	// embed version number in generated form code (4.0.2 and beyond)
+	$form_html      = "<!-- SD " . dgx_donate_get_version () . " form engine mode -->";
 	$form_body_html = '';
 	$form_before    = '';
 	$form_after     = '';
@@ -22,7 +23,7 @@ function seamless_donations_forms_engine ( $form_array ) {
 	if( ! isset( $form_array['onsubmit'] ) ) {
 		$form_array['onsubmit'] = ''; // fixme probably not used
 	}
-	if (isset($form_array['before'])) {
+	if( isset( $form_array['before'] ) ) {
 		$form_before = $form_array['before'];
 	}
 	$form_size = count ( $form_array );
@@ -176,6 +177,12 @@ function seamless_donations_forms_engine_element_list ( $form_array, $form_html 
 	$supported_form_types = array( 'text', 'checkbox', 'radio', 'hidden', 'submit', 'image', 'select', 'static' );
 	$input_tag_types      = array( 'text', 'checkbox', 'radio', 'hidden', 'submit', 'image' );
 
+	if( get_option ( 'dgx_donate_labels_for_input' ) == true ) {
+		$generate_input_labels = true;
+	} else {
+		$generate_input_labels = false;
+	}
+
 	for( $element_index = 0; $element_index < $form_size; ++ $element_index ) {
 
 		$element_html       = '';
@@ -266,7 +273,7 @@ function seamless_donations_forms_engine_element_list ( $form_array, $form_html 
 					$element_uncheck = $form_array[ $element_name ]['uncheck'];
 					break;
 				case 'source':
-					$element_source = trim($form_array[$element_name]['source']);
+					$element_source = trim ( $form_array[ $element_name ]['source'] );
 					break;
 				case 'wrapper':
 					$element_wrapper = strtolower ( ( $form_array[ $element_name ]['wrapper'] ) );
@@ -327,7 +334,15 @@ function seamless_donations_forms_engine_element_list ( $form_array, $form_html 
 			if( in_array ( $element_type, $input_tag_types ) ) {
 				// process input tag
 
-				$element_html .= $element_before;                                           // BEFORE
+				if( ($generate_input_labels == true) and ($element_type == 'text') ) {
+						// set up the label tag
+						$element_html .= "<label for='". sanitize_text_field ( $element_name ) . "'>";
+						$element_html .= esc_html__ ( $element_before, 'seamless-donations' );
+						$element_html .= " </label>";
+
+				} else {
+					$element_html .= $element_before;  // BEFORE
+				}
 				$element_html .= "<input type='" . $element_type . "' ";                    // INPUT
 				// process the name and radio group
 				if( isset( $form_array[ $element_name ]['group'] ) ) {
@@ -345,7 +360,7 @@ function seamless_donations_forms_engine_element_list ( $form_array, $form_html 
 				if( $element_type == 'text' and $element_size != '' ) {                     // TEXT
 					$element_html .= "size='" . $element_size . "' ";                       // SIZE
 				}
-				if($element_type == 'image' and $element_source != '') {                    // IMAGE
+				if( $element_type == 'image' and $element_source != '' ) {                    // IMAGE
 					$element_html .= "src='" . $element_source . "' ";
 				}
 				if( $element_id != '' ) {
@@ -393,7 +408,17 @@ function seamless_donations_forms_engine_element_list ( $form_array, $form_html 
 				if( count ( $element_options ) > 0 ) {
 
 					// only build the select tag if there are options provided
-					$element_html .= $element_before;
+
+					if( $generate_input_labels == true ) {
+						// set up the label tag
+						$element_html .= "<label for='". sanitize_text_field ( $element_name ) . "'>";
+						$element_html .= esc_html__ ( $element_before, 'seamless-donations' );
+						$element_html .= " </label>";
+
+					} else {
+						$element_html .= $element_before;  // BEFORE
+					}
+
 					$element_html .= "<select ";
 					$element_html .= "name='" . sanitize_text_field ( $element_name ) . "' ";
 					if( $element_size != '' ) {

@@ -103,19 +103,7 @@ function dgx_donate_queue_scripts () {
 
 add_action ( 'wp_enqueue_scripts', 'dgx_donate_queue_scripts' ); // will eventually be deprecated
 
-/******************************************************************************************************/
-function dgx_donate_get_version () {
 
-	$pluginFolder   = get_plugins ();
-	$pluginBasename = plugin_basename ( __FILE__ );
-	if( isset( $pluginFolder[ $pluginBasename ]['Version'] ) ) {
-		$pluginVersion = $pluginFolder[ $pluginBasename ]['Version'];
-
-		return $pluginVersion;
-	} else {
-		return "";
-	}
-}
 
 /******************************************************************************************************/
 function dgx_donate_display_thank_you () {
