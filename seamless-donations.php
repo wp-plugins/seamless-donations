@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://zatzlabs.com/seamless-donations/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts. Adopted from Allen Snook.
-Version: 4.0.2
+Version: 4.0.3
 Author: David Gewirtz
 Author URI: http://zatzlabs.com/lab-notes/
 Text Domain: seamless-donations
@@ -27,6 +27,10 @@ License: GPL2
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+
+function seamless_donations_set_version() {
+	update_option ( 'dgx_donate_active_version', '4.0.3' );
+}
 
 require_once 'inc/geography.php';
 require_once 'inc/currency.php';
@@ -205,6 +209,8 @@ function seamless_donations_init () {
 	if( ! $session_already_started ) {
 		session_start ();
 	}
+
+	seamless_donations_set_version(); // make sure we've got the version set as an option
 
 	// Check to see if we're supposed to run an upgrade
 	seamless_donations_sd40_process_upgrade_check ();
@@ -438,13 +444,7 @@ function seamless_donations_init_defaults () {
 /******************************************************************************************************/
 function dgx_donate_get_version () {
 
-	$pluginFolder   = get_plugins ();
-	$pluginBasename = plugin_basename ( __FILE__ ); // only works if in seamless-donations.php
-	if( isset( $pluginFolder[ $pluginBasename ]['Version'] ) ) {
-		$pluginVersion = $pluginFolder[ $pluginBasename ]['Version'];
+	$pluginVersion = get_option('dgx_donate_active_version');
+	return $pluginVersion;
 
-		return $pluginVersion;
-	} else {
-		return "";
-	}
 }
