@@ -4,7 +4,7 @@ Donate link: http://zatzlabs.com/project-donations/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts, church, worship, churches, crowdfunding, donation plugin, fundraiser, fundraising, giving, nonprofit, paypal, PayPal Donate, paypal donations, recurring, recurring donations, wordpress donation plugin, wordpress donations, wp donation
 Requires at least: 3.4
 Tested up to: 4.2.2
-Stable tag: 4.0.2
+Stable tag: 4.0.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -158,8 +158,11 @@ If you'd like to keep up with the latest updates to this plugin, please visit [D
 
 == Changelog ==
 
-= 4.0.2 =
+= 4.0.3 =
 * **IMPORTANT:** Before upgrading from 3.3 or if you are experiencing problems upgrading from v3 to v4, [read this](http://zatzlabs.com/fixing-seamless-donations-4-0-updateactivation-problems/).
+* Fixed fatal bug introduced in 4.0.2
+
+= 4.0.2 =
 * Added Spanish translation (thanks to David Chávez) and French translation (thanks to Etienne Lombard).
 * Added new Form Tweaks section to Form Options, with an option to enable Label Tags. This may improve form layout for some themes, particularly those where vertical form field alignment needs improvement.
 * Added an indicator comment in the form code to allow inspection to determine the version of the plugin that's currently running.
