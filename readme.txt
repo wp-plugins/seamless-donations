@@ -88,8 +88,8 @@ Support for the following currencies is built into Seamless Donations 4.0:
 * German translation (as of 4.0.1)
 * Spanish translation, courtesy David Chávez (as of 4.0.2)
 * French translation, courtesy Etienne Lombard (as of 4.0.2)
-* [Assist with translations](https://wordpress.org/support/topic/translators-check-in-here-so-youre-not-duplicating-work)
 * HUGE thank you to users doing these translations!
+* [Assist with translations](https://wordpress.org/support/topic/translators-check-in-here-so-youre-not-duplicating-work)
 
 = Adoption Notice =
 
@@ -158,7 +158,7 @@ If you'd like to keep up with the latest updates to this plugin, please visit [D
 
 == Changelog ==
 
-= 4.0.2
+= 4.0.2 =
 * **IMPORTANT:** Before upgrading from 3.3 or if you are experiencing problems upgrading from v3 to v4, [read this](http://zatzlabs.com/fixing-seamless-donations-4-0-updateactivation-problems/).
 * Added Spanish translation (thanks to David Chávez) and French translation (thanks to Etienne Lombard).
 * Added new Form Tweaks section to Form Options, with an option to enable Label Tags. This may improve form layout for some themes, particularly those where vertical form field alignment needs improvement.
