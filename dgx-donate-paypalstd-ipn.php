@@ -13,7 +13,17 @@
 include "../../../wp-config.php";
 
 // Load Seamless Donations Core
-include_once "./dgx-donate.php";
+require_once './inc/geography.php';
+require_once './inc/currency.php';
+require_once './inc/utilities.php';
+require_once './inc/legacy.php';
+require_once './inc/donations.php';
+
+require_once './legacy/dgx-donate.php';
+require_once './legacy/dgx-donate-admin.php';
+require_once './seamless-donations-admin.php';
+require_once './seamless-donations-form.php';
+require_once './dgx-donate-paypalstd.php';
 
 class Dgx_Donate_IPN_Handler {
 
@@ -26,7 +36,8 @@ class Dgx_Donate_IPN_Handler {
 	public function __construct () {
 
 		dgx_donate_debug_log ( '----------------------------------------' );
-		dgx_donate_debug_log ( 'IPN processing start' );
+		dgx_donate_debug_log ( 'PROCESSING PAYPAL IPN TRANSACTION' );
+		dgx_donate_debug_log ( "Seamless Donations Version: " . dgx_donate_get_version () );
 
 		// Grab all the post data
 		$post = file_get_contents ( 'php://input' );
@@ -53,7 +64,8 @@ class Dgx_Donate_IPN_Handler {
 			dgx_donate_debug_log ( 'Null IPN (Empty session id).  Nothing to do.' );
 		}
 
-		dgx_donate_debug_log ( 'IPN processing complete' );
+		do_action( 'seamless_donations_paypal_ipn_processing_complete', $this->session_id, $this->transaction_id );
+		dgx_donate_debug_log ( 'IPN processing complete.' );
 	}
 
 	function configure_for_production_or_test () {
@@ -97,8 +109,8 @@ class Dgx_Donate_IPN_Handler {
 				}
 			} while( ! $done );
 		} else {
-			dgx_donate_debug_log (
-				"IPN failed ( unable to open chatbackurl, url = {$this->chat_back_url}, errno = $errno, errstr = $errstr )" );
+			dgx_donate_debug_log ( "IPN failed: unable to establish network chatback connection to PayPal" );
+			dgx_donate_debug_log ( "==> url = {$this->chat_back_url}, errno = $errno, errstr = $errstr" );
 		}
 		fclose ( $fp );
 
@@ -107,17 +119,11 @@ class Dgx_Donate_IPN_Handler {
 
 	function handle_verified_ipn () {
 
-		$payment_status = $this->post_data["payment_status"];
 		$sd4_mode       = get_option ( 'dgx_donate_start_in_sd4_mode' );
+		$payment_status = $this->post_data["payment_status"];
 
 		dgx_donate_debug_log ( "IPN VERIFIED for session ID {$this->session_id}" );
-		dgx_donate_debug_log ( "Payment status = {$payment_status}" );
-
-		if( $sd4_mode == false ) {
-			dgx_donate_debug_log ( "Processing in pre-4.x mode." );
-		} else {
-			dgx_donate_debug_log ( "Processing in 4.x mode." );
-		}
+		dgx_donate_debug_log ( "PayPal reports payment status: {$payment_status}" );
 
 		if( "Completed" == $payment_status ) {
 			// Check if we've already logged a transaction with this same transaction id
@@ -132,26 +138,33 @@ class Dgx_Donate_IPN_Handler {
 				if( 0 == count ( $donation_id ) ) {
 					// We haven't seen this session ID already
 
-					// Retrieve the data from transient
-					$donation_form_data = get_transient ( $this->session_id );
+					// Retrieve the data
+					if( $sd4_mode == false ) {
+						// retrieve from transient
+						$donation_form_data = get_transient ( $this->session_id );
+					} else {
+						// retrieve from audit db table
+						$donation_form_data = seamless_donations_get_audit_option ( $this->session_id);
+					}
 
 					if( ! empty( $donation_form_data ) ) {
 						// Create a donation record
 						if( $sd4_mode == false ) {
 							dgx_donate_debug_log (
-								"Processing create_donation_from_transient_data in pre-4.x mode." );
+								"Creating donation from transient data in pre-4.x mode." );
 							$donation_id = dgx_donate_create_donation_from_transient_data ( $donation_form_data );
 						} else {
-							dgx_donate_debug_log ( "Processing create_donation_from_transient_data in 4.x mode." );
+							dgx_donate_debug_log ( "Creating donation from transaction audit data in 4.x mode." );
 							$donation_id = seamless_donations_create_donation_from_transient_data (
 								$donation_form_data );
 						}
 						dgx_donate_debug_log (
-							"Created donation {$donation_id} " .
-							"from form data in transient for sessionID {$this->session_id}" );
+							"Created donation {$donation_id} for session ID {$this->session_id}");
 
-						// Clear the transient
-						delete_transient ( $this->session_id );
+						if( $sd4_mode == false ) {
+							// Clear the transient
+							delete_transient ( $this->session_id );
+						}
 					} else {
 						// We have a session_id but no transient (the admin might have
 						// deleted all previous donations in a recurring donation for
@@ -159,11 +172,15 @@ class Dgx_Donate_IPN_Handler {
 						// from the data supplied by PayPal
 						if( $sd4_mode == false ) {
 							$donation_id = dgx_donate_create_donation_from_paypal_data ( $this->post_data );
+							dgx_donate_debug_log (
+								"Created donation {$donation_id} " .
+								"from PayPal data (no transient data found) in pre-4.x mode." );
 						} else {
 							$donation_id = seamless_donations_create_donation_from_paypal_data ( $this->post_data );
+							dgx_donate_debug_log (
+								"Created donation {$donation_id} " .
+								"from PayPal data (no audit db data found) in 4.x mode." );
 						}
-						dgx_donate_debug_log (
-							"Created donation {$donation_id} from PayPal data (no transient data found)" );
 					}
 				} else {
 					// We have seen this session ID already, create a new donation record for this new transaction
@@ -214,7 +231,7 @@ class Dgx_Donate_IPN_Handler {
 	function handle_unrecognized_ipn ( $paypal_response ) {
 
 		dgx_donate_debug_log ( "IPN failed (unrecognized response) for sessionID {$this->session_id}" );
-		dgx_donate_debug_log ( $paypal_response );
+		dgx_donate_debug_log ( "==> " . $paypal_response );
 	}
 }
 

@@ -988,3 +988,18 @@ function dgx_donate_send_donation_notification ( $donationID ) {
 	}
 }
 
+function dgx_donate_init_session() {
+	// Start a PHP session if none has been started yet
+	// The means to test whether a session has been started varies by PHP version
+
+	if( version_compare ( phpversion (), '5.4.0', '>=' ) ) {
+		$session_already_started = ( session_status () === PHP_SESSION_ACTIVE );
+	} else {
+		$session_id              = session_id ();
+		$session_already_started = ( ! empty( $session_id ) );
+	}
+
+	if( ! $session_already_started ) {
+		session_start ();
+	}
+}

@@ -9,13 +9,30 @@ function seamless_donations_name_of ( array $a, $pos ) {
 	return key ( $temp );
 }
 
-function seamless_donations_debug_alert( $a ) {
+// from http://www.w3schools.com/php/filter_validate_url.asp
+// returns a clean URL or false
+// use === false to check it
+function seamless_donations_validate_url ($url) {
+	// Remove all illegal characters from a url
+	$url = filter_var($url, FILTER_SANITIZE_URL);
+
+	// Validate url
+	if (!filter_var($url, FILTER_VALIDATE_URL) === false) {
+		return $url;
+	} else {
+		return false;
+	}
+}
+
+function seamless_donations_debug_alert ( $a ) {
+
 	echo "<script>";
 	echo 'alert("' . $a . '");';
 	echo "</script>";
 }
 
-function seamless_donations_debug_log( $a ) {
+function seamless_donations_debug_log ( $a ) {
+
 	echo "<script>";
 	echo 'console.log("' . $a . '");';
 	echo "</script>";
@@ -24,7 +41,8 @@ function seamless_donations_debug_log( $a ) {
 // This function builds both options and settings based on passed arrays
 // The $options_array is an array that would be passed to the addSettingsField method
 // If $settings_array is passed (not false), it will create a section and add the options to that section
-function seamless_donations_process_add_settings_fields_with_options ( $options_array, $apf_object, $settings_array = array() ) {
+function seamless_donations_process_add_settings_fields_with_options (
+	$options_array, $apf_object, $settings_array = array() ) {
 
 	if( count ( $settings_array ) > 0 ) {
 		$apf_object->addSettingSections ( $settings_array );
@@ -56,18 +74,61 @@ function seamless_donations_process_add_settings_fields_with_options ( $options_
 // this is admittedly less efficient than just picking values out of the array, but it makes for
 // considerably easier-to-read code for admin form processing. Given that admin submits are relatively
 // rare and the array scan is short, it's a fair trade-off for more maintainable code
-function seamless_donations_get_submitted_admin_section ($_the_array) {
+function seamless_donations_get_submitted_admin_section ( $_the_array ) {
+
 	$slug = $_POST['page_slug'];
-	for ($i=0 ; $i<count($_the_array); ++$i) {
-		$key = seamless_donations_name_of($_the_array, $i);
-		if(strpos($key, $slug) === 0) { // key begins with slug
-			if(isset($_the_array[$key]['submit'])){
-				if($_the_array[$key]['submit'] != NULL) {
-					return($key);
+	for( $i = 0; $i < count ( $_the_array ); ++ $i ) {
+		$key = seamless_donations_name_of ( $_the_array, $i );
+		if( strpos ( $key, $slug ) === 0 ) { // key begins with slug
+			if( isset( $_the_array[ $key ]['submit'] ) ) {
+				if( $_the_array[ $key ]['submit'] != NULL ) {
+					return ( $key );
 				}
 			}
 		}
 	}
+
 	return false;
 }
 
+function seamless_donations_get_guid ( $namespace = '' ) {
+
+	// based on post by redtrader http://php.net/manual/en/function.uniqid.php#107512
+	$guid = '';
+	$uid  = uniqid ( "", true );
+	$data = $namespace;
+	$data .= isset( $_SERVER['REQUEST_TIME'] ) ? $_SERVER['REQUEST_TIME'] : '';
+	$data .= isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '';
+	$data .= isset( $_SERVER['LOCAL_ADDR'] ) ? $_SERVER['LOCAL_ADDR'] : '';
+	$data .= isset( $_SERVER['LOCAL_PORT'] ) ? $_SERVER['LOCAL_PORT'] : '';
+	$data .= isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : '';
+	$data .= isset( $_SERVER['REMOTE_PORT'] ) ? $_SERVER['REMOTE_PORT'] : '';
+	$hash = strtoupper ( hash ( 'ripemd128', $uid . $guid . md5 ( $data ) ) );
+	$guid = substr ( $hash, 0, 8 ) .
+	        '-' .
+	        substr ( $hash, 8, 4 ) .
+	        '-' .
+	        substr ( $hash, 12, 4 ) .
+	        '-' .
+	        substr ( $hash, 16, 4 ) .
+	        '-' .
+	        substr ( $hash, 20, 12 );
+
+	return $guid;
+}
+
+function seamless_donations_get_browser_name () {
+
+	$path = plugin_dir_path ( __FILE__ );
+	$path = dirname ( dirname ( dirname ( dirname ( $path ) ) ) ); // up the path (probably a better way)
+	$path .= '/wp-admin/includes/dashboard.php';
+
+	require_once ( $path );
+	$browser_data = wp_check_browser_version ();
+
+	isset( $browser_data['name'] ) ? $browser_name = $browser_data['name'] : $browser_name = '';
+	isset( $browser_data['version'] ) ? $browser_version = $browser_data['version'] :
+		$browser_version = '';
+
+	return $browser_name . ' ' . $browser_version;
+}

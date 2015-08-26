@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://zatzlabs.com/seamless-donations/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts. Adopted from Allen Snook.
-Version: 4.0.3
+Version: 4.0.6
 Author: David Gewirtz
 Author URI: http://zatzlabs.com/lab-notes/
 Text Domain: seamless-donations
@@ -28,8 +28,9 @@ License: GPL2
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-function seamless_donations_set_version() {
-	update_option ( 'dgx_donate_active_version', '4.0.3' );
+function seamless_donations_set_version () {
+
+	update_option ( 'dgx_donate_active_version', '4.0.6' );
 }
 
 require_once 'inc/geography.php';
@@ -104,12 +105,12 @@ function seamless_donations_enqueue_scripts () {
 
 	$script_url = plugins_url ( '/js/seamless-donations.js', __FILE__ );
 
-	wp_register_script ( 'seamless_javascript_code', $script_url, array( 'jquery' ), false );
-	wp_enqueue_script ( 'seamless_javascript_code' );
+	// wp_register_script ( 'seamless_javascript_code', $script_url, array( 'jquery' ), false );
+	wp_enqueue_script ( 'seamless_javascript_code', $script_url, array( 'jquery' ) );
 
 	// declare the URL to the file that handles the AJAX request (wp-admin/admin-ajax.php)
 	wp_localize_script (
-		'dgx_donate_script', 'dgxDonateAjax',
+		'seamless_javascript_code', 'dgxDonateAjax',
 		array(
 			'ajaxurl'            => admin_url ( 'admin-ajax.php' ),
 			'nonce'              => wp_create_nonce ( 'dgx-donate-nonce' ),
@@ -161,20 +162,67 @@ function seamless_donations_get_escaped_formatted_amount ( $amount, $decimal_pla
 add_shortcode ( 'seamless-donations', 'seamless_donations_shortcode' );
 
 function seamless_donations_shortcode ( $atts ) {
+	$output = '';
 
-	$output      = '';
-	$show_thanks = false;
-	if( isset( $_GET['thanks'] ) ) {
-		$show_thanks = true;
-	} else if( isset( $_GET['auth'] ) ) {
-		$show_thanks = true;
+	// shortcodes in SD4.0.5 and up are extensible
+	// they are controlled by a $shortcode_features array defined below
+	// it is up to each function to determine whether it should display anything
+	$shortcode_features = array(
+		array( 'seamless_donations_shortcode_form', 'seamless_donations_shortcode_form_filter', 10, 1 ),
+		array( 'seamless_donations_shortcode_thanks', 'seamless_donations_shortcode_thanks_filter', 10, 1 ),
+	);
+
+	// extend the array
+	$shortcode_features = apply_filters ( 'seamless_donations_shortcode_features', $shortcode_features );
+
+	// create the filters
+	for( $i = 0; $i < count ( $shortcode_features ); ++ $i ) {
+		$filter_name     = $shortcode_features[ $i ][0];
+		$filter_func     = $shortcode_features[ $i ][1];
+		$filter_priority = $shortcode_features[ $i ][2];
+		$filter_args     = $shortcode_features[ $i ][3];
+		add_filter ( $filter_name, $filter_func, $filter_priority, $filter_args );
 	}
 
-	// Switch
-	if( $show_thanks ) {
+	// process each filter in turn, adding to the output (in reality, you want one filter to run)
+	for( $i = 0; $i < count ( $shortcode_features ); ++ $i ) {
+		$filter_name     = $shortcode_features[ $i ][0];
+		$output .= apply_filters ( $filter_name, $atts );
+	}
+
+	return $output;
+}
+
+function seamless_donations_shortcode_thanks_filter ( $atts ) {
+
+	$shortcode_mode = '';
+	$output         = '';
+
+	if( isset( $_GET['thanks'] ) ) {
+		$shortcode_mode = 'show_thanks';
+	} else if( isset( $_GET['auth'] ) ) {
+		$shortcode_mode = 'show_thanks';
+	}
+	if( $shortcode_mode == 'show_thanks' ) {
 		$output = dgx_donate_display_thank_you ();
-	} else {
-		$sd4_mode = get_option ( 'dgx_donate_start_in_sd4_mode' );
+	}
+
+	return $output;
+}
+
+function seamless_donations_shortcode_form_filter ( $atts ) {
+
+	$sd4_mode       = get_option ( 'dgx_donate_start_in_sd4_mode' );
+	$shortcode_mode = 'show_form';
+	$output         = '';
+
+	if( isset( $_GET['thanks'] ) ) {
+		$shortcode_mode = 'show_thanks';
+	} else if( isset( $_GET['auth'] ) ) {
+		$shortcode_mode = 'show_thanks';
+	}
+
+	if( $shortcode_mode == 'show_form' and $atts == '') {
 		if( $sd4_mode == false ) {
 			$output .= "<div style='background-color:red; color:white'>";
 			$output .= "<P style='padding:5px;'>Warning: This form needs to be updated. ";
@@ -182,7 +230,7 @@ function seamless_donations_shortcode ( $atts ) {
 			$output .= "</div>";
 		} else {
 			$output = "";
-			$output = seamless_donations_generate_donation_form ( $output );
+			$output = seamless_donations_generate_donation_form (  );
 
 			if( empty( $output ) ) {
 				$output = "<p>Error: No payment gateway selected. ";
@@ -196,21 +244,7 @@ function seamless_donations_shortcode ( $atts ) {
 
 function seamless_donations_init () {
 
-	// Start a PHP session if none has been started yet
-	// The means to test whether a session has been started varies by PHP version
-
-	if( version_compare ( phpversion (), '5.4.0', '>=' ) ) {
-		$session_already_started = ( session_status () === PHP_SESSION_ACTIVE );
-	} else {
-		$session_id              = session_id ();
-		$session_already_started = ( ! empty( $session_id ) );
-	}
-
-	if( ! $session_already_started ) {
-		session_start ();
-	}
-
-	seamless_donations_set_version(); // make sure we've got the version set as an option
+	seamless_donations_set_version (); // make sure we've got the version set as an option
 
 	// Check to see if we're supposed to run an upgrade
 	seamless_donations_sd40_process_upgrade_check ();
@@ -231,19 +265,28 @@ function seamless_donations_init () {
 
 	// Initialize options to defaults as needed
 	if( $sd4_mode ) {
+		//seamless_donations_init_session ();
+		//dgx_donate_init_session ();
 		seamless_donations_init_defaults ();
+		seamless_donations_init_audit ();
 		seamless_donations_admin_loader ();
 	} else {
+		dgx_donate_init_session ();
 		dgx_donate_init_defaults ();
 		seamless_donations_legacy_admin_loader ();
 		add_action ( 'admin_notices', 'seamless_donations_sd40_update_alert_message' );
 	}
 
 	// Display an admin notice if we are in sandbox mode
-
 	$payPalServer = get_option ( 'dgx_donate_paypal_server' );
 	if( strcasecmp ( $payPalServer, "SANDBOX" ) == 0 ) {
 		add_action ( 'admin_notices', 'dgx_donate_admin_sandbox_msg' );
+	}
+
+	// Display an admin notice if we are in debug mode
+	$debug_mode = get_option ( 'dgx_donate_debug_mode' );
+	if( $debug_mode == 1 ) {
+		add_action ( 'admin_notices', 'seamless_donations_admin_debug_mode_msg' );
 	}
 }
 
@@ -441,10 +484,103 @@ function seamless_donations_init_defaults () {
 	}
 }
 
+function seamless_donations_init_audit () {
+
+	// this checks to see if the audit table exists and builds it, if not
+	global $wpdb;
+
+	$table_name = $wpdb->prefix . "seamless_donations_audit";
+
+	if( ( $wpdb->get_var ( "SHOW TABLES LIKE '" . $table_name . "'" ) != $table_name ) or
+	    get_option ( "dgx_donate_db_version" ) != "1.0.1"
+	) {
+		// table doesn't exist, add it
+		$charset_collate = $wpdb->get_charset_collate ();
+
+		$sql
+			= "CREATE TABLE $table_name (
+  			option_id bigint(9) UNSIGNED NOT NULL AUTO_INCREMENT,
+  			option_name varchar(64) NOT NULL DEFAULT '',
+			option_value longtext NOT NULL,
+  			autoload varchar(20) NOT NULL DEFAULT 'yes',
+  			donor_email varchar(128) NOT NULL DEFAULT '',
+  			created_on TIMESTAMP DEFAULT 0,
+  			changed_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			PRIMARY KEY  (option_id),
+			KEY donor_email (donor_email),
+  			UNIQUE KEY option_name (option_name)
+			) $charset_collate;";
+
+		require_once ( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta ( $sql );
+
+		update_option ( "dgx_donate_db_version", "1.0.1" );
+	} else {
+		// in future releases, might want to check dgx_donate_db_version and update database if desired
+	}
+}
+
+function seamless_donations_update_audit_option ( $option_name, $option_value ) {
+
+	global $wpdb;
+
+	$table_name  = $wpdb->prefix . "seamless_donations_audit";
+	$option_name = trim ( $option_name );
+
+	if( empty( $option_name ) ) {
+		return false;
+	}
+
+	if (! isset($option_value['CURRENCY'])) {
+		$currency = get_option('dgx_donate_currency');
+		$option_value['CURRENCY'] = $currency;
+	}
+
+	// http://codex.wordpress.org/Class_Reference/wpdb#REPLACE_row
+	$replace_result = $wpdb->replace (
+		$table_name,
+		array(
+			'option_name'  => $option_name,
+			'option_value' => maybe_serialize ( $option_value ),
+		)
+	);
+
+	return $replace_result;
+}
+
+function seamless_donations_get_audit_option ( $option_name ) {
+
+	global $wpdb;
+
+	$table_name  = $wpdb->prefix . "seamless_donations_audit";
+	$option_name = trim ( $option_name );
+
+	$query = "SELECT * FROM $table_name WHERE option_name='" . $option_name . "'";
+
+	$option_object = $wpdb->get_row ( $query, ARRAY_A );
+
+	if( $option_object != NULL ) {
+		// do something with the link
+		return maybe_unserialize ( $option_object['option_value'] );
+	} else {
+		// no matching option record found
+		return false;
+	}
+}
+
+function seamless_donations_init_session () {
+
+	$session_id                               = seamless_donations_get_guid ( 'sd' );
+	$GLOBALS['seamless_donations_session_id'] = $session_id;
+	dgx_donate_debug_log ( 'Session ID (guid/audit db mode): ' . $session_id );
+}
+
 /******************************************************************************************************/
 function dgx_donate_get_version () {
 
-	$pluginVersion = get_option('dgx_donate_active_version');
-	return $pluginVersion;
+	$pluginVersion = get_option ( 'dgx_donate_active_version' );
 
+	return $pluginVersion;
 }
+
+

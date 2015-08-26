@@ -121,12 +121,12 @@ function seamless_donations_create_donation_from_transient_data ( $transient_dat
 	return $donation_id;
 }
 
-function seamless_donations_donation_from_donation ( $old_donation_id ) {
+function seamless_donations_create_donation_from_donation ( $old_donation_id ) {
 
 	// Create a new donation record by cloning an old one (useful for repeating donations)
-	dgx_donate_debug_log ( "about to create donation from old donation $old_donation_id" );
+	dgx_donate_debug_log ( "About to create donation from old donation $old_donation_id" );
 	$new_donation_id = dgx_donate_create_empty_donation_record ();
-	dgx_donate_debug_log ( "new donation id = $new_donation_id" );
+	dgx_donate_debug_log ( "New donation id = $new_donation_id" );
 
 	$meta_map = dgx_donate_get_meta_map ();
 
@@ -179,9 +179,9 @@ function seamless_donations_donation_from_donation ( $old_donation_id ) {
 function seamless_donations_create_donation_from_paypal_data ( $post_data ) {
 
 	// Create a new donation record from paypal data (if transient no longer exists for some reason)
-	dgx_donate_debug_log ( "about to create donation from paypal post data" );
+	dgx_donate_debug_log ( "About to create donation from paypal post data" );
 	$new_donation_id = dgx_donate_create_empty_donation_record ();
-	dgx_donate_debug_log ( "new donation id = $new_donation_id" );
+	dgx_donate_debug_log ( "New donation id = $new_donation_id" );
 
 	// @todo - loop over the meta map translating paypal keys into our keys
 	// @todo ADDRESS
@@ -238,7 +238,7 @@ function seamless_donations_create_donation_from_paypal_data ( $post_data ) {
 	}
 	update_post_meta ( $post_id, '_dgx_donate_donor_donations', $donations_list );
 
-	dgx_donate_debug_log ( "done with dgx_donate_create_donation_from_paypal_data, returning new id $new_donation_id" );
+	dgx_donate_debug_log ( "Done with dgx_donate_create_donation_from_paypal_data, returning new id $new_donation_id" );
 
 	return $new_donation_id;
 }

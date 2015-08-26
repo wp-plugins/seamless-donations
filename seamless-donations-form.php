@@ -11,24 +11,38 @@
 
 function seamless_donations_generate_donation_form () {
 
-	$payPalServer = get_option ( 'dgx_donate_paypal_server' );
-	if( $payPalServer == "SANDBOX" ) {
-		$formAction = "https://www.sandbox.paypal.com/cgi-bin/webscr";
-	} else {
-		$formAction = "https://www.paypal.com/cgi-bin/webscr";
-	}
+	$form_action = plugins_url ( '/seamless-donations-payment.php', __FILE__ );
 
-	$session_id = 'dgxdonate_' . substr ( session_id (), 0, 10 ) . '_' . time ();
-	$form       = array(
+	//$session_id = $GLOBALS['seamless_donations_session_id'];
+	//$session_id = 'dgxdonate_' . substr ( session_id (), 0, 10 ) . '_' . time ();
+	$session_id = seamless_donations_get_guid ( 'sd' );
+	dgx_donate_debug_log ( '----------------------------------------' );
+	dgx_donate_debug_log ( 'PREPARING DONATION FORM' );
+	dgx_donate_debug_log ( "Seamless Donations Version: " . dgx_donate_get_version () );
+	dgx_donate_debug_log ( "User browser: " . seamless_donations_get_browser_name () );
+	dgx_donate_debug_log ( "Assigning hidden field session ID to $session_id" );
+	dgx_donate_debug_log ( "Form action: $form_action" );
+
+	$form = array(
 		'id'       => 'seamless-donations-form',
 		'name'     => 'seamless-donations-form',
-		'action'   => $formAction,
+		'action'   => $form_action,
 		'method'   => 'post',
 		'elements' => array(
-			$session_id_element = array(
+			'session_id_element'   => array(
 				'type'  => 'hidden', // Save the session ID as a hidden input
 				'group' => '_dgx_donate_session_id',
 				'value' => $session_id,
+			),
+			'redirect_url_element' => array(
+				'type'  => 'hidden', // Save the PayPal redirect URL as a hidden input
+				'group' => '_dgx_donate_redirect_url',
+				'value' => $form_action,
+			),
+			'success_url_element' => array(
+				'type'  => 'hidden', // Save the PayPal redirect URL as a hidden input
+				'group' => '_dgx_donate_success_url',
+				'value' => dgx_donate_paypalstd_get_current_url(),
 			),
 		),
 	);
@@ -139,7 +153,7 @@ function seamless_donations_get_donation_section () {
 	$donation_section['elements']['other_radio_button'] = array(
 		'type'    => 'radio',
 		'group'   => '_dgx_donate_amount',
-		'prompt'  => 'Other',
+		'prompt'  => esc_html__ ( 'Other', 'seamless-donations' ),
 		'reveal'  => 'other-donation-level',
 		'wrapper' => 'span',
 		'value'   => 'OTHER',
@@ -167,7 +181,7 @@ function seamless_donations_get_donation_section () {
 			'order'       => 'asc',
 			'post_type'   => 'funds',
 			'post_status' => 'publish',
-			'numberposts'   => -1,
+			'numberposts' => - 1,
 			'meta_query'  => array(
 				array(
 					'key'   => '_dgx_donate_fund_show',
@@ -419,7 +433,7 @@ function seamless_donations_get_donor_section () {
 			'_dgx_donate_donor_email'      => array(
 				'type'       => 'text',
 				'size'       => 20,
-				'validation' => 'required',
+				'validation' => 'required,email',
 				'before'     => esc_html__ ( 'Email:', 'seamless-donations' ),
 			),
 		),
@@ -552,7 +566,7 @@ function seamless_donations_get_billing_section () {
 					"<span class='dgx-donate-comment'>" .
 					esc_html__ ( '(optional)', 'seamless-donations' ) . "</span>"
 			),
-			'_dgx_donate_donor_city'  => array(
+			'_dgx_donate_donor_city'     => array(
 				'type'       => 'text',
 				'size'       => 20,
 				'validation' => 'required',
@@ -627,23 +641,26 @@ function seamless_donations_get_billing_section () {
 	return $billing_section;
 }
 
+/**
+ * @return array|mixed|void
+ */
 function seamless_donations_get_paypal_section () {
 
 	$paypal_email  = get_option ( 'dgx_donate_paypal_email' );
 	$currency_code = get_option ( 'dgx_donate_currency' );
 
 	$notify_url = plugins_url ( '/dgx-donate-paypalstd-ipn.php', __FILE__ );
-	$session_id = session_id ();
+	//$session_id = session_id ();
 
 	// set up success URL
 	$success_url = dgx_donate_paypalstd_get_current_url ();
-	if( strpos ( $success_url, "?" ) === false ) {
-		$success_url .= "?";
-	} else {
-		$success_url .= "&";
-	}
-	$success_url .= "thanks=1&sessionid=";
-	$success_url .= "$session_id";
+//	if( strpos ( $success_url, "?" ) === false ) {
+//		$success_url .= "?";
+//	} else {
+//		$success_url .= "&";
+//	}
+//	$success_url .= "thanks=1&sessionid=";
+//	$success_url .= "$session_id";
 
 	// not used in core code, but users might be including this somewhere
 	$item_name = apply_filters ( 'dgx_donate_item_name', __ ( 'Donation', 'seamless-donations' ) );
@@ -653,9 +670,13 @@ function seamless_donations_get_paypal_section () {
 		'class'    => 'dgx-donate-form-section',
 		'style'    => 'display:none',          // we want to hide this section from the form
 		'elements' => array(
+			'nonce'         => array(
+				'type'  => 'hidden',
+				'value' => wp_create_nonce ( 'dgx-donate-nonce' ),
+			),
 			'cmd'           => array(
 				'type'  => 'hidden',
-				'value' => '_donations',
+				'value' => '',
 			),
 			'business'      => array(
 				'type'  => 'hidden',
@@ -663,7 +684,7 @@ function seamless_donations_get_paypal_section () {
 			),
 			'return'        => array(
 				'type'  => 'hidden',
-				'value' => esc_attr ( $success_url ),
+				'value' => '', // set later in payment function, not really needed here
 			),
 			'first_name'    => array(
 				'type'  => 'hidden',
@@ -735,15 +756,15 @@ function seamless_donations_get_paypal_section () {
 			),
 			'p3'            => array(
 				'type'  => 'hidden', // removed when not repeating
-				'value' => '1',
+				'value' => '',
 			),
 			't3'            => array(
 				'type'  => 'hidden', // removed when not repeating
-				'value' => '1',
+				'value' => '',
 			),
 			'a3'            => array(
 				'type'  => 'hidden', // removed when not repeating
-				'value' => '1',
+				'value' => '',
 			),
 		),
 	);

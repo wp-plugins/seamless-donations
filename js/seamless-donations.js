@@ -8,6 +8,10 @@
  Copyright (c) 2015 by David Gewirtz
  */
 
+//jQuery( document ).ajaxError(function( event, jqxhr, settings, exception ) {
+//    console.log( "Triggered ajaxError handler." );
+//});
+
 jQuery(document).ready(function () {
 
     // radio button revealer, works with multiple sets per page
@@ -197,14 +201,36 @@ jQuery(document).ready(function () {
     }
 
     // process form clicks, trigger on the input inside the form-submit div
-    jQuery(".seamless-donations-form-submit > input").click(function () {
+/*    jQuery(".seamless-donations-form-submit > input").click(function () {
         // validate and process form here
         // begin validation code
         var foo = SeamlessDonationsFormsEngineValidator();
         return false;
-    });
+    }); */
+
+    // process form clicks, trigger on the input inside the form-submit div
+ /*   jQuery("#seamless-donations-form").submit(function () {
+        // validate and process form here
+        // begin validation code
+        console.log("jQuery form submit function");
+        // do we need .val(firstName);
+        var test = jQuery("#seamless-donations-form").attr("action");
+        console.log("jQuery form submit function test=" + test);
+        if (test != "stop") {
+            console.log("jQuery form submit function sending to validator");
+            jQuery("#seamless-donations-form").attr("action", "stop");
+            var valid = SeamlessDonationsFormsEngineValidator();
+        } else {
+            console.log("jQuery form submit function validator bypassed");
+        }
+        return valid;
+    }); */
+
 });
 
+/**
+ * @return {boolean}
+ */
 function SeamlessDonationsFormsEngineValidator() {
     var formOkay = true;
 
@@ -251,9 +277,7 @@ function SeamlessDonationsFormsEngineValidator() {
         return false; // returning false blocks the page loader from executing on submit
     } else {
         // the form is okay, so go on to the form submit function, another JavaScript
-        console.log("-- SeamlessDonationsFormsEngineValidator: before call checkout");
-        SeamlessDonationsCheckout();
-        console.log("-- SeamlessDonationsFormsEngineValidator: after call checkout");
+        console.log("-- SeamlessDonationsFormsEngineValidator: form passed validation");
         return true;
     }
 }
@@ -363,17 +387,34 @@ function SeamlessDonationsValidateCurrency(validationObject) {
     return true;
 }
 
+function SeamlessDonationsTrim(s) {
+    if (s == undefined) {
+        s = "";
+    }
+
+    s = s.replace(/(^\s*)|(\s*$)/gi, "");
+    s = s.replace(/[ ]{2,}/gi, " ");
+    s = s.replace(/\n /, "\n");
+    return s;
+}
+
+// THE FOLLOWING HOT MESS IS DEPRECATED. LEFT IN TEMPORARILY FOR REFERENCE
+
+/*
 function SeamlessDonationsCheckout() {
 
     console.log("SeamlessDonationsCheckout: entered function");
 
+    var mainForm = jQuery('#seamless-donations-form'); // cache the form
+
     // Get the form data
     var values = {};
-    jQuery.each(jQuery('#seamless-donations-form').serializeArray(), function (i, field) {
+    jQuery.each(mainForm.serializeArray(), function (i, field) {
         values[field.name] = field.value;
     });
 
     var sessionID = values['_dgx_donate_session_id'];
+    var redirectURL = values['_dgx_donate_redirect_url'];
     var donationAmount = DgxDonateTrim(values['_dgx_donate_amount']);
     var userAmount = DgxDonateTrim(values['_dgx_donate_user_amount']);
     var repeating = DgxDonateTrim(values['_dgx_donate_repeating']);
@@ -414,21 +455,30 @@ function SeamlessDonationsCheckout() {
     var ukGiftAid = DgxDonateTrim(values['_dgx_donate_uk_gift_aid']);
     var referringUrl = location.href;
 
-    var amount = "";
+    var amount = 0.0;
 
+    // Resolve the donation amount
     if (donationAmount == "OTHER") {
-        amount = userAmount;
+        amount = parseFloat(userAmount);
     }
     else {
-        amount = donationAmount;
+        amount = parseFloat(donationAmount);
     }
+    if( amount < 1.00 ) {
+        amount = 1.00;
+    }
+    // per http://stackoverflow.com/questions/6134039/format-number-to-always-show-2-decimal-places
+    amount = parseFloat(Math.round(amount * 100) / 100).toFixed(2); // set to 2 digits
+    amount.toString();
 
     // If validation succeeds, post the data to ajax to create a transient
     // and update the hidden form with the visible form values that PayPal cares about
 
+    console.log("-- SeamlessDonationsCheckout: session id: " + sessionID);
     console.log("-- SeamlessDonationsCheckout: moving values into hidden section");
 
     var hiddenForm = jQuery('#dgx-donate-form-paypal-hidden-section');
+
 
     hiddenForm.find('input[name="first_name"]').val(firstName);
     hiddenForm.find('input[name="last_name"]').val(lastName);
@@ -467,7 +517,9 @@ function SeamlessDonationsCheckout() {
     // Send the request
 
     console.log("-- SeamlessDonationsCheckout: before dgxDonateAjax.nonce");
+
     var nonce = dgxDonateAjax.nonce;
+    console.log("-- SeamlessDonationsCheckout: nonce=" + nonce);
     console.log("-- SeamlessDonationsCheckout: preparing data array");
 
     var data = {
@@ -516,7 +568,32 @@ function SeamlessDonationsCheckout() {
     };
 
     console.log("-- SeamlessDonationsCheckout: before jQuery.post");
-    jQuery.post(dgxDonateAjax.ajaxurl, data, SeamlessDonationsAjaxCallback);
+    console.log("-- SeamlessDonationsCheckout: ajaxurl=" + dgxDonateAjax.ajaxurl);
+    console.log("-- SeamlessDonationsCheckout: redirecturl=" + redirectURL);
+
+
+    jQuery.ajax({
+        type: 'POST',
+        url: dgxDonateAjax.ajaxurl,
+        data: data,
+        success: function() {
+
+// form.submit sends the post data, but seems to cycle infinitely because there's a submit handler
+// in the form
+// some notes: http://cwestblog.com/2012/11/21/javascript-go-to-url-using-post-variable/
+// http://www.prowebguru.com/2013/10/send-post-data-while-redirecting-with-jquery/#.VaWMjxNVhBc
+// THIS MOSTLY WORKS, problem is sending the redirect with the form data. erroring out on appendChild
+            // also the redirectURL (which should be the paypal sandbox) is undefined
+            // but this is where the ajax form processing should take place, one way or another
+            console.log("-- SeamlessDonationsCheckout: jQuery.ajax success");
+            var paypalFormTag = '<form action="' + redirectURL + '" />';
+            var paypalForm = jQuery("#dgx-donate-form-paypal-hidden-section").wrapAll(paypalFormTag);
+            paypalForm.submit();
+            //response(data);
+        }
+    });
+
+    //jQuery.post(dgxDonateAjax.ajaxurl, data, SeamlessDonationsAjaxCallback);
     console.log("-- SeamlessDonationsCheckout: after jQuery.post");
 
     return false;
@@ -527,15 +604,5 @@ function SeamlessDonationsAjaxCallback(data) {
     console.log("Inside SeamlessDonationsAjaxCallback");
     //jQuery('#seamless-donations-form').submit();
 }
+*/
 
-
-function SeamlessDonationsTrim(s) {
-    if (s == undefined) {
-        s = "";
-    }
-
-    s = s.replace(/(^\s*)|(\s*$)/gi, "");
-    s = s.replace(/[ ]{2,}/gi, " ");
-    s = s.replace(/\n /, "\n");
-    return s;
-}
