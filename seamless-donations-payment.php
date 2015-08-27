@@ -218,7 +218,8 @@ if( $session_data !== false ) {
 	$post_args .= "custom=" . urlencode ( $post_data['SESSIONID'] ) . "&";
 
 	// fill in repeating data, overriding if necessary
-	if( $repeating == '' ) {
+	dgx_donate_debug_log("Checking for repeat. REPEAT value is [" . $post_data['REPEATING']. "].");
+	if( $post_data['REPEATING']  == '' ) {
 		if( $post_data['CMD'] == '' ) {
 			$post_data['CMD'] = '_donations';
 		}
@@ -238,6 +239,10 @@ if( $session_data !== false ) {
 		$post_args .= "p3=" . urlencode ( $post_data['P3'] ) . "&";  // 1, M = monthly
 		$post_args .= "t3=" . urlencode ( $post_data['T3'] ) . "&";
 		$post_args .= "a3=" . urlencode ( $post_data['AMOUNT'] ) . "&";
+		$log_msg = "Enabling repeating donation, cmd=" . $post_data['CMD'];
+		$log_msg .= ", p3=" . $post_data['P3'] . ", t3=" . $post_data['T3'];
+		$log_msg .= ", a3=" . $post_data['AMOUNT'];
+		dgx_donate_debug_log($log_msg);
 	}
 
 	$notify_url = plugins_url ( '/dgx-donate-paypalstd-ipn.php', __FILE__ );
