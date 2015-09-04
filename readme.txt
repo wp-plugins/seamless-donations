@@ -4,7 +4,7 @@ Donate link: http://zatzlabs.com/project-donations/
 Tags: donation, donations, paypal, donate, non-profit, charity, gifts, church, worship, churches, crowdfunding, donation plugin, fundraiser, fundraising, giving, nonprofit, paypal, PayPal Donate, paypal donations, recurring, recurring donations, wordpress donation plugin, wordpress donations, wp donation
 Requires at least: 3.4
 Tested up to: 4.3
-Stable tag: 4.0.7
+Stable tag: 4.0.8
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,6 +36,10 @@ plugins and themes outside of Seamless Donations.
 * **Shortcode engine designed for extensibility:** The main shortcode for the plugin has been designed so that extensions can add features to the main seamless-donations shortcode.
 * **Admin UI designed for extensibility:** Yep, like everything else, the admin interface has been designed to allow for extensibility.
 * **Translation-ready:** Seamless Donations 4.0 has had numerous tweaks to allow it to be translated into other languages.
+
+= Fight Back Against Spam =
+
+Seamless Donations and [GoodBye Captcha](https://wordpress.org/plugins/goodbye-captcha/) now work together to keep your site and forms safe. Block spambots without annoying captcha images.
 
 = Developer Resources =
 
@@ -160,8 +164,13 @@ If you'd like to keep up with the latest updates to this plugin, please visit [D
 
 == Changelog ==
 
-= 4.0.7 =
+= 4.0.8 =
 * **IMPORTANT:** Before upgrading from 3.3 or if you are experiencing problems upgrading from v3 to v4, [read this](http://zatzlabs.com/fixing-seamless-donations-4-0-updateactivation-problems/).
+* Added support for GoodBye Captcha spam-blocking plugin
+* Fixed bug limiting notification emails to one email address
+* Fixed other minor and potential bugs in the code
+
+= 4.0.7 =
 * Fixed bug in repeating donations
 
 = 4.0.6 =

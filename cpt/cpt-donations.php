@@ -40,6 +40,14 @@ class SeamlessDonationsDonationPostType extends SeamlessDonationsAdminPageFramew
 
 		);
 
+		$compact_menus = get_option ( 'dgx_donate_compact_menus' );
+		if( $compact_menus == 1 ) {
+			$donations_setup['show_ui'] = true;
+			$donations_setup['show_in_menu'] = 'SeamlessDonationsAdmin';
+			unset($donations_setup['public']);
+			unset($donations_setup['menu_icon']);
+		}
+
 		$donations_setup      = apply_filters ( 'seamless_donations_donations_setup', $donations_setup );
 		$donations_type_setup = apply_filters ( 'seamless_donations_donations_type_setup', $donations_type_setup );
 

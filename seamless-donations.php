@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://zatzlabs.com/seamless-donations/
 Description: Making online donations easy for your visitors; making donor and donation management easy for you.  Receive donations (now including repeating donations), track donors and send customized thank you messages with Seamless Donations for WordPress.  Works with PayPal accounts. Adopted from Allen Snook.
-Version: 4.0.7
+Version: 4.0.8
 Author: David Gewirtz
 Author URI: http://zatzlabs.com/lab-notes/
 Text Domain: seamless-donations
@@ -30,7 +30,7 @@ License: GPL2
 
 function seamless_donations_set_version () {
 
-	update_option ( 'dgx_donate_active_version', '4.0.7' );
+	update_option ( 'dgx_donate_active_version', '4.0.8' );
 }
 
 require_once 'inc/geography.php';
@@ -59,6 +59,8 @@ function seamless_donations_admin_loader () {
 	require_once 'admin/settings.php';
 	require_once 'admin/logs.php';
 	require_once 'admin/help.php';
+	require_once 'admin/addons.php';
+	require_once 'admin/licenses.php';
 
 	// bring in the custom post types
 	require_once 'cpt/cpt-donations.php';
