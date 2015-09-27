@@ -79,6 +79,7 @@ class SeamlessDonationsDonationPostType extends SeamlessDonationsAdminPageFramew
 		// clean up donor edit page
 		$donation_header_style .= "#edit-slug-box {display:none}" . PHP_EOL;
 		$donation_header_style .= "#delete-action {display:none}" . PHP_EOL;
+		$donation_header_style .= ".page-title-action {display:none}" . PHP_EOL;
 		$donation_header_style .= "a.edit-post-status {display:none}" . PHP_EOL;
 		$donation_header_style .= "a.edit-visibility {display:none}" . PHP_EOL;
 		$donation_header_style .= "a.edit-timestamp {display:none}" . PHP_EOL;
