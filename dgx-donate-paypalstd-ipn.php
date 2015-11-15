@@ -155,7 +155,7 @@ class Dgx_Donate_IPN_Handler {
 							$donation_id = dgx_donate_create_donation_from_transient_data ( $donation_form_data );
 						} else {
 							dgx_donate_debug_log ( "Creating donation from transaction audit data in 4.x mode." );
-							$donation_id = seamless_donations_create_donation_from_transient_data (
+							$donation_id = seamless_donations_create_donation_from_transaction_audit_table (
 								$donation_form_data );
 						}
 						dgx_donate_debug_log (
@@ -176,7 +176,7 @@ class Dgx_Donate_IPN_Handler {
 								"Created donation {$donation_id} " .
 								"from PayPal data (no transient data found) in pre-4.x mode." );
 						} else {
-							$donation_id = seamless_donations_create_donation_from_paypal_data ( $this->post_data );
+							$donation_id = seamless_donations_create_donation_from_paypal_data ( );
 							dgx_donate_debug_log (
 								"Created donation {$donation_id} " .
 								"from PayPal data (no audit db data found) in 4.x mode." );
