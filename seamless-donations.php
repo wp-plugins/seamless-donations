@@ -3,7 +3,7 @@
 Plugin Name: Seamless Donations
 Plugin URI: http://zatzlabs.com/seamless-donations/
 Description: The most popular donations plugin for WordPress
-Version: 4.0.12
+Version: 4.0.13
 Author: David Gewirtz
 Author URI: http://zatzlabs.com/lab-notes/
 Text Domain: seamless-donations
@@ -30,7 +30,7 @@ License: GPL2
 
 function seamless_donations_set_version () {
 
-	update_option ( 'dgx_donate_active_version', '4.0.12' );
+	update_option ( 'dgx_donate_active_version', '4.0.13' );
 }
 
 require_once 'inc/geography.php';
@@ -275,6 +275,7 @@ function seamless_donations_init () {
 
 		// check for any sd4 upgrades
 		seamless_donations_4012_update_indexes();
+		seamless_donations_4013_update_anon();
 	} else {
 		dgx_donate_init_session ();
 		dgx_donate_init_defaults ();

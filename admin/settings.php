@@ -114,6 +114,7 @@ function validate_page_slug_seamless_donations_admin_settings_callback (
 				dgx_donate_debug_log ( 'INDEX CROSS-REFERENCE ATTEMPTED' );
 				seamless_donations_rebuild_donor_index ();
 				seamless_donations_rebuild_funds_index ();
+				seamless_donations_rebuild_donor_anon_flag ();
 				$settings_notice .= ' Cross-reference index rebuild by name complete.';
 				dgx_donate_debug_log('Cross-reference index rebuild by name complete.');
 			}

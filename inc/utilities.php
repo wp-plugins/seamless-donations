@@ -262,10 +262,10 @@ function seamless_donations_rebuild_donor_index () {
 	);
 	$posts_array = get_posts ( $args );
 
-	// loop through a list of funds
+	// loop through a list of donors
 	for( $i = 0; $i < count ( $posts_array ); ++ $i ) {
 
-		// extract the fund id from the donation and fund records
+		// extract the donor id from the donation and fund records
 		$donor_id = $posts_array[ $i ]->ID;
 		delete_post_meta ( $donor_id, '_dgx_donate_donor_donations' );
 		delete_post_meta ( $donor_id, '_dgx_donate_donor_total' );
@@ -306,6 +306,57 @@ function seamless_donations_rebuild_donor_index () {
 
 			// update the donation total for the donor
 			seamless_donations_add_donation_amount_to_donor_total ( $donation_id, $donor_id );
+		}
+	}
+}
+
+function seamless_donations_rebuild_donor_anon_flag () {
+
+	// first clear out the donations meta items
+	$args        = array(
+			'post_type'   => 'donor',
+			'post_status' => 'publish',
+			'nopaging'    => 'true',
+	);
+	$posts_array = get_posts ( $args );
+
+	// loop through a list of donors
+	for( $i = 0; $i < count ( $posts_array ); ++ $i ) {
+
+		// set all donors to anonymous = no
+		$donor_id = $posts_array[ $i ]->ID;
+		update_post_meta ( $donor_id, '_dgx_donate_anonymous', 'no' );
+	}
+
+	// then loop through the donations
+
+	$args = array(
+			'post_type'   => 'donation',
+			'post_status' => 'publish',
+			'nopaging'    => 'true',
+	);
+
+	$posts_array = get_posts ( $args );
+
+	// loop through a list of donations
+	for( $i = 0; $i < count ( $posts_array ); ++ $i ) {
+
+		// extract the donor id from the donation and donor records
+		$donation_id = $posts_array[ $i ]->ID;
+		$first       = get_post_meta ( $donation_id, '_dgx_donate_donor_first_name', true );
+		$last        = get_post_meta ( $donation_id, '_dgx_donate_donor_last_name', true );
+		$anon        = get_post_meta ( $donation_id, '_dgx_donate_anonymous', true );
+
+		// now move that data into a donor post type
+		$donor_name = sanitize_text_field ( $first . ' ' . $last );
+
+		if( $anon == 'on' ) {
+			// this code, like in funds, assumes the names haven't been changed.
+			// todo need additional code to go in and reconstruct ids based on possible new names
+			$donor    = get_page_by_title ( $donor_name, 'OBJECT', 'donor' );
+			$donor_id = $donor->ID;
+
+			update_post_meta ( $donor_id, '_dgx_donate_anonymous', 'yes' );
 		}
 	}
 }

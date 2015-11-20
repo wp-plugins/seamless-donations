@@ -29,6 +29,23 @@ function seamless_donations_4012_update_indexes () {
 	}
 }
 
+// for 4.0.13 add anonymous flag to donors
+function seamless_donations_4013_update_anon () {
+
+	// prior to 4.0.13, donor records did not save anonymous requests
+	// now, if any donation requests anonymity, the donor is marked anon
+
+	$anon_updated = get_option ( 'dgx_donate_4013_anon_updated' );
+
+	if( ! $anon_updated ) {
+
+		seamless_donations_rebuild_donor_anon_flag ();
+
+		$plugin_version = 'sd4013';
+		update_option ( 'dgx_donate_4013_anon_updated', $plugin_version );
+	}
+}
+
 // tell users that there is a new version and that they need to update
 function seamless_donations_sd40_update_alert_message () {
 

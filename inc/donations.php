@@ -91,6 +91,10 @@ function seamless_donations_create_donation_from_transaction_audit_table ( $tran
 	if( $zip !== false ) {
 		update_post_meta ( $donor_id, '_dgx_donate_donor_zip', $zip );
 	}
+	$anon = get_post_meta ( $donation_id, '_dgx_donate_anonymous', true );
+	if( $anon == 'on' ) {
+		update_post_meta ( $donor_id, '_dgx_donate_anonymous', 'yes' );
+	}
 
 	return $donation_id;
 }
