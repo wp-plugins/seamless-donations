@@ -44,7 +44,12 @@ Visit [Seamless Donation's comprehensive documentation and video tutorial sectio
 
 = Plugins and Extensions =
 
-Seamless Donations supports [compatible free plugins including CAPTCHA, export, and mail integration, plus premium add-ons and extensions](http://zatzlabs.com/project/seamless-donations-plugins-and-extensions/) that can help you get the most out of your fund-raising efforts.
+Seamless Donations supports [compatible free plugins including CAPTCHA, export, and mail integration, plus premium add-ons and extensions](http://zatzlabs.com/project/seamless-donations-plugins-and-extensions/) that can help you get the most out of your fund-raising efforts. New premium add-ons include:
+
+* [Giving Level Manager](http://zatzlabs.com/project/seamless-donations-giving-level-manager/)
+* [Basic Widget Pack](http://zatzlabs.com/project/seamless-donations-basic-widget-pack/)
+* [Thank You Enhanced](http://zatzlabs.com/project/seamless-donations-thank-you-enhanced/)
+* [Delete Monster](http://zatzlabs.com/project/seamless-donations-delete-monster/)
 
 = Fight Back Against Spam =
 
